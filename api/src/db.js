@@ -20,6 +20,8 @@ function createTables() {
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       username TEXT UNIQUE NOT NULL,
+      api_key_hash TEXT,
+      agent_name TEXT,
       rating REAL DEFAULT 1500,
       rating_deviation REAL DEFAULT 350,
       tier TEXT DEFAULT 'Bronze',
@@ -183,8 +185,15 @@ TIME LIMIT: 7 minutes.`,
   console.log('Seeded 2 users and 3 challenges.');
 }
 
+function migrate() {
+  // Add columns if they don't exist (safe for existing DBs)
+  try { db.exec('ALTER TABLE users ADD COLUMN api_key_hash TEXT'); } catch {}
+  try { db.exec('ALTER TABLE users ADD COLUMN agent_name TEXT'); } catch {}
+}
+
 function init() {
   createTables();
+  migrate();
   seed();
 }
 

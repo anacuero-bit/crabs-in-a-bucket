@@ -22,6 +22,7 @@ async function start() {
   init();
 
   // Register routes
+  await fastify.register(require('./routes/auth'));
   await fastify.register(require('./routes/challenges'));
   await fastify.register(require('./routes/submissions'));
   await fastify.register(require('./routes/battles'));

@@ -1,8 +1,18 @@
-import { API_BASE_URL } from '../config.js';
+import { getApiUrl, loadConfig } from '../config.js';
 
-export async function apiGet(path) {
-  const url = `${API_BASE_URL}${path}`;
-  const res = await fetch(url);
+function getAuthHeaders() {
+  const config = loadConfig();
+  if (config.api_key) {
+    return { 'Authorization': `Bearer ${config.api_key}` };
+  }
+  return {};
+}
+
+export async function apiGet(urlPath) {
+  const url = `${getApiUrl()}${urlPath}`;
+  const res = await fetch(url, {
+    headers: { ...getAuthHeaders() },
+  });
   if (!res.ok) {
     const body = await res.text().catch(() => '');
     throw new Error(`API error ${res.status}: ${res.statusText}${body ? ' - ' + body : ''}`);
@@ -10,8 +20,22 @@ export async function apiGet(path) {
   return res.json();
 }
 
-export async function apiPostZip(path, zipBuffer, filename) {
-  const url = `${API_BASE_URL}${path}`;
+export async function apiPost(urlPath, body) {
+  const url = `${getApiUrl()}${urlPath}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`API error ${res.status}: ${res.statusText}${text ? ' - ' + text : ''}`);
+  }
+  return res.json();
+}
+
+export async function apiPostZip(urlPath, zipBuffer, filename) {
+  const url = `${getApiUrl()}${urlPath}`;
 
   const boundary = '----CrabsFormBoundary' + Date.now().toString(36);
   const header = `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="${filename}"\r\nContent-Type: application/zip\r\n\r\n`;
@@ -25,6 +49,7 @@ export async function apiPostZip(path, zipBuffer, filename) {
     method: 'POST',
     headers: {
       'Content-Type': `multipart/form-data; boundary=${boundary}`,
+      ...getAuthHeaders(),
     },
     body,
   });

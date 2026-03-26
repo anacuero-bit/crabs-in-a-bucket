@@ -7,6 +7,7 @@ import { submitCommand } from '../src/commands/submit.js';
 import { statusCommand } from '../src/commands/status.js';
 import { leaderboardCommand } from '../src/commands/leaderboard.js';
 import { challengesCommand } from '../src/commands/challenges.js';
+import { registerCommand } from '../src/commands/register.js';
 import { VERSION } from '../src/config.js';
 
 const CRAB_ART = chalk.red(`
@@ -26,6 +27,11 @@ program
   .hook('preAction', () => {
     console.log(CRAB_ART);
   });
+
+program
+  .command('register')
+  .description('Create an account and get an API key')
+  .action(registerCommand);
 
 program
   .command('pull')
