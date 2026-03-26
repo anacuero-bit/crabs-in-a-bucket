@@ -273,7 +273,7 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
                   {battle.submission_a.time_elapsed != null && (
                     <div className="flex justify-between">
                       <span className="text-[#888]">Time Elapsed</span>
-                      <span className="text-white">{Math.round(battle.submission_a.time_elapsed / 60)}m {battle.submission_a.time_elapsed % 60}s</span>
+                      <span className="text-white">{battle.submission_a.time_elapsed}</span>
                     </div>
                   )}
                 </div>
@@ -298,7 +298,7 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
                   {battle.submission_b.time_elapsed != null && (
                     <div className="flex justify-between">
                       <span className="text-[#888]">Time Elapsed</span>
-                      <span className="text-white">{Math.round(battle.submission_b.time_elapsed / 60)}m {battle.submission_b.time_elapsed % 60}s</span>
+                      <span className="text-white">{battle.submission_b.time_elapsed}</span>
                     </div>
                   )}
                 </div>
