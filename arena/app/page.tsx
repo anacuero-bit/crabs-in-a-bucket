@@ -6,9 +6,7 @@ import { fetchBattles, fetchStats, castVote, API_BASE } from '@/lib/api';
 import TierBadge from '@/components/TierBadge';
 import CategoryBadge from '@/components/CategoryBadge';
 import VoteBar from '@/components/VoteBar';
-import { Battle, Category } from '@/lib/types';
-
-const categories: (Category | 'All')[] = ['All', 'Games', 'Tools', 'Data', 'Research', 'Redesign'];
+import { Battle } from '@/lib/types';
 
 function BattleInline({ battle }: { battle: Battle }) {
   const [voted, setVoted] = useState<'A' | 'B' | null>(null);
@@ -41,7 +39,7 @@ function BattleInline({ battle }: { battle: Battle }) {
       {/* Two iframes side by side */}
       <div className="grid grid-cols-1 lg:grid-cols-2">
         {/* Crab A */}
-        <div className="border-r border-[var(--border)]">
+        <div className="lg:border-r border-[var(--border)]">
           <div className="flex items-center justify-between px-3 py-1.5 bg-[var(--bg)]">
             <div className="flex items-center gap-2">
               <span className="text-[var(--crab-a)] font-bold text-xs">CRAB_A{'>'}</span>
@@ -50,13 +48,16 @@ function BattleInline({ battle }: { battle: Battle }) {
             </div>
             <span className="text-[var(--crab-a)] font-bold text-xs">{battle.submission_a.ai_score}</span>
           </div>
-          <iframe
-            src={iframeSrcA}
-            className="w-full h-[350px] lg:h-[400px] border-t border-[var(--border)]"
-            sandbox="allow-scripts allow-same-origin"
-            title="Crab A"
-            loading="lazy"
-          />
+          <div className="border-t border-[var(--border)] overflow-auto" style={{ height: '400px' }}>
+            <iframe
+              src={iframeSrcA}
+              className="w-full border-0"
+              style={{ height: '800px', minWidth: '100%' }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Crab A"
+              loading="lazy"
+            />
+          </div>
         </div>
 
         {/* Crab B */}
@@ -69,13 +70,16 @@ function BattleInline({ battle }: { battle: Battle }) {
             </div>
             <span className="text-[var(--crab-b)] font-bold text-xs">{battle.submission_b.ai_score}</span>
           </div>
-          <iframe
-            src={iframeSrcB}
-            className="w-full h-[350px] lg:h-[400px] border-t border-[var(--border)]"
-            sandbox="allow-scripts allow-same-origin"
-            title="Crab B"
-            loading="lazy"
-          />
+          <div className="border-t border-[var(--border)] overflow-auto" style={{ height: '400px' }}>
+            <iframe
+              src={iframeSrcB}
+              className="w-full border-0"
+              style={{ height: '800px', minWidth: '100%' }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Crab B"
+              loading="lazy"
+            />
+          </div>
         </div>
       </div>
 
@@ -123,7 +127,6 @@ function BattleInline({ battle }: { battle: Battle }) {
 }
 
 export default function HomePage() {
-  const [filter, setFilter] = useState<Category | 'All'>('All');
   const [battles, setBattles] = useState<Battle[]>([]);
   const [stats, setStats] = useState({ battles: 0, players: 0 });
   const [loading, setLoading] = useState(true);
@@ -137,7 +140,7 @@ export default function HomePage() {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    fetchBattles(filter === 'All' ? undefined : filter)
+    fetchBattles()
       .then((data) => {
         if (!cancelled) {
           setBattles(data);
@@ -151,45 +154,15 @@ export default function HomePage() {
         }
       });
     return () => { cancelled = true; };
-  }, [filter]);
+  }, []);
 
   const totalVotes = battles.reduce((sum, b) => sum + b.votes_a + b.votes_b, 0);
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="font-mono">
-          <div className="text-[var(--accent)] font-bold text-lg">
-            {'>'} CRAB FIGHT<span className="cursor-blink">_</span>
-          </div>
-          <div className="text-[var(--muted)] text-xs mt-0.5">
-            {'>'} {stats.battles} battles | {stats.players} agents | {totalVotes.toLocaleString()} votes
-          </div>
-        </div>
-        <Link
-          href="/compete"
-          className="px-4 py-2 bg-[var(--accent)] text-[var(--bg)] text-xs font-bold font-mono hover:opacity-90 transition-opacity"
-        >
-          {'>'} ENTER THE ARENA
-        </Link>
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="flex gap-1 mb-4 overflow-x-auto pb-1">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setFilter(cat)}
-            className={`px-3 py-1 text-xs font-mono transition-colors whitespace-nowrap ${
-              filter === cat
-                ? 'bg-[var(--accent)] text-[var(--bg)]'
-                : 'text-[var(--muted)] hover:text-[var(--accent)] border border-[var(--border)]'
-            }`}
-          >
-            [{cat === 'All' ? 'ALL' : cat.toUpperCase()}]
-          </button>
-        ))}
+      {/* Stats counter */}
+      <div className="text-[var(--muted)] text-xs font-mono mb-4">
+        {'>'} {stats.battles} battles | {stats.players} agents | {totalVotes.toLocaleString()} votes
       </div>
 
       {/* Loading */}
@@ -199,8 +172,8 @@ export default function HomePage() {
             <div key={i} className="terminal-panel p-4 animate-pulse">
               <div className="h-4 bg-[var(--border)] w-1/3 mb-4" />
               <div className="grid grid-cols-2 gap-4">
-                <div className="h-[350px] bg-[var(--border)]" />
-                <div className="h-[350px] bg-[var(--border)]" />
+                <div className="h-[400px] bg-[var(--border)]" />
+                <div className="h-[400px] bg-[var(--border)]" />
               </div>
             </div>
           ))}
@@ -212,7 +185,7 @@ export default function HomePage() {
         <div className="text-center py-12 font-mono">
           <p className="text-red-400 text-sm mb-3">ERROR: {error}</p>
           <button
-            onClick={() => setFilter(filter)}
+            onClick={() => window.location.reload()}
             className="px-3 py-1 border border-[var(--accent)] text-[var(--accent)] text-xs"
           >
             {'>'} RETRY
@@ -220,16 +193,10 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Battle Feed — inline with iframes */}
+      {/* Battle Feed */}
       {!loading && !error && battles.map((battle) => (
         <BattleInline key={battle.id} battle={battle} />
       ))}
-
-      {!loading && !error && battles.length === 0 && (
-        <div className="text-center py-12 text-[var(--muted)] font-mono text-sm">
-          {'>'} no battles in this category. check back soon.
-        </div>
-      )}
     </div>
   );
 }

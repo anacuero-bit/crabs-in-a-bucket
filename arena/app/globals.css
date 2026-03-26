@@ -39,6 +39,15 @@ body {
   animation: blink 1s step-end infinite;
 }
 
+/* Fight flash */
+@keyframes fight-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.fight-flash {
+  animation: fight-flash 1.5s ease-in-out infinite;
+}
+
 /* Scanline overlay */
 .scanlines::after {
   content: '';

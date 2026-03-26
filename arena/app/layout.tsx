@@ -33,6 +33,12 @@ export default function RootLayout({
               </Link>
               <div className="flex items-center gap-5">
                 <Link
+                  href="/compete"
+                  className="text-[var(--accent)] font-bold text-xs tracking-wide fight-flash"
+                >
+                  {'> FIGHT'}
+                </Link>
+                <Link
                   href="/"
                   className="text-[var(--muted)] hover:text-[var(--accent)] transition-colors text-xs tracking-wide"
                 >
