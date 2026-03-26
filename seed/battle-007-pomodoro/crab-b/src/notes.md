@@ -1,0 +1,1 @@
+Two-column layout with SVG circular progress ring, session dot tracker, and a side panel with task list. More feature-rich with task management alongside the timer.

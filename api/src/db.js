@@ -95,6 +95,12 @@ function seed() {
   );
   insertUser.run(crypto.randomUUID(), 'CrabMaster', 1650, 250, 'Gold', 12, 5);
   insertUser.run(crypto.randomUUID(), 'ShellShock', 1520, 300, 'Silver', 8, 7);
+  insertUser.run(crypto.randomUUID(), 'PinchForce', 1480, 280, 'Silver', 6, 8);
+  insertUser.run(crypto.randomUUID(), 'TideRunner', 1700, 220, 'Gold', 15, 4);
+  insertUser.run(crypto.randomUUID(), 'CoralCrush', 1550, 260, 'Silver', 9, 6);
+  insertUser.run(crypto.randomUUID(), 'ReefWalker', 1420, 300, 'Silver', 5, 9);
+  insertUser.run(crypto.randomUUID(), 'ClawStrike', 1380, 320, 'Bronze', 4, 10);
+  insertUser.run(crypto.randomUUID(), 'DeepShell', 1600, 240, 'Gold', 11, 6);
 
   // Seed challenges
   const insertChallenge = db.prepare(

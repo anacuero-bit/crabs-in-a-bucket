@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SciCalc Pro</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Consolas', 'Monaco', monospace;
+    background: #1a1a1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+  .app {
+    width: 820px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  h1 { font-size: 1.3rem; color: #00bcd4; font-weight: 400; }
+  .mode-toggle {
+    display: flex;
+    background: #2a2a2a;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .mode-btn {
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    color: #888;
+    font-family: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .mode-btn.active { background: #00bcd4; color: #000; }
+  .main-area {
+    display: flex;
+    gap: 16px;
+  }
+  .calc-panel {
+    flex: 1;
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .display-box {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    text-align: right;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .stack-display {
+    font-size: 0.75rem;
+    color: #666;
+    max-height: 60px;
+    overflow-y: auto;
+  }
+  .stack-display div { padding: 1px 0; }
+  .stack-display .lbl { color: #00bcd4; display: inline-block; width: 24px; }
+  .main-val {
+    font-size: 2rem;
+    color: #fff;
+    word-break: break-all;
+  }
+  .sub-val { font-size: 0.8rem; color: #555; }
+  .keys {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+  .k {
+    padding: 12px 4px;
+    border: 1px solid #333;
+    border-radius: 6px;
+    background: #2a2a2a;
+    color: #ccc;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.1s;
+  }
+  .k:hover { background: #3a3a3a; }
+  .k:active { background: #444; }
+  .k.num { background: #333; color: #fff; }
+  .k.op { background: #004d5a; color: #00bcd4; }
+  .k.fn { background: #2a2a2a; color: #aaa; font-size: 0.75rem; }
+  .k.act { background: #00bcd4; color: #000; font-weight: bold; }
+  .k.wide { grid-column: span 2; }
+  .graph-panel {
+    width: 340px;
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 16px;
+    display: none;
+  }
+  .graph-panel.show { display: block; }
+  .graph-panel h3 {
+    font-size: 0.75rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .graph-input {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .graph-input input {
+    flex: 1;
+    background: #111;
+    border: 1px solid #333;
+    color: #00bcd4;
+    font-family: inherit;
+    padding: 8px;
+    border-radius: 6px;
+    outline: none;
+    font-size: 0.85rem;
+  }
+  .graph-input button {
+    background: #00bcd4;
+    color: #000;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+  canvas {
+    width: 100%;
+    border: 1px solid #333;
+    border-radius: 6px;
+    background: #111;
+  }
+  .range-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #666;
+  }
+  .range-row input {
+    width: 60px;
+    background: #111;
+    border: 1px solid #333;
+    color: #aaa;
+    font-family: inherit;
+    padding: 4px 6px;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 0.75rem;
+    outline: none;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>SciCalc Pro</h1>
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="modeStd" onclick="setMode('std')">Standard</button>
+      <button class="mode-btn" id="modeRPN" onclick="setMode('rpn')">RPN</button>
+      <button class="mode-btn" id="modeGraph" onclick="toggleGraph()">Graph</button>
+    </div>
+  </div>
+
+  <div class="main-area">
+    <div class="calc-panel">
+      <div class="display-box">
+        <div class="stack-display" id="stackDisp"></div>
+        <div class="sub-val" id="subDisp"></div>
+        <div class="main-val" id="mainDisp">0</div>
+      </div>
+      <div class="keys" id="keypad"></div>
+    </div>
+
+    <div class="graph-panel" id="graphPanel">
+      <h3>Function Plotter</h3>
+      <div class="graph-input">
+        <input type="text" id="fnInput" placeholder="e.g. sin(x), x^2, log(x)" value="sin(x)">
+        <button onclick="plotGraph()">Plot</button>
+      </div>
+      <canvas id="graphCanvas" width="600" height="400"></canvas>
+      <div class="range-row">
+        <span>x:</span>
+        <input type="number" id="xMin" value="-10">
+        <span>to</span>
+        <input type="number" id="xMax" value="10">
+        <span>y:</span>
+        <input type="number" id="yMin" value="-5">
+        <span>to</span>
+        <input type="number" id="yMax" value="5">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let mode = 'std'; // 'std' or 'rpn'
+let current = '0';
+let expression = '';
+let freshResult = false;
+let rpnStack = [];
+let entering = true;
+
+const stdKeys = [
+  {l:'sin',t:'fn',a:'sci_sin'},{l:'cos',t:'fn',a:'sci_cos'},{l:'tan',t:'fn',a:'sci_tan'},{l:'log',t:'fn',a:'sci_log'},{l:'ln',t:'fn',a:'sci_ln'},
+  {l:'\u221A',t:'fn',a:'sci_sqrt'},{l:'x\u00B2',t:'fn',a:'sci_sq'},{l:'\u03C0',t:'fn',a:'pi'},{l:'e',t:'fn',a:'euler'},{l:'x^y',t:'fn',a:'pow'},
+  {l:'AC',t:'op',a:'clear'},{l:'+/-',t:'op',a:'neg'},{l:'%',t:'op',a:'pct'},{l:'(',t:'fn',a:'lp'},{l:'\u00F7',t:'op',a:'/'},
+  {l:'7',t:'num',a:'7'},{l:'8',t:'num',a:'8'},{l:'9',t:'num',a:'9'},{l:')',t:'fn',a:'rp'},{l:'\u00D7',t:'op',a:'*'},
+  {l:'4',t:'num',a:'4'},{l:'5',t:'num',a:'5'},{l:'6',t:'num',a:'6'},{l:'\u232B',t:'fn',a:'bksp'},{l:'\u2212',t:'op',a:'-'},
+  {l:'1',t:'num',a:'1'},{l:'2',t:'num',a:'2'},{l:'3',t:'num',a:'3'},{l:'.',t:'num',a:'.'},{l:'+',t:'op',a:'+'},
+  {l:'0',t:'num wide',a:'0'},{l:'ANS',t:'fn',a:'ans'},{l:'DEG',t:'fn',a:'deg'},{l:'=',t:'act',a:'eq'},
+];
+
+const rpnKeys = [
+  {l:'sin',t:'fn',a:'sci_sin'},{l:'cos',t:'fn',a:'sci_cos'},{l:'tan',t:'fn',a:'sci_tan'},{l:'log',t:'fn',a:'sci_log'},{l:'ln',t:'fn',a:'sci_ln'},
+  {l:'\u221A',t:'fn',a:'sci_sqrt'},{l:'x\u00B2',t:'fn',a:'sci_sq'},{l:'\u03C0',t:'fn',a:'pi'},{l:'e',t:'fn',a:'euler'},{l:'x^y',t:'fn',a:'pow'},
+  {l:'AC',t:'op',a:'clear'},{l:'SWAP',t:'op',a:'swap'},{l:'DUP',t:'op',a:'dup'},{l:'DROP',t:'op',a:'drop'},{l:'\u00F7',t:'op',a:'/'},
+  {l:'7',t:'num',a:'7'},{l:'8',t:'num',a:'8'},{l:'9',t:'num',a:'9'},{l:'\u232B',t:'fn',a:'bksp'},{l:'\u00D7',t:'op',a:'*'},
+  {l:'4',t:'num',a:'4'},{l:'5',t:'num',a:'5'},{l:'6',t:'num',a:'6'},{l:'+/-',t:'fn',a:'neg'},{l:'\u2212',t:'op',a:'-'},
+  {l:'1',t:'num',a:'1'},{l:'2',t:'num',a:'2'},{l:'3',t:'num',a:'3'},{l:'.',t:'num',a:'.'},{l:'+',t:'op',a:'+'},
+  {l:'0',t:'num wide',a:'0'},{l:'ROT',t:'fn',a:'rot'},{l:'%',t:'fn',a:'pct'},{l:'ENTER',t:'act',a:'enter'},
+];
+
+let lastAnswer = 0;
+let degMode = true;
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('modeStd').classList.toggle('active', m==='std');
+  document.getElementById('modeRPN').classList.toggle('active', m==='rpn');
+  if (m === 'rpn') { rpnStack = []; entering = true; }
+  current = '0'; expression = '';
+  renderKeys();
+  updateDisp();
+}
+
+function toggleGraph() {
+  const p = document.getElementById('graphPanel');
+  const b = document.getElementById('modeGraph');
+  p.classList.toggle('show');
+  b.classList.toggle('active');
+  if (p.classList.contains('show')) plotGraph();
+}
+
+function renderKeys() {
+  const keys = mode === 'rpn' ? rpnKeys : stdKeys;
+  const el = document.getElementById('keypad');
+  el.innerHTML = keys.map(k =>
+    `<button class="k ${k.t}" onclick="press('${k.a}')">${k.l}</button>`
+  ).join('');
+}
+
+function fmt(n) {
+  if (isNaN(n)) return 'Error';
+  if (!isFinite(n)) return 'Inf';
+  const s = parseFloat(n.toPrecision(10)).toString();
+  return s.length > 14 ? n.toExponential(6) : s;
+}
+
+function toRad(v) { return degMode ? v * Math.PI / 180 : v; }
+
+function sciOp(fn, v) {
+  switch(fn) {
+    case 'sci_sin': return Math.sin(toRad(v));
+    case 'sci_cos': return Math.cos(toRad(v));
+    case 'sci_tan': return Math.tan(toRad(v));
+    case 'sci_log': return Math.log10(v);
+    case 'sci_ln': return Math.log(v);
+    case 'sci_sqrt': return Math.sqrt(v);
+    case 'sci_sq': return v * v;
+  }
+}
+
+function updateDisp() {
+  const main = document.getElementById('mainDisp');
+  const sub = document.getElementById('subDisp');
+  const stack = document.getElementById('stackDisp');
+
+  if (mode === 'rpn') {
+    main.textContent = current;
+    sub.textContent = 'RPN Mode' + (degMode ? ' | DEG' : ' | RAD');
+    stack.innerHTML = rpnStack.map((v, i) =>
+      `<div><span class="lbl">${rpnStack.length - i}:</span> ${fmt(v)}</div>`
+    ).reverse().join('');
+  } else {
+    main.textContent = current;
+    sub.textContent = expression + (degMode ? '  [DEG]' : '  [RAD]');
+    stack.innerHTML = '';
+  }
+}
+
+function press(a) {
+  if (mode === 'rpn') pressRPN(a);
+  else pressStd(a);
+}
+
+function pressStd(a) {
+  if ('0123456789'.includes(a)) {
+    if (freshResult) { current = ''; expression = ''; freshResult = false; }
+    current = (current === '0') ? a : current + a;
+  } else if (a === '.') {
+    if (freshResult) { current = '0'; expression = ''; freshResult = false; }
+    if (!current.includes('.')) current += '.';
+  } else if ('+-*/'.includes(a)) {
+    if (freshResult) { expression = current + ' ' + a + ' '; current = ''; freshResult = false; }
+    else { expression += current + ' ' + a + ' '; current = ''; }
+  } else if (a === 'eq') {
+    let full = expression + current;
+    full = full.replace(/\^/g, '**');
+    try {
+      const r = Function('"use strict";return(' + full + ')')();
+      lastAnswer = r;
+      expression = expression + current + ' =';
+      current = fmt(r);
+      freshResult = true;
+    } catch(e) { current = 'Error'; }
+  } else if (a === 'clear') { current = '0'; expression = ''; freshResult = false; }
+  else if (a === 'bksp') { current = current.length > 1 ? current.slice(0,-1) : '0'; }
+  else if (a === 'neg') { current = current.startsWith('-') ? current.slice(1) : '-' + current; }
+  else if (a === 'pct') { current = fmt(parseFloat(current) / 100); }
+  else if (a === 'pi') { current = Math.PI.toString().slice(0,12); if(freshResult) { expression=''; freshResult=false;} }
+  else if (a === 'euler') { current = Math.E.toString().slice(0,12); if(freshResult) { expression=''; freshResult=false;} }
+  else if (a === 'lp') { expression += '('; }
+  else if (a === 'rp') { expression += current + ')'; current = ''; }
+  else if (a === 'pow') { expression += current + '^'; current = ''; freshResult = false; }
+  else if (a === 'ans') { current = fmt(lastAnswer); }
+  else if (a === 'deg') { degMode = !degMode; }
+  else if (a.startsWith('sci_')) {
+    const v = parseFloat(current);
+    const r = sciOp(a, v);
+    expression += a.replace('sci_','') + '(' + current + ')';
+    current = fmt(r);
+    freshResult = true;
+  }
+  updateDisp();
+}
+
+function pressRPN(a) {
+  if ('0123456789'.includes(a)) {
+    if (!entering) { rpnStack.push(parseFloat(current) || 0); current = ''; entering = true; }
+    current = (current === '0') ? a : current + a;
+  } else if (a === '.') {
+    if (!entering) { rpnStack.push(parseFloat(current) || 0); current = '0'; entering = true; }
+    if (!current.includes('.')) current += '.';
+  } else if (a === 'enter') {
+    rpnStack.push(parseFloat(current) || 0);
+    current = '0';
+    entering = true;
+  } else if ('+-*/'.includes(a)) {
+    if (entering && current !== '0') rpnStack.push(parseFloat(current) || 0);
+    if (rpnStack.length < 2) { current = 'Need 2'; updateDisp(); return; }
+    const b = rpnStack.pop(), aa = rpnStack.pop();
+    let r;
+    switch(a) { case '+': r=aa+b; break; case '-': r=aa-b; break; case '*': r=aa*b; break; case '/': r=b===0?NaN:aa/b; break; }
+    current = fmt(r);
+    entering = false;
+  } else if (a === 'clear') { rpnStack = []; current = '0'; entering = true; }
+  else if (a === 'bksp') { current = current.length > 1 ? current.slice(0,-1) : '0'; }
+  else if (a === 'neg') { current = current.startsWith('-') ? current.slice(1) : '-' + current; }
+  else if (a === 'swap') {
+    if (entering && current !== '0') rpnStack.push(parseFloat(current) || 0);
+    if (rpnStack.length >= 2) { const a = rpnStack.pop(), b = rpnStack.pop(); rpnStack.push(a, b); }
+    current = fmt(rpnStack.pop() || 0); entering = false;
+  }
+  else if (a === 'dup') {
+    if (entering && current !== '0') rpnStack.push(parseFloat(current) || 0);
+    if (rpnStack.length >= 1) rpnStack.push(rpnStack[rpnStack.length-1]);
+    current = fmt(rpnStack[rpnStack.length-1] || 0); entering = false;
+  }
+  else if (a === 'drop') {
+    if (rpnStack.length > 0) rpnStack.pop();
+    current = rpnStack.length > 0 ? fmt(rpnStack[rpnStack.length-1]) : '0';
+    entering = false;
+  }
+  else if (a === 'rot') {
+    if (entering && current !== '0') rpnStack.push(parseFloat(current) || 0);
+    if (rpnStack.length >= 3) { const c=rpnStack.splice(-3,1)[0]; rpnStack.push(c); }
+    current = fmt(rpnStack[rpnStack.length-1] || 0); entering = false;
+  }
+  else if (a === 'pi') { current = Math.PI.toString().slice(0,12); entering = true; }
+  else if (a === 'euler') { current = Math.E.toString().slice(0,12); entering = true; }
+  else if (a === 'pct') { current = fmt(parseFloat(current)/100); }
+  else if (a === 'pow') {
+    if (entering && current !== '0') rpnStack.push(parseFloat(current) || 0);
+    if (rpnStack.length < 2) { current = 'Need 2'; updateDisp(); return; }
+    const exp = rpnStack.pop(), base = rpnStack.pop();
+    current = fmt(Math.pow(base, exp));
+    entering = false;
+  }
+  else if (a.startsWith('sci_')) {
+    const v = parseFloat(current);
+    current = fmt(sciOp(a, v));
+    entering = false;
+  }
+  else if (a === 'deg') { degMode = !degMode; }
+  updateDisp();
+}
+
+function plotGraph() {
+  const canvas = document.getElementById('graphCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  const xMin = parseFloat(document.getElementById('xMin').value) || -10;
+  const xMax = parseFloat(document.getElementById('xMax').value) || 10;
+  const yMin = parseFloat(document.getElementById('yMin').value) || -5;
+  const yMax = parseFloat(document.getElementById('yMax').value) || 5;
+  const fnStr = document.getElementById('fnInput').value;
+
+  ctx.fillStyle = '#111';
+  ctx.fillRect(0, 0, w, h);
+
+  // Grid
+  ctx.strokeStyle = '#2a2a2a';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 10; i++) {
+    const x = (i / 10) * w;
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+    const y = (i / 10) * h;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+  }
+
+  // Axes
+  const zeroX = ((0 - xMin) / (xMax - xMin)) * w;
+  const zeroY = ((yMax - 0) / (yMax - yMin)) * h;
+  ctx.strokeStyle = '#444';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(zeroX, 0); ctx.lineTo(zeroX, h); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, zeroY); ctx.lineTo(w, zeroY); ctx.stroke();
+
+  // Axis labels
+  ctx.fillStyle = '#555';
+  ctx.font = '11px Consolas, monospace';
+  ctx.fillText(xMin.toString(), 4, zeroY - 4);
+  ctx.fillText(xMax.toString(), w - 30, zeroY - 4);
+  ctx.fillText(yMax.toString(), zeroX + 4, 14);
+  ctx.fillText(yMin.toString(), zeroX + 4, h - 4);
+
+  // Prepare function
+  let fn;
+  try {
+    const safe = fnStr
+      .replace(/sin/g, 'Math.sin')
+      .replace(/cos/g, 'Math.cos')
+      .replace(/tan/g, 'Math.tan')
+      .replace(/log/g, 'Math.log10')
+      .replace(/ln/g, 'Math.log')
+      .replace(/sqrt/g, 'Math.sqrt')
+      .replace(/abs/g, 'Math.abs')
+      .replace(/\^/g, '**')
+      .replace(/pi/g, 'Math.PI')
+      .replace(/e(?![a-z])/g, 'Math.E');
+    fn = new Function('x', '"use strict"; return ' + safe);
+  } catch(e) { return; }
+
+  // Plot
+  ctx.strokeStyle = '#00bcd4';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  let started = false;
+
+  for (let px = 0; px < w; px++) {
+    const x = xMin + (px / w) * (xMax - xMin);
+    let y;
+    try { y = fn(x); } catch(e) { started = false; continue; }
+    if (!isFinite(y) || isNaN(y)) { started = false; continue; }
+
+    const py = ((yMax - y) / (yMax - yMin)) * h;
+    if (py < -100 || py > h + 100) { started = false; continue; }
+
+    if (!started) { ctx.moveTo(px, py); started = true; }
+    else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+
+  // Label
+  ctx.fillStyle = '#00bcd4';
+  ctx.font = '13px Consolas, monospace';
+  ctx.fillText('f(x) = ' + fnStr, 10, 20);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key >= '0' && e.key <= '9') press(e.key);
+  else if (e.key === '.') press('.');
+  else if (e.key === '+') press('+');
+  else if (e.key === '-') press('-');
+  else if (e.key === '*') press('*');
+  else if (e.key === '/') { e.preventDefault(); press('/'); }
+  else if (e.key === 'Enter') press(mode === 'rpn' ? 'enter' : 'eq');
+  else if (e.key === 'Escape') press('clear');
+  else if (e.key === 'Backspace') press('bksp');
+});
+
+renderKeys();
+updateDisp();
+</script>
+</body>
+</html>

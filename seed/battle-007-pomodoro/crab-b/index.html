@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pomodoro Focus</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: linear-gradient(135deg, #0f0c29, #1a1a3e, #24243e);
+    color: #e0e0e0;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .app {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 24px;
+    max-width: 720px;
+    width: 100%;
+  }
+  @media (max-width: 640px) {
+    .app { grid-template-columns: 1fr; }
+  }
+
+  .main-panel { text-align: center; }
+
+  /* Mode selector */
+  .modes {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+  .mode-btn {
+    padding: 8px 18px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.03);
+    color: #888;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+  .mode-btn.active {
+    background: #ff6b6b;
+    border-color: #ff6b6b;
+    color: #fff;
+    font-weight: 600;
+  }
+  .mode-btn.active.is-break {
+    background: #51cf66;
+    border-color: #51cf66;
+  }
+
+  /* Circular timer */
+  .timer-ring-wrap {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    margin: 0 auto 28px;
+  }
+  .timer-ring-wrap svg {
+    transform: rotate(-90deg);
+    width: 260px;
+    height: 260px;
+  }
+  .ring-bg {
+    fill: none;
+    stroke: rgba(255,255,255,0.06);
+    stroke-width: 8;
+  }
+  .ring-progress {
+    fill: none;
+    stroke: #ff6b6b;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s linear, stroke 0.3s;
+  }
+  .ring-progress.is-break { stroke: #51cf66; }
+  .timer-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .timer-time {
+    font-size: 3.5rem;
+    font-weight: 300;
+    letter-spacing: 3px;
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+  }
+  .timer-label {
+    font-size: 0.8rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 4px;
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .btn {
+    padding: 12px 32px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-primary {
+    background: #ff6b6b;
+    color: #fff;
+    min-width: 130px;
+  }
+  .btn-primary:hover { background: #ee5a5a; transform: translateY(-1px); }
+  .btn-primary.is-break { background: #51cf66; }
+  .btn-primary.is-break:hover { background: #40c057; }
+  .btn-primary.paused { background: #ffd43b; color: #333; }
+  .btn-secondary {
+    background: rgba(255,255,255,0.06);
+    color: #888;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.1); color: #ccc; }
+  .btn-icon {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 10px;
+    font-size: 1.2rem;
+  }
+
+  /* Session counter */
+  .sessions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  .session-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.3s;
+  }
+  .session-dot.filled {
+    background: #ff6b6b;
+    border-color: #ff6b6b;
+    box-shadow: 0 0 8px rgba(255,107,107,0.4);
+  }
+  .session-info {
+    font-size: 0.75rem;
+    color: #555;
+    margin-bottom: 0;
+  }
+
+  /* Side panel: Tasks */
+  .side-panel {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  .side-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #555;
+    margin-bottom: 16px;
+  }
+  .task-input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .task-input {
+    flex: 1;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    color: #ccc;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .task-input:focus { border-color: rgba(255,107,107,0.4); }
+  .task-input::placeholder { color: #444; }
+  .add-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,107,107,0.15);
+    color: #ff6b6b;
+    border-radius: 10px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .add-btn:hover { background: rgba(255,107,107,0.25); }
+  .task-list {
+    list-style: none;
+    flex: 1;
+    overflow-y: auto;
+    max-height: 300px;
+  }
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    transition: opacity 0.2s;
+  }
+  .task-item.done { opacity: 0.4; }
+  .task-item.done .task-text { text-decoration: line-through; }
+  .task-check {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #444;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: transparent;
+  }
+  .task-item.done .task-check {
+    background: #ff6b6b;
+    border-color: #ff6b6b;
+    color: #fff;
+  }
+  .task-text {
+    flex: 1;
+    font-size: 0.85rem;
+    color: #bbb;
+  }
+  .task-del {
+    background: none;
+    border: none;
+    color: #444;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 2px;
+    transition: color 0.15s;
+  }
+  .task-del:hover { color: #e74c3c; }
+
+  /* Duration settings */
+  .duration-settings {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .dur-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+    color: #777;
+  }
+  .dur-row:last-child { margin-bottom: 0; }
+  .dur-adj {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dur-btn {
+    width: 24px;
+    height: 24px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    color: #888;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .dur-btn:hover { background: rgba(255,255,255,0.1); color: #ccc; }
+  .dur-val {
+    min-width: 28px;
+    text-align: center;
+    font-weight: 600;
+    color: #ccc;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="main-panel">
+    <div class="modes">
+      <button class="mode-btn active" data-mode="work" onclick="setMode('work')">Focus</button>
+      <button class="mode-btn" data-mode="short" onclick="setMode('short')">Short Break</button>
+      <button class="mode-btn" data-mode="long" onclick="setMode('long')">Long Break</button>
+    </div>
+
+    <div class="timer-ring-wrap">
+      <svg viewBox="0 0 260 260">
+        <circle class="ring-bg" cx="130" cy="130" r="115"/>
+        <circle class="ring-progress" id="ringProgress" cx="130" cy="130" r="115"
+          stroke-dasharray="722.57" stroke-dashoffset="0"/>
+      </svg>
+      <div class="timer-center">
+        <div class="timer-time" id="timerTime">25:00</div>
+        <div class="timer-label" id="timerLabel">focus</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="startBtn" onclick="toggle()">Start</button>
+      <button class="btn btn-secondary btn-icon" onclick="reset()" title="Reset">&#x21bb;</button>
+    </div>
+
+    <div class="sessions" id="sessionDots"></div>
+    <div class="session-info" id="sessionInfo">0 of 4 sessions</div>
+  </div>
+
+  <div class="side-panel">
+    <div class="side-title">Tasks</div>
+    <div class="task-input-row">
+      <input class="task-input" id="taskInput" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTask()">
+      <button class="add-btn" onclick="addTask()">+</button>
+    </div>
+    <ul class="task-list" id="taskList"></ul>
+
+    <div class="duration-settings">
+      <div class="side-title" style="margin-bottom:10px">Durations</div>
+      <div class="dur-row">
+        <span>Focus</span>
+        <div class="dur-adj">
+          <button class="dur-btn" onclick="adjDur('work',-5)">-</button>
+          <span class="dur-val" id="durWork">25</span>
+          <button class="dur-btn" onclick="adjDur('work',5)">+</button>
+        </div>
+      </div>
+      <div class="dur-row">
+        <span>Short Break</span>
+        <div class="dur-adj">
+          <button class="dur-btn" onclick="adjDur('short',-1)">-</button>
+          <span class="dur-val" id="durShort">5</span>
+          <button class="dur-btn" onclick="adjDur('short',1)">+</button>
+        </div>
+      </div>
+      <div class="dur-row">
+        <span>Long Break</span>
+        <div class="dur-adj">
+          <button class="dur-btn" onclick="adjDur('long',-5)">-</button>
+          <span class="dur-val" id="durLong">15</span>
+          <button class="dur-btn" onclick="adjDur('long',5)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CIRCUMFERENCE = 2 * Math.PI * 115; // ~722.57
+const ring = document.getElementById('ringProgress');
+
+let durations = { work: 25, short: 5, long: 15 };
+let mode = 'work';
+let totalTime = durations.work * 60;
+let timeLeft = totalTime;
+let running = false;
+let interval = null;
+let completedSessions = 0;
+let tasks = [];
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function beep(freq, dur) {
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.connect(g); g.connect(audioCtx.destination);
+  osc.frequency.value = freq;
+  osc.type = 'sine';
+  g.gain.setValueAtTime(0.25, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+  osc.start(); osc.stop(audioCtx.currentTime + dur);
+}
+
+function playAlarm() {
+  beep(880, 0.2);
+  setTimeout(() => beep(880, 0.2), 250);
+  setTimeout(() => beep(1100, 0.4), 500);
+}
+
+function fmt(s) {
+  return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+}
+
+function render() {
+  document.getElementById('timerTime').textContent = fmt(timeLeft);
+  document.title = `${fmt(timeLeft)} - Pomodoro`;
+
+  const pct = 1 - (timeLeft / totalTime);
+  ring.style.strokeDashoffset = CIRCUMFERENCE * (1 - pct);
+
+  const isBreak = mode !== 'work';
+  ring.classList.toggle('is-break', isBreak);
+
+  const btn = document.getElementById('startBtn');
+  btn.textContent = running ? 'Pause' : (timeLeft < totalTime ? 'Resume' : 'Start');
+  btn.classList.toggle('paused', running === false && timeLeft < totalTime);
+  btn.classList.toggle('is-break', isBreak);
+
+  document.getElementById('timerLabel').textContent = mode === 'work' ? 'focus' : mode === 'short' ? 'short break' : 'long break';
+
+  renderDots();
+}
+
+function renderDots() {
+  const el = document.getElementById('sessionDots');
+  el.innerHTML = '';
+  for (let i = 0; i < 4; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'session-dot' + (i < (completedSessions % 4) ? ' filled' : '');
+    el.appendChild(dot);
+  }
+  document.getElementById('sessionInfo').textContent = `${completedSessions} sessions completed`;
+}
+
+function setMode(m) {
+  if (running) return;
+  mode = m;
+  totalTime = durations[m] * 60;
+  timeLeft = totalTime;
+
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === m);
+    b.classList.toggle('is-break', b.dataset.mode === m && m !== 'work');
+  });
+
+  render();
+}
+
+function toggle() {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (running) {
+    running = false;
+    clearInterval(interval);
+  } else {
+    running = true;
+    interval = setInterval(() => {
+      timeLeft--;
+      if (timeLeft <= 0) {
+        timeLeft = 0;
+        running = false;
+        clearInterval(interval);
+        playAlarm();
+
+        if (mode === 'work') {
+          completedSessions++;
+          setTimeout(() => setMode(completedSessions % 4 === 0 ? 'long' : 'short'), 500);
+        } else {
+          setTimeout(() => setMode('work'), 500);
+        }
+      }
+      render();
+    }, 1000);
+  }
+  render();
+}
+
+function reset() {
+  running = false;
+  clearInterval(interval);
+  totalTime = durations[mode] * 60;
+  timeLeft = totalTime;
+  render();
+}
+
+function adjDur(key, delta) {
+  if (running) return;
+  durations[key] = Math.max(1, durations[key] + delta);
+  document.getElementById('dur' + key.charAt(0).toUpperCase() + key.slice(1)).textContent = durations[key];
+  if (key === mode) {
+    totalTime = durations[key] * 60;
+    timeLeft = totalTime;
+    render();
+  }
+}
+
+// Tasks
+function addTask() {
+  const input = document.getElementById('taskInput');
+  const text = input.value.trim();
+  if (!text) return;
+  tasks.push({ text, done: false });
+  input.value = '';
+  renderTasks();
+}
+
+function toggleTask(i) {
+  tasks[i].done = !tasks[i].done;
+  renderTasks();
+}
+
+function deleteTask(i) {
+  tasks.splice(i, 1);
+  renderTasks();
+}
+
+function renderTasks() {
+  const ul = document.getElementById('taskList');
+  ul.innerHTML = tasks.map((t, i) => `
+    <li class="task-item${t.done ? ' done' : ''}">
+      <div class="task-check" onclick="toggleTask(${i})">${t.done ? '&#10003;' : ''}</div>
+      <span class="task-text">${escHtml(t.text)}</span>
+      <button class="task-del" onclick="deleteTask(${i})">&times;</button>
+    </li>
+  `).join('');
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+Tabbed markdown editor with light theme. Edit/Preview toggle instead of split view, richer formatting toolbar including strikethrough, task lists, and table insert. Includes download-as-.md and copy-as-HTML export features.

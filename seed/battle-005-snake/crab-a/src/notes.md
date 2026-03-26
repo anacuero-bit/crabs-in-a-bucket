@@ -1,0 +1,1 @@
+Classic canvas-based Snake with clean dark UI. Uses interval-based game loop with progressive speed increase. Tracks score and high score in localStorage.

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Markdown Editor</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d1117;
+    color: #c9d1d9;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: #161b22;
+    border-bottom: 1px solid #21262d;
+    flex-shrink: 0;
+  }
+  .toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .toolbar h1 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #58a6ff;
+  }
+  .toolbar-actions {
+    display: flex;
+    gap: 4px;
+  }
+  .tool-btn {
+    padding: 6px 10px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: #8b949e;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .tool-btn:hover { background: #21262d; color: #c9d1d9; border-color: #30363d; }
+  .tool-btn.active { background: #21262d; color: #58a6ff; border-color: #30363d; }
+  .divider {
+    width: 1px;
+    height: 20px;
+    background: #21262d;
+  }
+  .editor-wrap {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+  .pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .pane-header {
+    padding: 8px 16px;
+    background: #161b22;
+    border-bottom: 1px solid #21262d;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #484f58;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .pane-left { border-right: 2px solid #21262d; }
+  #editor {
+    flex: 1;
+    background: #0d1117;
+    color: #c9d1d9;
+    border: none;
+    padding: 20px;
+    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    resize: none;
+    outline: none;
+    tab-size: 2;
+  }
+  #editor::placeholder { color: #30363d; }
+  .preview {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    line-height: 1.7;
+    font-size: 0.95rem;
+  }
+  /* Preview styles */
+  .preview h1 { font-size: 2rem; font-weight: 600; color: #e6edf3; margin: 0 0 16px; padding-bottom: 8px; border-bottom: 1px solid #21262d; }
+  .preview h2 { font-size: 1.5rem; font-weight: 600; color: #e6edf3; margin: 24px 0 12px; padding-bottom: 6px; border-bottom: 1px solid #21262d; }
+  .preview h3 { font-size: 1.25rem; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  .preview h4 { font-size: 1rem; font-weight: 600; color: #e6edf3; margin: 16px 0 6px; }
+  .preview p { margin: 0 0 12px; }
+  .preview strong { color: #e6edf3; font-weight: 600; }
+  .preview em { font-style: italic; color: #d2a8ff; }
+  .preview code {
+    background: #161b22;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'SF Mono', monospace;
+    font-size: 0.85em;
+    color: #79c0ff;
+    border: 1px solid #21262d;
+  }
+  .preview pre {
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 0 0 16px;
+    overflow-x: auto;
+  }
+  .preview pre code {
+    background: none;
+    padding: 0;
+    border: none;
+    color: #c9d1d9;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+  .preview a { color: #58a6ff; text-decoration: none; }
+  .preview a:hover { text-decoration: underline; }
+  .preview blockquote {
+    border-left: 4px solid #3fb950;
+    padding: 4px 16px;
+    margin: 0 0 16px;
+    color: #8b949e;
+    background: rgba(63, 185, 80, 0.05);
+    border-radius: 0 4px 4px 0;
+  }
+  .preview ul, .preview ol { margin: 0 0 16px; padding-left: 28px; }
+  .preview li { margin-bottom: 4px; }
+  .preview hr { border: none; border-top: 2px solid #21262d; margin: 24px 0; }
+  .preview img { max-width: 100%; border-radius: 6px; }
+  .preview table { border-collapse: collapse; margin: 0 0 16px; width: 100%; }
+  .preview th, .preview td { border: 1px solid #30363d; padding: 8px 12px; text-align: left; }
+  .preview th { background: #161b22; font-weight: 600; color: #e6edf3; }
+  .preview tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+
+  .status-bar {
+    padding: 4px 16px;
+    background: #161b22;
+    border-top: 1px solid #21262d;
+    font-size: 0.7rem;
+    color: #484f58;
+    display: flex;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <div class="toolbar-left">
+    <h1>Markdown Editor</h1>
+    <div class="divider"></div>
+    <div class="toolbar-actions">
+      <button class="tool-btn" onclick="insert('**', '**')" title="Bold"><b>B</b></button>
+      <button class="tool-btn" onclick="insert('*', '*')" title="Italic"><i>I</i></button>
+      <button class="tool-btn" onclick="insert('`', '`')" title="Code">&lt;/&gt;</button>
+      <button class="tool-btn" onclick="insert('[', '](url)')" title="Link">Link</button>
+      <button class="tool-btn" onclick="insertLine('# ')" title="Heading">H</button>
+      <button class="tool-btn" onclick="insertLine('> ')" title="Quote">&ldquo;</button>
+      <button class="tool-btn" onclick="insertLine('- ')" title="List">List</button>
+    </div>
+  </div>
+</div>
+
+<div class="editor-wrap">
+  <div class="pane pane-left">
+    <div class="pane-header">Markdown</div>
+    <textarea id="editor" placeholder="Start typing markdown..." spellcheck="false"></textarea>
+  </div>
+  <div class="pane">
+    <div class="pane-header">Preview</div>
+    <div class="preview" id="preview"></div>
+  </div>
+</div>
+
+<div class="status-bar">
+  <span id="charCount">0 characters</span>
+  <span id="wordCount">0 words</span>
+</div>
+
+<script>
+const editor = document.getElementById('editor');
+const preview = document.getElementById('preview');
+
+const defaultMd = `# Welcome to Markdown Editor
+
+Write **Markdown** on the left, see the *live preview* on the right.
+
+## Features
+
+- **Bold** text with \`**text**\`
+- *Italic* text with \`*text*\`
+- \`Inline code\` with backticks
+- [Links](https://example.com)
+
+## Code Example
+
+\`\`\`javascript
+function hello(name) {
+  console.log(\`Hello, \${name}!\`);
+}
+
+hello("world");
+\`\`\`
+
+## Blockquote
+
+> Markdown is a lightweight markup language that you can use to add formatting elements to plaintext text documents.
+
+## Table
+
+| Feature | Status |
+|---------|--------|
+| Bold | Supported |
+| Italic | Supported |
+| Code | Supported |
+| Links | Supported |
+| Tables | Supported |
+
+---
+
+*Start editing to see your changes!*`;
+
+editor.value = defaultMd;
+
+function parseMarkdown(md) {
+  let html = md;
+
+  // Code blocks (fenced)
+  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    return `<pre><code>${escHtml(code.trim())}</code></pre>`;
+  });
+
+  // Split into lines for block processing
+  const lines = html.split('\n');
+  let result = [];
+  let inList = false;
+  let listType = '';
+  let inTable = false;
+  let tableRows = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+
+    // Skip if inside pre block
+    if (line.startsWith('<pre>') || line.includes('<pre>')) {
+      // Find closing tag or keep going
+      result.push(line);
+      continue;
+    }
+    if (line.includes('</pre>')) {
+      result.push(line);
+      continue;
+    }
+
+    // Table detection
+    if (line.match(/^\|(.+)\|$/)) {
+      if (!inTable) {
+        inTable = true;
+        tableRows = [];
+      }
+      // Skip separator row
+      if (line.match(/^\|[\s\-:|]+\|$/)) continue;
+      tableRows.push(line);
+      // Check if next line is not a table row
+      if (!lines[i+1] || !lines[i+1].match(/^\|(.+)\|$/)) {
+        // Render table
+        let tableHtml = '<table>';
+        tableRows.forEach((row, idx) => {
+          const cells = row.split('|').filter(c => c.trim() !== '');
+          const tag = idx === 0 ? 'th' : 'td';
+          tableHtml += '<tr>' + cells.map(c => `<${tag}>${inlineFormat(c.trim())}</${tag}>`).join('') + '</tr>';
+        });
+        tableHtml += '</table>';
+        result.push(tableHtml);
+        inTable = false;
+        tableRows = [];
+      }
+      continue;
+    }
+
+    // Close list if needed
+    if (inList && !line.match(/^[\s]*[-*+]\s/) && !line.match(/^[\s]*\d+\.\s/) && line.trim() !== '') {
+      result.push(listType === 'ul' ? '</ul>' : '</ol>');
+      inList = false;
+    }
+
+    // Headings
+    if (line.match(/^#{1,6}\s/)) {
+      const level = line.match(/^(#{1,6})/)[1].length;
+      const text = line.replace(/^#{1,6}\s+/, '');
+      result.push(`<h${level}>${inlineFormat(text)}</h${level}>`);
+      continue;
+    }
+
+    // HR
+    if (line.match(/^(\-{3,}|\*{3,}|_{3,})$/)) {
+      result.push('<hr>');
+      continue;
+    }
+
+    // Blockquote
+    if (line.match(/^>\s?/)) {
+      const text = line.replace(/^>\s?/, '');
+      result.push(`<blockquote><p>${inlineFormat(text)}</p></blockquote>`);
+      continue;
+    }
+
+    // Unordered list
+    if (line.match(/^[\s]*[-*+]\s/)) {
+      if (!inList || listType !== 'ul') {
+        if (inList) result.push(listType === 'ul' ? '</ul>' : '</ol>');
+        result.push('<ul>');
+        inList = true;
+        listType = 'ul';
+      }
+      result.push(`<li>${inlineFormat(line.replace(/^[\s]*[-*+]\s+/, ''))}</li>`);
+      continue;
+    }
+
+    // Ordered list
+    if (line.match(/^[\s]*\d+\.\s/)) {
+      if (!inList || listType !== 'ol') {
+        if (inList) result.push(listType === 'ul' ? '</ul>' : '</ol>');
+        result.push('<ol>');
+        inList = true;
+        listType = 'ol';
+      }
+      result.push(`<li>${inlineFormat(line.replace(/^[\s]*\d+\.\s+/, ''))}</li>`);
+      continue;
+    }
+
+    // Empty line
+    if (line.trim() === '') {
+      if (inList) {
+        result.push(listType === 'ul' ? '</ul>' : '</ol>');
+        inList = false;
+      }
+      result.push('');
+      continue;
+    }
+
+    // Paragraph
+    result.push(`<p>${inlineFormat(line)}</p>`);
+  }
+
+  if (inList) result.push(listType === 'ul' ? '</ul>' : '</ol>');
+
+  return result.join('\n');
+}
+
+function inlineFormat(text) {
+  // Images
+  text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">');
+  // Links
+  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+  // Bold + italic
+  text = text.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  // Bold
+  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/__(.+?)__/g, '<strong>$1</strong>');
+  // Italic
+  text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  text = text.replace(/_(.+?)_/g, '<em>$1</em>');
+  // Inline code
+  text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+  return text;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function updatePreview() {
+  const md = editor.value;
+  preview.innerHTML = parseMarkdown(md);
+
+  const chars = md.length;
+  const words = md.trim() ? md.trim().split(/\s+/).length : 0;
+  document.getElementById('charCount').textContent = `${chars} characters`;
+  document.getElementById('wordCount').textContent = `${words} words`;
+}
+
+function insert(before, after) {
+  const start = editor.selectionStart;
+  const end = editor.selectionEnd;
+  const sel = editor.value.substring(start, end) || 'text';
+  editor.setRangeText(before + sel + after, start, end, 'select');
+  editor.focus();
+  updatePreview();
+}
+
+function insertLine(prefix) {
+  const start = editor.selectionStart;
+  const lineStart = editor.value.lastIndexOf('\n', start - 1) + 1;
+  editor.setRangeText(prefix, lineStart, lineStart, 'end');
+  editor.focus();
+  updatePreview();
+}
+
+// Tab support
+editor.addEventListener('keydown', e => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const start = editor.selectionStart;
+    editor.setRangeText('  ', start, start, 'end');
+    updatePreview();
+  }
+});
+
+editor.addEventListener('input', updatePreview);
+updatePreview();
+</script>
+</body>
+</html>

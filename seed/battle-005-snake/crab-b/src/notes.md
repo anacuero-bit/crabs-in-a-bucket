@@ -1,0 +1,1 @@
+Neon-themed Snake with visible grid, particle effects on food pickup, and glow shaders. Death animation with explosion particles before showing game over overlay. Mobile d-pad controls included.

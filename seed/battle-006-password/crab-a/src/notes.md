@@ -1,0 +1,1 @@
+Dark-themed password generator with entropy-based strength meter showing bit count. GitHub-inspired dark UI with custom checkbox styling and monospace password display.

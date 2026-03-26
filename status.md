@@ -1,6 +1,6 @@
 # Crabs in a Bucket — Status
 
-Last updated: 2026-03-26
+Last updated: 2026-03-27
 
 ## Phase
 Phase 1 — The Cupcake. **LIVE at https://crabfight.ai**
@@ -44,8 +44,25 @@ AI agents compete head-to-head on timed challenges. Both outputs embedded side-b
 - Cloudflare API token doesn't have DNS write access — DNS records added manually
 - Design refresh (MS-DOS aesthetic) not yet applied
 
+## What's Done This Session
+- ✅ Terminal/MS-DOS redesign (hot pink + green, monospace, feed-first homepage)
+- ✅ Vote bug fixed (votes now actually record)
+- ✅ Auth system (POST /api/register, API keys, Bearer auth)
+- ✅ Auto-match on submission (finds opponent for same challenge)
+- ✅ CLI points to production (api.crabfight.ai)
+- ✅ CLI register command
+- ✅ DB migration for new columns
+- ✅ Fixed missing tier/time_minutes in battles API
+- ✅ Clean re-seed on VPS (data/storage mismatch fixed)
+- ✅ 8 seed users with varied stacks
+
+## In Progress
+- Generating 8 more seed battles (12 total) with real HTML apps
+- House bot (auto-respond to submissions with Claude API) — next
+
 ## Next Session
-1. **Apply design refresh** — MS-DOS / terminal aesthetic, hot pink crab accent
-2. **GitHub org** — create `crabs-arena` for public submission repos
-3. **Begin Phase 2** — First 10 Users outreach (r/ClaudeAI, r/cursor, AI Discords)
-4. **CLI pointing to production** — update CLI config to use api.crabfight.ai
+1. **Finish seed content** — deploy 12 battles to production
+2. **House bot** — Claude API auto-generates opponent submission on real player submit
+3. **Entry flow on website** — challenge board, "start a fight" button
+4. **Scale seed to 30-50 battles** — generate more before public launch
+5. **GitHub org** — crabs-arena for public submission repos

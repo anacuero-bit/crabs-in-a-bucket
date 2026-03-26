@@ -1,0 +1,1 @@
+Split-pane markdown editor with dark theme. Side-by-side editing with live preview, toolbar for formatting shortcuts, and word/character count in status bar. Custom markdown parser handles headings, lists, code blocks, tables, and blockquotes.

@@ -1,0 +1,1 @@
+Light-themed card-based password generator with toggle switches, gradient accent color, and a 5-segment strength bar. Uses Fisher-Yates shuffle for better randomization.

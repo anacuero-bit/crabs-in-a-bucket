@@ -33,10 +33,18 @@ db.pragma('foreign_keys = ON');
 
 // ── Battle definitions ─────────────────────────────────────────────────────
 const BATTLES = [
-  { dir: 'battle-001-breakout', challengeName: 'The Arcade' },
-  { dir: 'battle-002-json',     challengeName: 'The Quick Draw' },
-  { dir: 'battle-003-typing',   challengeName: 'The Arcade' },
-  { dir: 'battle-004-colors',   challengeName: 'The Quick Draw' },
+  { dir: 'battle-001-breakout',  challengeName: 'The Arcade' },
+  { dir: 'battle-002-json',      challengeName: 'The Quick Draw' },
+  { dir: 'battle-003-typing',    challengeName: 'The Arcade' },
+  { dir: 'battle-004-colors',    challengeName: 'The Quick Draw' },
+  { dir: 'battle-005-snake',     challengeName: 'The Arcade' },
+  { dir: 'battle-006-password',  challengeName: 'The Quick Draw' },
+  { dir: 'battle-007-pomodoro',  challengeName: 'The Quick Draw' },
+  { dir: 'battle-008-markdown',  challengeName: 'The Quick Draw' },
+  { dir: 'battle-009-memory',    challengeName: 'The Arcade' },
+  { dir: 'battle-010-regex',     challengeName: 'The Quick Draw' },
+  { dir: 'battle-011-calculator', challengeName: 'The Quick Draw' },
+  { dir: 'battle-012-tetris',    challengeName: 'The Arcade' },
 ];
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -73,16 +81,20 @@ function makeScores(boost) {
 
 // ── Fetch existing seed data ───────────────────────────────────────────────
 
-// Look up test users
-const users = db.prepare('SELECT id, username FROM users WHERE username IN (?, ?)').all('CrabMaster', 'ShellShock');
+// Look up all users
+const users = db.prepare('SELECT id, username FROM users').all();
 if (users.length < 2) {
-  console.error('ERROR: Could not find test users CrabMaster and ShellShock in the database.');
+  console.error('ERROR: Need at least 2 users in the database.');
   console.error('Make sure the API server has been started at least once so the seed data is created.');
   process.exit(1);
 }
 const userMap = {};
-for (const u of users) userMap[u.username] = u.id;
-console.log(`Found users: ${users.map(u => `${u.username} (${u.id})`).join(', ')}`);
+const userList = [];
+for (const u of users) {
+  userMap[u.username] = u.id;
+  userList.push(u.id);
+}
+console.log(`Found ${users.length} users: ${users.map(u => u.username).join(', ')}`);
 
 // Look up challenges by name
 const challenges = db.prepare('SELECT id, name FROM challenges').all();
@@ -124,10 +136,11 @@ const seedAll = db.transaction(() => {
 
     console.log(`\n── ${battle.dir} → "${battle.challengeName}" ──`);
 
-    // Alternate who is crab-a vs crab-b
-    // Even battles: CrabMaster=a, ShellShock=b.  Odd: reversed.
-    const userA = i % 2 === 0 ? userMap['CrabMaster'] : userMap['ShellShock'];
-    const userB = i % 2 === 0 ? userMap['ShellShock'] : userMap['CrabMaster'];
+    // Distribute users across battles — pick two different users
+    const userA = userList[i % userList.length];
+    const userB = userList[(i + 1 + Math.floor(i / 2)) % userList.length];
+    // Ensure different users
+    const finalUserB = userB === userA ? userList[(i + 2) % userList.length] : userB;
 
     // Read crabs.json from each side
     const crabAMeta = JSON.parse(fs.readFileSync(path.join(battleDir, 'crab-a', 'crabs.json'), 'utf-8'));
@@ -160,7 +173,7 @@ const seedAll = db.transaction(() => {
     console.log(`  Submission A: score=${scoresA.score} model=${crabAMeta.model} harness=${crabAMeta.harness} time=${crabAMeta.time_elapsed}`);
 
     insertSubmission.run(
-      subIdB, challengeId, userB, subIdB,
+      subIdB, challengeId, finalUserB, subIdB,
       scoresB.score, JSON.stringify(scoresB.breakdown),
       crabBMeta.model, crabBMeta.harness, crabBMeta.time_elapsed,
       crabBMeta.submitted_at

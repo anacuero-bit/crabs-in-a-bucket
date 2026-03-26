@@ -1,0 +1,1 @@
+Minimal dark Pomodoro with start/pause/reset, +/- duration controls, and Web Audio API beep notification. Auto-transitions between focus and break modes after each session.
