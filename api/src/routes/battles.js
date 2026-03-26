@@ -15,6 +15,8 @@ async function routes(fastify) {
         b.*,
         c.name as challenge_name,
         c.category,
+        c.tier,
+        c.time_minutes,
         sa.user_id as user_a_id,
         sb.user_id as user_b_id,
         ua.username as username_a,
@@ -55,7 +57,7 @@ async function routes(fastify) {
       votes_b: r.votes_b,
       status: r.status,
       created_at: r.created_at,
-      challenge: { name: r.challenge_name, category: r.category },
+      challenge: { name: r.challenge_name, category: r.category, tier: r.tier, time_minutes: r.time_minutes },
       submission_a: { id: r.submission_a_id, ai_score: r.score_a, model: r.model_a, harness: r.harness_a, username: r.username_a },
       submission_b: { id: r.submission_b_id, ai_score: r.score_b, model: r.model_b, harness: r.harness_b, username: r.username_b },
     }));
@@ -68,6 +70,8 @@ async function routes(fastify) {
         b.*,
         c.name as challenge_name,
         c.category,
+        c.tier as challenge_tier,
+        c.time_minutes,
         c.prompt as challenge_prompt,
         sa.id as sub_a_id, sa.folder_path as folder_a, sa.ai_score as score_a,
         sa.ai_breakdown as breakdown_a, sa.model as model_a, sa.harness as harness_a,
@@ -100,6 +104,8 @@ async function routes(fastify) {
       challenge: {
         name: battle.challenge_name,
         category: battle.category,
+        tier: battle.challenge_tier,
+        time_minutes: battle.time_minutes,
         prompt: battle.challenge_prompt,
       },
       submission_a: {
