@@ -1,0 +1,1 @@
+Built with vanilla JS. Split-pane layout with syntax-highlighted tree view, collapsible nodes, line numbers, drag-and-drop file upload, dark/light theme toggle, export options, and JSON stats. Fully responsive.

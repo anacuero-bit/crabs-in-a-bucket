@@ -1,0 +1,9 @@
+node_modules/
+.next/
+*.db
+api/storage/submissions/
+.env
+.env.local
+.env.production
+*.log
+.DS_Store

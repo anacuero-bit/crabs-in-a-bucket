@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON Studio</title>
+<style>
+:root{--bg:#0d1117;--panel:#161b22;--border:#30363d;--text:#c9d1d9;--accent:#58a6ff;--green:#3fb950;--red:#f85149;--yellow:#d29922;--purple:#bc8cff;--orange:#f0883e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+body.light{--bg:#fff;--panel:#f6f8fa;--border:#d0d7de;--text:#24292f;--accent:#0969da;--green:#1a7f37;--red:#cf222e;--yellow:#9a6700;--purple:#8250df;--orange:#bc4c00}
+#toolbar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--panel);border-bottom:1px solid var(--border);flex-wrap:wrap}
+#toolbar button,#toolbar select{padding:5px 12px;font-size:12px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;cursor:pointer}
+#toolbar button:hover{border-color:var(--accent)}
+#toolbar select{padding:4px 8px}
+.sep{width:1px;height:20px;background:var(--border)}
+#stats{font-size:11px;color:#8b949e;margin-left:auto;white-space:nowrap}
+#error-bar{display:none;padding:6px 12px;background:#3d1115;color:var(--red);font-size:12px;border-bottom:1px solid #5c1a1a;font-family:monospace}
+#main{display:flex;flex:1;overflow:hidden}
+.pane{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.pane-header{padding:6px 12px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#8b949e;background:var(--panel);border-bottom:1px solid var(--border)}
+#splitter{width:4px;background:var(--border);cursor:col-resize;flex-shrink:0}
+#splitter:hover{background:var(--accent)}
+.editor-wrap{flex:1;display:flex;overflow:auto;position:relative}
+.line-nums{padding:8px 8px 8px 4px;text-align:right;font-family:'Courier New',monospace;font-size:13px;color:#484f58;background:var(--panel);user-select:none;line-height:1.5;white-space:pre}
+textarea{flex:1;background:var(--bg);color:var(--text);border:none;outline:none;padding:8px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;resize:none;tab-size:2}
+#tree-output{flex:1;overflow:auto;padding:8px;font-family:'Courier New',monospace;font-size:13px;line-height:1.6}
+.json-key{color:var(--accent)}
+.json-str{color:var(--green)}
+.json-num{color:var(--orange)}
+.json-bool{color:var(--purple)}
+.json-null{color:var(--red)}
+.json-bracket{color:#8b949e}
+.toggle{cursor:pointer;user-select:none;display:inline-block;width:14px;text-align:center;color:#8b949e;font-size:11px}
+.toggle:hover{color:var(--accent)}
+.collapsible-content{margin-left:0}
+.collapsed>.collapsible-content{display:none}
+.collapsed>.toggle::after{content:''}
+.drop-overlay{display:none;position:absolute;inset:0;background:rgba(88,166,255,0.1);border:2px dashed var(--accent);z-index:10;align-items:center;justify-content:center;font-size:16px;color:var(--accent)}
+.drop-overlay.visible{display:flex}
+@media(max-width:700px){#main{flex-direction:column}#splitter{width:auto;height:4px;cursor:row-resize}.pane{min-height:0}}
+</style>
+</head>
+<body>
+<div id="toolbar">
+  <button id="btnFormat" title="Format (Ctrl+Enter)">Format</button>
+  <button id="btnMinify">Minify</button>
+  <div class="sep"></div>
+  <label style="font-size:12px">Tab: <select id="tabSize"><option value="2">2</option><option value="4">4</option></select></label>
+  <div class="sep"></div>
+  <button id="btnCopy">Copy</button>
+  <button id="btnDownload">Download</button>
+  <div class="sep"></div>
+  <button id="btnTheme">☀ Light</button>
+  <div id="stats"></div>
+</div>
+<div id="error-bar"></div>
+<div id="main">
+  <div class="pane" id="inputPane">
+    <div class="pane-header">Input</div>
+    <div class="editor-wrap">
+      <div class="line-nums" id="lineNums">1</div>
+      <textarea id="input" spellcheck="false" placeholder="Paste JSON here or drag a .json file..."></textarea>
+    </div>
+    <div class="drop-overlay" id="dropOverlay">Drop JSON file here</div>
+  </div>
+  <div id="splitter"></div>
+  <div class="pane">
+    <div class="pane-header">Output — Tree View</div>
+    <div id="tree-output" class="editor-wrap"></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const input=$('input'),treeOut=$('tree-output'),lineNums=$('lineNums'),errorBar=$('error-bar'),statsEl=$('stats');
+
+// Line numbers
+function updateLineNums(){const lines=input.value.split('\n').length;let s='';for(let i=1;i<=lines;i++)s+=i+'\n';lineNums.textContent=s}
+input.addEventListener('input',updateLineNums);
+input.addEventListener('scroll',()=>{lineNums.scrollTop=input.scrollTop});
+updateLineNums();
+
+// Splitter drag
+const splitter=$('splitter');
+let dragging=false;
+splitter.addEventListener('mousedown',e=>{dragging=true;e.preventDefault()});
+document.addEventListener('mousemove',e=>{if(!dragging)return;const main=$('main'),rect=main.getBoundingClientRect();const pct=((e.clientX-rect.left)/rect.width)*100;$('inputPane').style.flex='0 0 '+Math.max(20,Math.min(80,pct))+'%'});
+document.addEventListener('mouseup',()=>{dragging=false});
+
+// Format
+function getTab(){return parseInt($('tabSize').value)}
+
+function formatJSON(){
+  errorBar.style.display='none';treeOut.innerHTML='';
+  const val=input.value.trim();
+  if(!val)return;
+  try{
+    const parsed=JSON.parse(val);
+    treeOut.innerHTML=renderTree(parsed);
+    updateStats(val,parsed);
+  }catch(e){
+    const m=e.message;errorBar.textContent='Error: '+m;errorBar.style.display='block';
+    // try to find line
+    const lm=m.match(/position (\d+)/);
+    if(lm){const pos=parseInt(lm[1]);const before=val.substring(0,pos);const line=before.split('\n').length;const col=pos-before.lastIndexOf('\n');errorBar.textContent=`Error at line ${line}, col ${col}: `+m}
+  }
+}
+
+function minifyJSON(){
+  errorBar.style.display='none';
+  try{const p=JSON.parse(input.value);input.value=JSON.stringify(p);updateLineNums();formatJSON()}catch(e){errorBar.textContent='Error: '+e.message;errorBar.style.display='block'}
+}
+
+// Tree renderer
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function renderValue(v){
+  if(v===null)return'<span class="json-null">null</span>';
+  if(typeof v==='boolean')return`<span class="json-bool">${v}</span>`;
+  if(typeof v==='number')return`<span class="json-num">${v}</span>`;
+  if(typeof v==='string')return`<span class="json-str">"${esc(v)}"</span>`;
+  if(Array.isArray(v))return renderTree(v);
+  if(typeof v==='object')return renderTree(v);
+  return esc(String(v));
+}
+
+function renderTree(obj){
+  const isArr=Array.isArray(obj);
+  const entries=isArr?obj.map((v,i)=>[i,v]):Object.entries(obj);
+  if(entries.length===0)return`<span class="json-bracket">${isArr?'[]':'{}'}</span>`;
+  const tab='  '.repeat(getTab()/2);
+  let h=`<span class="json-bracket">${isArr?'[':'{'}</span>`;
+  h+=`<span class="toggle" onclick="this.parentElement.classList.toggle('collapsed')">▼</span>`;
+  h+=`<span class="collapsible-content">`;
+  entries.forEach(([k,v],i)=>{
+    h+=`<div style="margin-left:${getTab()*8}px">`;
+    if(!isArr)h+=`<span class="json-key">"${esc(String(k))}"</span>: `;
+    h+=renderValue(v);
+    if(i<entries.length-1)h+=',';
+    h+=`</div>`;
+  });
+  h+=`</span><span class="json-bracket">${isArr?']':'}'}</span>`;
+  return`<span class="collapsible">${h}</span>`;
+}
+
+// Stats
+function updateStats(raw,parsed){
+  function countKeys(o){if(typeof o!=='object'||o===null)return 0;let c=0;if(Array.isArray(o)){o.forEach(v=>{c+=countKeys(v)})}else{const k=Object.keys(o);c+=k.length;k.forEach(key=>{c+=countKeys(o[key])})}return c}
+  function getDepth(o){if(typeof o!=='object'||o===null)return 0;if(Array.isArray(o))return o.length?1+Math.max(...o.map(getDepth)):1;const v=Object.values(o);return v.length?1+Math.max(...v.map(getDepth)):1}
+  const bytes=new Blob([raw]).size;
+  statsEl.textContent=`Keys: ${countKeys(parsed)} | Depth: ${getDepth(parsed)} | Size: ${bytes>=1024?(bytes/1024).toFixed(1)+'KB':bytes+'B'}`;
+}
+
+// Buttons
+$('btnFormat').addEventListener('click',formatJSON);
+$('btnMinify').addEventListener('click',minifyJSON);
+$('btnCopy').addEventListener('click',()=>{try{const p=JSON.parse(input.value);navigator.clipboard.writeText(JSON.stringify(p,null,getTab()))}catch(e){navigator.clipboard.writeText(input.value)}});
+$('btnDownload').addEventListener('click',()=>{try{const p=JSON.parse(input.value);const blob=new Blob([JSON.stringify(p,null,getTab())],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='formatted.json';a.click()}catch(e){errorBar.textContent='Fix JSON errors before downloading';errorBar.style.display='block'}});
+
+// Theme toggle
+$('btnTheme').addEventListener('click',()=>{document.body.classList.toggle('light');$('btnTheme').textContent=document.body.classList.contains('light')?'🌙 Dark':'☀ Light'});
+
+// Keyboard shortcut
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();formatJSON()}});
+
+// Drag and drop
+const drop=$('dropOverlay'),pane=$('inputPane');
+pane.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('visible')});
+pane.addEventListener('dragleave',()=>{drop.classList.remove('visible')});
+pane.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('visible');const f=e.dataTransfer.files[0];if(f){const r=new FileReader();r.onload=ev=>{input.value=ev.target.result;updateLineNums();formatJSON()};r.readAsText(f)}});
+
+// Tab size change re-renders
+$('tabSize').addEventListener('change',formatJSON);
+</script>
+</body>
+</html>

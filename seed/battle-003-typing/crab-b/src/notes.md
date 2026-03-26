@@ -1,0 +1,1 @@
+Built with vanilla JS. Real-time character highlighting, difficulty levels, streak counter, confetti on personal best, history chart, keyboard miss heatmap, and localStorage persistence. Neon dark theme.

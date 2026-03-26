@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palette Studio</title>
+<style>
+:root{--bg:#0d1117;--panel:#161b22;--border:#30363d;--text:#c9d1d9;--accent:#58a6ff;--dim:#484f58}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
+#top{padding:12px 16px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--border);flex-wrap:wrap}
+#top h1{font-size:16px;color:var(--accent);margin-right:8px}
+#top input[type=text]{padding:8px 14px;font-size:14px;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;width:180px;outline:none}
+#top input:focus{border-color:var(--accent)}
+#top select,#top button{padding:6px 14px;font-size:12px;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:4px;cursor:pointer}
+#top button:hover{border-color:var(--accent)}
+.sep{width:1px;height:22px;background:var(--border)}
+#palette{display:flex;min-height:180px;width:100%;user-select:none}
+.swatch-col{flex:1;display:flex;flex-direction:column;position:relative;transition:flex 0.3s;min-width:0;cursor:grab}
+.swatch-col:active{cursor:grabbing}
+.swatch-top{flex:1;display:flex;align-items:center;justify-content:center;position:relative;transition:background 0.4s}
+.swatch-info{padding:12px;background:var(--panel);border-top:1px solid var(--border);font-size:11px;font-family:monospace;line-height:1.8}
+.swatch-info .hex{font-size:15px;font-weight:bold;cursor:pointer}
+.swatch-info .hex:hover{color:var(--accent)}
+.lock-btn{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.4);border:none;color:#fff;font-size:16px;cursor:pointer;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.lock-btn:hover{background:rgba(0,0,0,0.7)}
+.lock-btn.locked{color:#f0c040}
+.copy-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:8px 20px;border-radius:6px;font-size:13px;font-weight:bold;z-index:100;opacity:0;transition:opacity 0.3s;pointer-events:none}
+.copy-toast.show{opacity:1}
+#export-bar{padding:10px 16px;display:flex;gap:8px;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center}
+#export-bar button{padding:6px 14px;font-size:12px;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:4px;cursor:pointer}
+#export-bar button:hover{border-color:var(--accent)}
+#contrast-section{padding:16px;border-top:1px solid var(--border)}
+#contrast-section h3{font-size:13px;color:var(--dim);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+#contrast-grid{display:flex;gap:6px;flex-wrap:wrap}
+.contrast-pair{background:var(--panel);border-radius:6px;padding:10px;font-size:11px;width:130px;border:1px solid var(--border)}
+.contrast-pair .ratio{font-size:16px;font-weight:bold;margin:4px 0}
+.contrast-pair .pass{color:#3fb950}.contrast-pair .fail{color:#f85149}
+.contrast-sample{display:flex;gap:4px;margin-top:6px;height:20px;border-radius:3px;overflow:hidden}
+.contrast-sample div{flex:1}
+#preview-section{padding:16px;border-top:1px solid var(--border)}
+#preview-section h3{font-size:13px;color:var(--dim);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px}
+#preview-mock{display:flex;gap:16px;flex-wrap:wrap}
+.mock-card{border-radius:8px;padding:16px;width:220px;min-height:140px}
+.mock-card h4{margin-bottom:8px;font-size:14px}
+.mock-card p{font-size:12px;opacity:0.8;margin-bottom:12px;line-height:1.4}
+.mock-btn{padding:6px 16px;border:none;border-radius:4px;font-size:12px;cursor:pointer;font-weight:bold}
+.mock-header{padding:12px 16px;border-radius:8px;font-size:14px;font-weight:bold;min-width:220px;display:flex;align-items:center;gap:10px}
+.mock-badge{padding:3px 10px;border-radius:10px;font-size:11px}
+</style>
+</head>
+<body>
+<div id="top">
+  <h1>Palette Studio</h1>
+  <input type="text" id="input" placeholder="Keyword or #hex" value="ocean">
+  <select id="harmony">
+    <option value="complementary">Complementary</option>
+    <option value="analogous">Analogous</option>
+    <option value="triadic">Triadic</option>
+    <option value="split">Split-Complementary</option>
+  </select>
+  <button id="genBtn">Generate</button>
+  <button id="randBtn">Random</button>
+</div>
+<div id="palette"></div>
+<div id="export-bar">
+  <span style="font-size:12px;color:var(--dim)">Export:</span>
+  <button id="expCSS">CSS Variables</button>
+  <button id="expTW">Tailwind Config</button>
+  <button id="expPNG">PNG Image</button>
+</div>
+<div id="contrast-section"><h3>Contrast Checker</h3><div id="contrast-grid"></div></div>
+<div id="preview-section"><h3>Preview</h3><div id="preview-mock"></div></div>
+<div class="copy-toast" id="toast">Copied!</div>
+
+<script>
+const KEYWORDS={red:[0,80,55],blue:[220,80,55],green:[140,70,45],purple:[280,70,55],orange:[25,90,55],pink:[330,80,60],yellow:[50,90,55],teal:[175,70,45],coral:[16,80,60],navy:[220,60,30],sunset:[15,85,55],ocean:[200,80,45],forest:[140,60,30],lavender:[270,50,65],gold:[45,90,55],mint:[160,70,60],rose:[345,80,55],sky:[200,70,65],fire:[10,90,50],ice:[190,60,70],earth:[25,50,35],warm:[25,80,55],cool:[210,70,55],neon:[120,100,50],pastel:[0,60,80],autumn:[25,70,45],spring:[140,70,55],summer:[40,80,60],winter:[210,50,60],night:[240,40,20],coffee:[25,50,30],wine:[345,60,30],peach:[20,80,75],sage:[130,25,55],slate:[210,15,45],rust:[15,70,40],plum:[300,40,35],aqua:[180,80,50],indigo:[260,70,45],crimson:[348,80,45]};
+
+let colors=[],locked=[];
+
+function hsl2hex(h,s,l){h=((h%360)+360)%360;s=Math.max(0,Math.min(100,s));l=Math.max(0,Math.min(100,l));const s1=s/100,l1=l/100;const f=n=>{const k=(n+h/30)%12;const a=s1*Math.min(l1,1-l1);return Math.round((l1-a*Math.max(-1,Math.min(k-3,9-k,1)))*255)};return'#'+[f(0),f(8),f(4)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function hex2hsl(hex){hex=hex.replace('#','');const r=parseInt(hex.substring(0,2),16)/255,g=parseInt(hex.substring(2,4),16)/255,b=parseInt(hex.substring(4,6),16)/255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b);let h=0,s=0,l=(mx+mn)/2;if(mx!==mn){const d=mx-mn;s=l>0.5?d/(2-mx-mn):d/(mx+mn);switch(mx){case r:h=((g-b)/d+(g<b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;case b:h=((r-g)/d+4)/6;break}}return[h*360,s*100,l*100]}
+function hex2rgb(hex){hex=hex.replace('#','');return[parseInt(hex.substring(0,2),16),parseInt(hex.substring(2,4),16),parseInt(hex.substring(4,6),16)]}
+function luminance(r,g,b){const a=[r,g,b].map(v=>{v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4)});return a[0]*0.2126+a[1]*0.7152+a[2]*0.0722}
+function contrastRatio(hex1,hex2){const l1=luminance(...hex2rgb(hex1)),l2=luminance(...hex2rgb(hex2));const lighter=Math.max(l1,l2),darker=Math.min(l1,l2);return(lighter+0.05)/(darker+0.05)}
+
+function getBase(){
+  const val=document.getElementById('input').value.trim().toLowerCase();
+  if(val.match(/^#?[0-9a-f]{6}$/i))return hex2hsl(val.startsWith('#')?val:'#'+val);
+  if(KEYWORDS[val])return[...KEYWORDS[val]];
+  let hash=0;const str=val||'x'+Date.now();
+  for(let i=0;i<str.length;i++){hash=str.charCodeAt(i)+((hash<<5)-hash)}
+  return[Math.abs(hash)%360,60+Math.abs(hash>>8)%30,40+Math.abs(hash>>16)%25];
+}
+
+function genPalette(){
+  const[bh,bs,bl]=getBase();
+  const mode=document.getElementById('harmony').value;
+  let hsls;
+  switch(mode){
+    case'complementary':hsls=[[bh,bs,bl],[bh+30,bs*0.7,bl+15],[bh+180,bs,bl],[bh+180,bs*0.7,bl+20],[bh+210,bs*0.5,bl-10]];break;
+    case'analogous':hsls=[[bh-30,bs,bl],[bh-15,bs*0.9,bl+8],[bh,bs,bl],[bh+15,bs*0.9,bl+8],[bh+30,bs,bl]];break;
+    case'triadic':hsls=[[bh,bs,bl],[bh+120,bs,bl],[bh+240,bs,bl],[bh+60,bs*0.6,bl+15],[bh+180,bs*0.6,bl+15]];break;
+    case'split':hsls=[[bh,bs,bl],[bh+150,bs,bl],[bh+210,bs,bl],[bh+150,bs*0.6,bl+15],[bh+210,bs*0.6,bl+15]];break;
+  }
+  for(let i=0;i<5;i++){
+    if(locked[i])hsls[i]=hex2hsl(colors[i]);
+  }
+  colors=hsls.map(([h,s,l])=>hsl2hex(h,s,l));
+  render();
+}
+
+function render(){
+  const pal=document.getElementById('palette');pal.innerHTML='';
+  colors.forEach((c,i)=>{
+    const col=document.createElement('div');col.className='swatch-col';col.draggable=true;
+    col.dataset.idx=i;
+    const[r,g,b]=hex2rgb(c);
+    const[h,s,l]=hex2hsl(c);
+    const textCol=l>55?'#000':'#fff';
+    col.innerHTML=`
+      <div class="swatch-top" style="background:${c}">
+        <button class="lock-btn ${locked[i]?'locked':''}" data-i="${i}">${locked[i]?'🔒':'🔓'}</button>
+      </div>
+      <div class="swatch-info">
+        <div class="hex" data-c="${c}" title="Click to copy">${c.toUpperCase()}</div>
+        <div>rgb(${r}, ${g}, ${b})</div>
+        <div>hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(l)}%)</div>
+      </div>`;
+    pal.appendChild(col);
+
+    // Drag
+    col.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',i);col.style.opacity='0.4'});
+    col.addEventListener('dragend',()=>{col.style.opacity='1'});
+    col.addEventListener('dragover',e=>e.preventDefault());
+    col.addEventListener('drop',e=>{e.preventDefault();const from=parseInt(e.dataTransfer.getData('text/plain'));const to=i;if(from===to)return;const tmp=colors[from];colors[from]=colors[to];colors[to]=tmp;const tl=locked[from];locked[from]=locked[to];locked[to]=tl;render()});
+  });
+
+  // Lock buttons
+  pal.querySelectorAll('.lock-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{e.stopPropagation();const i=parseInt(btn.dataset.i);locked[i]=!locked[i];render()});
+  });
+  // Copy hex
+  pal.querySelectorAll('.hex').forEach(el=>{
+    el.addEventListener('click',()=>{navigator.clipboard.writeText(el.dataset.c);toast(el.dataset.c)});
+  });
+
+  renderContrast();renderPreview();
+}
+
+function toast(msg){const t=document.getElementById('toast');t.textContent='Copied '+msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1200)}
+
+function renderContrast(){
+  const grid=document.getElementById('contrast-grid');grid.innerHTML='';
+  for(let i=0;i<colors.length;i++)for(let j=i+1;j<colors.length;j++){
+    const ratio=contrastRatio(colors[i],colors[j]);
+    const pass=ratio>=4.5;
+    const pair=document.createElement('div');pair.className='contrast-pair';
+    pair.innerHTML=`<div style="display:flex;gap:4px;font-size:10px">${colors[i].toUpperCase()} / ${colors[j].toUpperCase()}</div>
+      <div class="ratio">${ratio.toFixed(2)}:1</div>
+      <div class="${pass?'pass':'fail'}">${pass?'AA Pass':'AA Fail'}</div>
+      <div class="contrast-sample"><div style="background:${colors[i]}"></div><div style="background:${colors[j]}"></div></div>`;
+    grid.appendChild(pair);
+  }
+}
+
+function renderPreview(){
+  const mock=document.getElementById('preview-mock');mock.innerHTML='';
+  // Header
+  const header=document.createElement('div');header.className='mock-header';
+  header.style.background=colors[0];header.style.color=hex2hsl(colors[0])[2]>55?'#000':'#fff';
+  header.innerHTML=`<span>AppName</span><span class="mock-badge" style="background:${colors[2]};color:${hex2hsl(colors[2])[2]>55?'#000':'#fff'}">Pro</span>`;
+  mock.appendChild(header);
+  // Card
+  const card=document.createElement('div');card.className='mock-card';
+  card.style.background=colors[3];card.style.color=hex2hsl(colors[3])[2]>55?'#111':'#fff';
+  card.innerHTML=`<h4>Card Title</h4><p>Sample content using your palette colors for text and backgrounds.</p>
+    <button class="mock-btn" style="background:${colors[1]};color:${hex2hsl(colors[1])[2]>55?'#000':'#fff'}">Action</button>`;
+  mock.appendChild(card);
+  // Card 2
+  const card2=document.createElement('div');card2.className='mock-card';
+  card2.style.background=colors[4];card2.style.color=hex2hsl(colors[4])[2]>55?'#111':'#fff';
+  card2.innerHTML=`<h4>Secondary</h4><p>Another card showing contrast between palette entries.</p>
+    <button class="mock-btn" style="background:${colors[0]};color:${hex2hsl(colors[0])[2]>55?'#000':'#fff'}">Details</button>`;
+  mock.appendChild(card2);
+}
+
+// Export CSS
+document.getElementById('expCSS').addEventListener('click',()=>{
+  const css=`:root {\n${colors.map((c,i)=>`  --color-${i+1}: ${c};`).join('\n')}\n}`;
+  navigator.clipboard.writeText(css);toast('CSS vars');
+});
+
+// Export Tailwind
+document.getElementById('expTW').addEventListener('click',()=>{
+  const tw=`// tailwind.config.js\nmodule.exports = {\n  theme: {\n    extend: {\n      colors: {\n        palette: {\n${colors.map((c,i)=>`          '${i+1}': '${c}',`).join('\n')}\n        }\n      }\n    }\n  }\n}`;
+  navigator.clipboard.writeText(tw);toast('Tailwind config');
+});
+
+// Export PNG
+document.getElementById('expPNG').addEventListener('click',()=>{
+  const cvs=document.createElement('canvas');cvs.width=500;cvs.height=120;
+  const ctx=cvs.getContext('2d');
+  const w=100;
+  colors.forEach((c,i)=>{
+    ctx.fillStyle=c;ctx.fillRect(i*w,0,w,80);
+    ctx.fillStyle='#222';ctx.fillRect(i*w,80,w,40);
+    ctx.fillStyle='#fff';ctx.font='12px monospace';ctx.textAlign='center';
+    ctx.fillText(c.toUpperCase(),i*w+w/2,102);
+  });
+  const a=document.createElement('a');a.href=cvs.toDataURL('image/png');a.download='palette.png';a.click();
+});
+
+// Random
+document.getElementById('randBtn').addEventListener('click',()=>{
+  document.getElementById('input').value='#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');
+  locked=[];genPalette();
+});
+
+document.getElementById('genBtn').addEventListener('click',genPalette);
+document.getElementById('input').addEventListener('keydown',e=>{if(e.key==='Enter')genPalette()});
+document.getElementById('harmony').addEventListener('change',genPalette);
+
+locked=Array(5).fill(false);
+genPalette();
+</script>
+</body>
+</html>

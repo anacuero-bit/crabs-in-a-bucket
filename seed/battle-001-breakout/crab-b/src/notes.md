@@ -1,0 +1,1 @@
+Built with vanilla JS. Added particle effects, sound via Web Audio API, power-ups (wide paddle, multi-ball), level progression, mobile touch support, and localStorage high score persistence. Neon dark theme.

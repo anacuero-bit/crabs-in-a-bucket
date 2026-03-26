@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neon Type</title>
+<style>
+:root{--bg:#0a0a1a;--panel:#12122a;--accent:#0ff;--green:#0f6;--red:#f44;--text:#c9d1d9;--dim:#444}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;overflow-x:hidden}
+#top-bar{width:100%;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1a1a3a;flex-wrap:wrap;gap:8px}
+#top-bar h1{font-size:18px;color:var(--accent);text-shadow:0 0 10px rgba(0,255,255,0.3)}
+.controls{display:flex;gap:8px;align-items:center}
+.controls select,.controls button{padding:5px 12px;font-size:12px;background:var(--panel);color:var(--text);border:1px solid #333;border-radius:4px;cursor:pointer}
+.controls button:hover{border-color:var(--accent)}
+#stats-bar{display:flex;gap:24px;padding:12px 20px;width:100%;max-width:800px;justify-content:center;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-val{font-size:26px;font-weight:bold;color:var(--accent);font-variant-numeric:tabular-nums}
+.stat-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#666}
+#timer-bar{width:100%;max-width:800px;height:4px;background:#1a1a3a;margin:0 auto;border-radius:2px;overflow:hidden}
+#timer-fill{height:100%;background:linear-gradient(90deg,var(--accent),#0f6);width:100%;transition:width 0.3s linear}
+#word-area{width:100%;max-width:800px;padding:30px 20px;min-height:160px;display:flex;flex-wrap:wrap;gap:8px 12px;justify-content:center;align-items:center;line-height:2.2}
+.word{font-size:22px;font-family:'Courier New',monospace;padding:2px 6px;border-radius:4px;transition:all 0.2s}
+.word.current{background:#1a2a4a;box-shadow:0 0 10px rgba(0,255,255,0.15)}
+.word.done-correct{color:#0f6;opacity:0.5}
+.word.done-wrong{color:var(--red);opacity:0.5;text-decoration:line-through}
+.word .char{transition:color 0.05s}
+.word .char.correct{color:var(--green)}
+.word .char.wrong{color:var(--red);text-decoration:underline}
+.word .char.cursor{border-left:2px solid var(--accent);animation:blink 0.8s infinite}
+@keyframes blink{0%,100%{border-color:var(--accent)}50%{border-color:transparent}}
+#input-area{width:100%;max-width:800px;padding:0 20px;margin-bottom:20px}
+#input{width:100%;padding:14px;font-size:20px;background:var(--panel);color:var(--text);border:2px solid #2a2a4a;border-radius:8px;outline:none;font-family:'Courier New',monospace;text-align:center}
+#input:focus{border-color:var(--accent);box-shadow:0 0 15px rgba(0,255,255,0.1)}
+#bottom{width:100%;max-width:800px;display:flex;gap:16px;padding:0 20px;flex-wrap:wrap;justify-content:center}
+#chart-area{flex:1;min-width:250px;background:var(--panel);border-radius:8px;padding:16px;border:1px solid #222}
+#chart-area h3{font-size:12px;color:#666;text-transform:uppercase;margin-bottom:10px;letter-spacing:1px}
+#history-chart{width:100%;height:120px}
+#heatmap-area{flex:1;min-width:250px;background:var(--panel);border-radius:8px;padding:16px;border:1px solid #222}
+#heatmap-area h3{font-size:12px;color:#666;text-transform:uppercase;margin-bottom:10px;letter-spacing:1px}
+#keyboard{display:flex;flex-direction:column;gap:4px;align-items:center}
+.kb-row{display:flex;gap:3px}
+.key{width:28px;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;background:#1a1a2e;border:1px solid #333;transition:background 0.3s}
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;align-items:center;justify-content:center;flex-direction:column}
+#overlay.visible{display:flex}
+#overlay h2{font-size:28px;color:var(--accent);text-shadow:0 0 20px rgba(0,255,255,0.5);margin-bottom:8px}
+#overlay .result-stats{display:flex;gap:24px;margin:16px 0}
+#overlay button{padding:10px 32px;font-size:16px;background:transparent;color:var(--accent);border:2px solid var(--accent);border-radius:6px;cursor:pointer;text-transform:uppercase;letter-spacing:2px}
+#overlay button:hover{background:var(--accent);color:var(--bg)}
+#confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:200}
+#start-overlay{display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:100;align-items:center;justify-content:center;flex-direction:column}
+#start-overlay h2{font-size:32px;color:var(--accent);margin-bottom:12px;text-shadow:0 0 30px rgba(0,255,255,0.4)}
+#start-overlay p{color:#888;margin-bottom:20px;font-size:14px}
+#start-overlay button{padding:12px 40px;font-size:18px;background:transparent;color:var(--accent);border:2px solid var(--accent);border-radius:6px;cursor:pointer;text-transform:uppercase;letter-spacing:2px}
+#start-overlay button:hover{background:var(--accent);color:var(--bg)}
+</style>
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+<div id="top-bar">
+  <h1>NEON TYPE</h1>
+  <div class="controls">
+    <select id="difficulty"><option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option></select>
+  </div>
+</div>
+<div id="stats-bar">
+  <div class="stat"><div class="stat-val" id="sWpm">0</div><div class="stat-label">WPM</div></div>
+  <div class="stat"><div class="stat-val" id="sAcc">100%</div><div class="stat-label">Accuracy</div></div>
+  <div class="stat"><div class="stat-val" id="sStreak">0</div><div class="stat-label">Streak</div></div>
+  <div class="stat"><div class="stat-val" id="sTime">60</div><div class="stat-label">Seconds</div></div>
+</div>
+<div id="timer-bar"><div id="timer-fill"></div></div>
+<div id="word-area"></div>
+<div id="input-area"><input type="text" id="input" placeholder="Start typing..." disabled autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+<div id="bottom">
+  <div id="chart-area"><h3>History (Last 5)</h3><canvas id="history-chart"></canvas></div>
+  <div id="heatmap-area"><h3>Miss Heatmap</h3><div id="keyboard"></div></div>
+</div>
+<div id="start-overlay"><h2>NEON TYPE</h2><p>How fast can you type? 60 seconds on the clock.</p><button id="startBtn">Start</button></div>
+<div id="overlay"><h2 id="oTitle"></h2><div class="result-stats" id="oStats"></div><button id="oBtn">Try Again</button></div>
+
+<script>
+const EASY=["the","be","to","of","and","a","in","it","for","not","on","he","as","you","do","at","but","we","or","an","my","so","up","if","me","no","go","us","am","is"];
+const MEDIUM=["about","their","would","there","other","after","could","think","first","because","these","people","every","place","while","where","still","found","world","right","house","point","small","great","group","begin","often","young","bring","start","close","under","never","learn","might","along","since","heart","light","story","watch","until","music","river","among","water","table","dance","earth","build","money","paper"];
+const HARD=["achievement","background","comfortable","demonstrate","environment","fundamental","immediately","acknowledge","nevertheless","occasionally","particularly","questionnaire","representative","sophisticated","understanding","vulnerability","communication","extraordinary","approximately","infrastructure","consciousness","philosophical","revolutionary","transformation","characterize","comprehensive","disappointment","investigation","manufacturing","perpendicular"];
+
+const wordLists={easy:EASY,medium:MEDIUM,hard:HARD};
+let words=[],wordIdx=0,charIdx=0,running=false,timer,timeLeft=60,totalChars=0,correctChars=0,streak=0,bestStreak=0,wordsCompleted=0;
+let missMap={};
+const history=JSON.parse(localStorage.getItem('neonTypeHistory')||'[]');
+
+const wordArea=document.getElementById('word-area'),inputEl=document.getElementById('input');
+const sWpm=document.getElementById('sWpm'),sAcc=document.getElementById('sAcc'),sStreak=document.getElementById('sStreak'),sTime=document.getElementById('sTime'),timerFill=document.getElementById('timer-fill');
+
+function genWords(n=40){
+  const list=wordLists[document.getElementById('difficulty').value];
+  const out=[];for(let i=0;i<n;i++)out.push(list[Math.floor(Math.random()*list.length)]);
+  return out;
+}
+
+function renderWords(){
+  wordArea.innerHTML='';
+  words.forEach((w,wi)=>{
+    const span=document.createElement('span');
+    span.className='word'+(wi===wordIdx?' current':'');
+    if(wi<wordIdx)span.className='word '+(w._correct?'done-correct':'done-wrong');
+    w.split('').forEach((ch,ci)=>{
+      const s=document.createElement('span');s.className='char';s.textContent=ch;
+      if(wi===wordIdx){
+        if(ci<charIdx){
+          const typed=inputEl.value[ci];
+          s.className='char '+(typed===ch?'correct':'wrong');
+        }else if(ci===charIdx){
+          s.className='char cursor';
+        }
+      }
+      span.appendChild(s);
+    });
+    wordArea.appendChild(span);
+  });
+}
+
+function start(){
+  document.getElementById('start-overlay').style.display='none';
+  document.getElementById('overlay').classList.remove('visible');
+  words=genWords(50);wordIdx=0;charIdx=0;
+  totalChars=0;correctChars=0;streak=0;bestStreak=0;wordsCompleted=0;
+  missMap={};timeLeft=60;running=true;
+  inputEl.disabled=false;inputEl.value='';inputEl.focus();
+  sWpm.textContent='0';sAcc.textContent='100%';sStreak.textContent='0';sTime.textContent='60';timerFill.style.width='100%';
+  renderWords();drawHeatmap();drawHistory();
+  timer=setInterval(tick,1000);
+}
+
+function tick(){
+  timeLeft--;sTime.textContent=timeLeft;
+  timerFill.style.width=(timeLeft/60*100)+'%';
+  const elapsed=60-timeLeft;
+  if(elapsed>0)sWpm.textContent=Math.round(wordsCompleted/(elapsed/60));
+  if(timeLeft<=0)endGame();
+}
+
+function endGame(){
+  clearInterval(timer);running=false;inputEl.disabled=true;
+  const wpm=Math.round(wordsCompleted/1);// 60s=1min
+  const acc=totalChars>0?Math.round(correctChars/totalChars*100):100;
+  const elapsed=60;
+  const finalWpm=Math.round(wordsCompleted/(elapsed/60));
+
+  // Save history
+  history.push({wpm:finalWpm,acc,date:Date.now()});
+  if(history.length>5)history.shift();
+  localStorage.setItem('neonTypeHistory',JSON.stringify(history));
+
+  // Check personal best
+  const best=Math.max(...history.map(h=>h.wpm));
+  const isPB=finalWpm>=best&&history.length>1;
+
+  const ov=document.getElementById('overlay');
+  document.getElementById('oTitle').textContent=isPB?'New Personal Best!':'Time\'s Up!';
+  document.getElementById('oStats').innerHTML=`
+    <div class="stat"><div class="stat-val">${finalWpm}</div><div class="stat-label">WPM</div></div>
+    <div class="stat"><div class="stat-val">${acc}%</div><div class="stat-label">Accuracy</div></div>
+    <div class="stat"><div class="stat-val">${wordsCompleted}</div><div class="stat-label">Words</div></div>
+    <div class="stat"><div class="stat-val">${bestStreak}</div><div class="stat-label">Best Streak</div></div>`;
+  ov.classList.add('visible');
+
+  if(isPB)fireConfetti();
+  drawHistory();drawHeatmap();
+}
+
+inputEl.addEventListener('input',()=>{
+  if(!running)return;
+  const val=inputEl.value;
+  charIdx=val.length;
+  renderWords();
+});
+
+inputEl.addEventListener('keydown',e=>{
+  if(!running)return;
+  if(e.key===' '||e.key==='Enter'){
+    e.preventDefault();
+    const val=inputEl.value;
+    const target=words[wordIdx];
+    let wordCorrect=val===target;
+    for(let i=0;i<Math.max(val.length,target.length);i++){
+      totalChars++;
+      if(val[i]===target[i]){correctChars++}
+      else{
+        const missed=target[i]||val[i];
+        if(missed)missMap[missed.toLowerCase()]=(missMap[missed.toLowerCase()]||0)+1;
+      }
+    }
+    words[wordIdx]._correct=wordCorrect;
+    if(wordCorrect){streak++;if(streak>bestStreak)bestStreak=streak}else{streak=0}
+    sStreak.textContent=streak;
+    wordsCompleted++;
+    const acc=totalChars>0?Math.round(correctChars/totalChars*100):100;
+    sAcc.textContent=acc+'%';
+    wordIdx++;charIdx=0;inputEl.value='';
+    if(wordIdx>=words.length){const more=genWords(30);words.push(...more)}
+    renderWords();drawHeatmap();
+  }
+});
+
+// Heatmap
+const KB_ROWS=[['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['z','x','c','v','b','n','m']];
+function drawHeatmap(){
+  const kb=document.getElementById('keyboard');kb.innerHTML='';
+  const maxMiss=Math.max(1,...Object.values(missMap));
+  KB_ROWS.forEach(row=>{
+    const div=document.createElement('div');div.className='kb-row';
+    row.forEach(k=>{
+      const key=document.createElement('div');key.className='key';key.textContent=k;
+      const miss=missMap[k]||0;
+      if(miss>0){const intensity=miss/maxMiss;key.style.background=`rgba(255,${Math.round(100-intensity*100)},${Math.round(60-intensity*60)},${0.3+intensity*0.7})`;key.style.borderColor='#f44'}
+      div.appendChild(key);
+    });
+    kb.appendChild(div);
+  });
+}
+
+// History chart
+function drawHistory(){
+  const canvas=document.getElementById('history-chart');
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth*2;canvas.height=canvas.offsetHeight*2;
+  ctx.scale(2,2);
+  const w=canvas.offsetWidth,h=canvas.offsetHeight;
+  ctx.clearRect(0,0,w,h);
+  if(history.length===0){ctx.fillStyle='#444';ctx.font='12px Arial';ctx.textAlign='center';ctx.fillText('No history yet',w/2,h/2);return}
+  const maxWpm=Math.max(20,...history.map(h=>h.wpm));
+  const barW=Math.min(40,w/history.length-8);
+  history.forEach((entry,i)=>{
+    const x=(w/(history.length))*(i+0.5)-barW/2;
+    const bh=(entry.wpm/maxWpm)*(h-30);
+    const grad=ctx.createLinearGradient(x,h-20-bh,x,h-20);
+    grad.addColorStop(0,'#0ff');grad.addColorStop(1,'#06a');
+    ctx.fillStyle=grad;
+    ctx.beginPath();ctx.roundRect(x,h-20-bh,barW,bh,3);ctx.fill();
+    ctx.fillStyle='#aaa';ctx.font='10px Arial';ctx.textAlign='center';
+    ctx.fillText(entry.wpm+'',x+barW/2,h-24-bh);
+    ctx.fillStyle='#666';ctx.fillText('#'+(i+1),x+barW/2,h-6);
+  });
+}
+
+// Confetti
+function fireConfetti(){
+  const canvas=document.getElementById('confetti-canvas');
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const ctx=canvas.getContext('2d');
+  const pieces=[];
+  for(let i=0;i<120;i++){pieces.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height-canvas.height,dx:(Math.random()-0.5)*6,dy:Math.random()*4+2,r:Math.random()*6+3,color:['#0ff','#0f6','#f0f','#ff0','#f66'][Math.floor(Math.random()*5)],rot:Math.random()*6.28,drot:(Math.random()-0.5)*0.2})}
+  let frames=0;
+  function anim(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      p.x+=p.dx;p.y+=p.dy;p.dy+=0.1;p.rot+=p.drot;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);
+      ctx.fillStyle=p.color;ctx.globalAlpha=Math.max(0,1-frames/100);
+      ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.6);
+      ctx.restore();
+    });
+    frames++;
+    if(frames<120)requestAnimationFrame(anim);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  anim();
+}
+
+document.getElementById('startBtn').addEventListener('click',start);
+document.getElementById('oBtn').addEventListener('click',start);
+drawHistory();drawHeatmap();
+renderWords();
+</script>
+</body>
+</html>

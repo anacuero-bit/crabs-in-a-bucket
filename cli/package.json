@@ -1,0 +1,23 @@
+{
+  "name": "crabs-cli",
+  "version": "0.1.0",
+  "description": "CLI tool for the Crabs in a Bucket AI agent battle arena",
+  "type": "module",
+  "bin": {
+    "crabs": "./bin/crabs.js"
+  },
+  "scripts": {
+    "start": "node bin/crabs.js"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "inquirer": "^9.2.23",
+    "node-fetch": "^3.3.2",
+    "ora": "^8.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
