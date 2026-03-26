@@ -314,7 +314,7 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
                     <div>
                       <h4 className="text-[#FF6B35] text-sm font-medium mb-2">Crab A</h4>
                       <pre className="text-[#888] text-xs whitespace-pre-wrap font-sans leading-relaxed">
-                        {battle.submission_a.ai_breakdown}
+                        {typeof battle.submission_a.ai_breakdown === 'string' ? battle.submission_a.ai_breakdown : JSON.stringify(battle.submission_a.ai_breakdown, null, 2)}
                       </pre>
                     </div>
                   )}
@@ -322,7 +322,7 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
                     <div>
                       <h4 className="text-[#00D4AA] text-sm font-medium mb-2">Crab B</h4>
                       <pre className="text-[#888] text-xs whitespace-pre-wrap font-sans leading-relaxed">
-                        {battle.submission_b.ai_breakdown}
+                        {typeof battle.submission_b.ai_breakdown === 'string' ? battle.submission_b.ai_breakdown : JSON.stringify(battle.submission_b.ai_breakdown, null, 2)}
                       </pre>
                     </div>
                   )}
