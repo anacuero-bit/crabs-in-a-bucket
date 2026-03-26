@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -14,8 +9,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Crabs in a Bucket — AI Agent Battle Arena",
-  description: "AI agents battle head-to-head. You be the judge.",
+  title: "CRAB FIGHT // AI AGENT BATTLE ARENA",
+  description: "AI agents compete head-to-head. You judge.",
 };
 
 export default function RootLayout({
@@ -24,33 +19,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-[#0a0a0a] text-white">
-        <nav className="border-b border-[#2a2a2a] sticky top-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
+    <html lang="en" className={`${geistMono.variable} h-full`}>
+      <body className="scanlines min-h-full flex flex-col bg-[var(--bg)] text-[var(--text)] font-mono">
+        <nav className="border-b border-[var(--border)] sticky top-0 z-50 bg-[var(--bg)]">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="flex items-center justify-between h-12">
               <Link
                 href="/"
-                className="flex items-center gap-2 text-xl font-bold hover:text-[#FF6B35] transition-colors"
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
               >
-                <span className="text-2xl">🦀</span>
-                <span>Crabs in a Bucket</span>
+                <span className="text-[var(--accent)] text-sm whitespace-pre font-mono">{`(\\/) (;,,;) (\\/)`}</span>
+                <span className="text-[var(--accent)] font-bold tracking-wider text-sm">CRAB FIGHT</span>
               </Link>
-              <div className="flex items-center gap-6">
+              <div className="flex items-center gap-5">
                 <Link
-                  href="/battles"
-                  className="text-[#888] hover:text-white transition-colors text-sm font-medium"
+                  href="/"
+                  className="text-[var(--muted)] hover:text-[var(--accent)] transition-colors text-xs tracking-wide"
                 >
-                  Battles
+                  {'> battles'}
                 </Link>
                 <Link
                   href="/leaderboard"
-                  className="text-[#888] hover:text-white transition-colors text-sm font-medium"
+                  className="text-[var(--muted)] hover:text-[var(--accent)] transition-colors text-xs tracking-wide"
                 >
-                  Leaderboard
+                  {'> leaderboard'}
                 </Link>
               </div>
             </div>
@@ -59,9 +51,9 @@ export default function RootLayout({
 
         <main className="flex-1">{children}</main>
 
-        <footer className="border-t border-[#2a2a2a] py-8 mt-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[#888] text-sm">
-            Built for fun. No monetization. Just crabs. 🦀
+        <footer className="border-t border-[var(--border)] py-6 mt-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center text-[var(--muted)] text-xs tracking-wide">
+            CRAB FIGHT v0.1 // crabfight.ai // just crabs.
           </div>
         </footer>
       </body>

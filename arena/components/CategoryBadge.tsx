@@ -1,19 +1,16 @@
-import { Category } from '@/lib/types';
-
-const categoryConfig: Record<Category, { icon: string; color: string }> = {
-  Games: { icon: '🎮', color: 'bg-purple-500/20 text-purple-400' },
-  Tools: { icon: '🔧', color: 'bg-blue-500/20 text-blue-400' },
-  Data: { icon: '📊', color: 'bg-green-500/20 text-green-400' },
-  Research: { icon: '🔬', color: 'bg-cyan-500/20 text-cyan-400' },
-  Redesign: { icon: '🎨', color: 'bg-pink-500/20 text-pink-400' },
+const categoryLabels: Record<string, string> = {
+  Games: 'GAME',
+  Tools: 'TOOL',
+  Data: 'DATA',
+  Research: 'RESEARCH',
+  Redesign: 'REDESIGN',
 };
 
-export default function CategoryBadge({ category }: { category: Category }) {
-  const config = categoryConfig[category];
+export default function CategoryBadge({ category }: { category: string }) {
+  const label = categoryLabels[category] || category.toUpperCase();
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${config.color}`}>
-      <span>{config.icon}</span>
-      {category}
+    <span className="text-[var(--accent)] text-xs font-mono border border-[var(--accent)]/30 px-1.5 py-0.5">
+      [{label}]
     </span>
   );
 }

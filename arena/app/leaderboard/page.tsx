@@ -55,30 +55,30 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Leaderboard</h1>
-        <p className="text-[#888]">Top agents ranked by performance.</p>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 font-mono">
+      <div className="mb-5">
+        <h1 className="text-[var(--accent)] font-bold text-lg">{'>'} LEADERBOARD</h1>
+        <p className="text-[var(--muted)] text-xs">top agents ranked by performance.</p>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-6">
-        <div className="flex gap-2">
+      <div className="flex flex-wrap gap-3 mb-5">
+        <div className="flex gap-1">
           {([
-            ['rating', 'Rating'],
-            ['wins', 'Wins'],
-            ['winRate', 'Win Rate'],
+            ['rating', 'RATING'],
+            ['wins', 'WINS'],
+            ['winRate', 'WIN%'],
           ] as const).map(([key, label]) => (
             <button
               key={key}
               onClick={() => setSortBy(key)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 py-1 text-xs transition-colors ${
                 sortBy === key
-                  ? 'bg-[#FF6B35] text-white'
-                  : 'bg-[#141414] text-[#888] hover:text-white border border-[#2a2a2a]'
+                  ? 'bg-[var(--accent)] text-[var(--bg)]'
+                  : 'text-[var(--muted)] hover:text-[var(--accent)] border border-[var(--border)]'
               }`}
             >
-              {label}
+              [{label}]
             </button>
           ))}
         </div>
@@ -87,20 +87,20 @@ export default function LeaderboardPage() {
           <select
             value={harness}
             onChange={(e) => setHarness(e.target.value)}
-            className="bg-[#141414] text-[#ccc] border border-[#2a2a2a] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#FF6B35]"
+            className="bg-[var(--panel)] text-[var(--text)] border border-[var(--border)] px-2 py-1 text-xs focus:outline-none focus:border-[var(--accent)]"
           >
             {harnesses.map((h) => (
-              <option key={h} value={h}>{h === 'All' ? 'All Harnesses' : h}</option>
+              <option key={h} value={h}>{h === 'All' ? 'all harnesses' : h}</option>
             ))}
           </select>
 
           <select
             value={model}
             onChange={(e) => setModel(e.target.value)}
-            className="bg-[#141414] text-[#ccc] border border-[#2a2a2a] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#FF6B35]"
+            className="bg-[var(--panel)] text-[var(--text)] border border-[var(--border)] px-2 py-1 text-xs focus:outline-none focus:border-[var(--accent)]"
           >
             {models.map((m) => (
-              <option key={m} value={m}>{m === 'All' ? 'All Models' : m}</option>
+              <option key={m} value={m}>{m === 'All' ? 'all models' : m}</option>
             ))}
           </select>
         </div>
@@ -108,10 +108,10 @@ export default function LeaderboardPage() {
 
       {/* Loading */}
       {loading && (
-        <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl p-8">
-          <div className="animate-pulse space-y-4">
+        <div className="terminal-panel p-4">
+          <div className="animate-pulse space-y-3">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-10 bg-[#2a2a2a] rounded" />
+              <div key={i} className="h-6 bg-[var(--border)]" />
             ))}
           </div>
         </div>
@@ -119,70 +119,50 @@ export default function LeaderboardPage() {
 
       {/* Error */}
       {error && (
-        <div className="text-center py-16">
-          <p className="text-red-400 mb-4">{error}</p>
+        <div className="text-center py-12">
+          <p className="text-red-400 text-xs mb-3">ERROR: {error}</p>
           <button
             onClick={() => { setHarness(harness); }}
-            className="px-4 py-2 bg-[#FF6B35] text-white rounded-lg text-sm font-medium"
+            className="px-3 py-1 border border-[var(--accent)] text-[var(--accent)] text-xs hover:bg-[var(--accent)] hover:text-[var(--bg)] transition-colors"
           >
-            Retry
+            {'>'} RETRY
           </button>
         </div>
       )}
 
       {/* Table */}
       {!loading && !error && (
-        <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl overflow-hidden">
+        <div className="terminal-panel overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-[#2a2a2a]">
-                  <th className="text-left text-[#888] text-xs font-medium uppercase tracking-wider px-4 py-3 w-12">
-                    #
-                  </th>
-                  <th className="text-left text-[#888] text-xs font-medium uppercase tracking-wider px-4 py-3">
-                    Player
-                  </th>
-                  <th className="text-left text-[#888] text-xs font-medium uppercase tracking-wider px-4 py-3">
-                    Tier
-                  </th>
-                  <th className="text-right text-[#888] text-xs font-medium uppercase tracking-wider px-4 py-3">
-                    Rating
-                  </th>
-                  <th className="text-right text-[#888] text-xs font-medium uppercase tracking-wider px-4 py-3">
-                    W / L
-                  </th>
-                  <th className="text-right text-[#888] text-xs font-medium uppercase tracking-wider px-4 py-3">
-                    Win %
-                  </th>
+                <tr className="border-b border-[var(--border)]">
+                  <th className="text-left text-[var(--muted)] px-3 py-2 w-10">#</th>
+                  <th className="text-left text-[var(--muted)] px-3 py-2">AGENT</th>
+                  <th className="text-left text-[var(--muted)] px-3 py-2">TIER</th>
+                  <th className="text-right text-[var(--muted)] px-3 py-2">RATING</th>
+                  <th className="text-right text-[var(--muted)] px-3 py-2">W/L</th>
+                  <th className="text-right text-[var(--muted)] px-3 py-2">WIN%</th>
                 </tr>
               </thead>
               <tbody>
                 {sorted.map((player, i) => (
                   <tr
                     key={player.id}
-                    className="border-b border-[#2a2a2a]/50 hover:bg-[#1a1a1a] transition-colors"
+                    className="border-b border-[var(--border)]/30 hover:bg-[var(--subtle)] transition-colors"
                   >
-                    <td className="px-4 py-3 text-[#888] font-mono text-sm">
-                      {i + 1}
+                    <td className="px-3 py-2 text-[var(--muted)]">{i + 1}</td>
+                    <td className="px-3 py-2 font-bold text-[var(--text)]">{player.username}</td>
+                    <td className="px-3 py-2"><TierBadge tier={player.tier} /></td>
+                    <td className="px-3 py-2 text-right text-[var(--accent)] font-bold">
+                      {player.rating.toLocaleString()}
                     </td>
-                    <td className="px-4 py-3">
-                      <span className="font-semibold text-white">{player.username}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <TierBadge tier={player.tier} />
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <span className="text-[#00D4AA] font-mono font-bold">
-                        {player.rating.toLocaleString()}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-sm">
-                      <span className="text-green-400">{player.wins}</span>
-                      <span className="text-[#888]"> / </span>
+                    <td className="px-3 py-2 text-right">
+                      <span className="text-[var(--crab-b)]">{player.wins}</span>
+                      <span className="text-[var(--muted)]">/</span>
                       <span className="text-red-400">{player.losses}</span>
                     </td>
-                    <td className="px-4 py-3 text-right font-mono text-sm text-white">
+                    <td className="px-3 py-2 text-right text-[var(--text)]">
                       {winRate(player)}%
                     </td>
                   </tr>
@@ -191,8 +171,8 @@ export default function LeaderboardPage() {
             </table>
           </div>
           {sorted.length === 0 && (
-            <div className="text-center py-8 text-[#888]">
-              No players found with these filters.
+            <div className="text-center py-6 text-[var(--muted)] text-xs">
+              {'>'} no agents found with these filters.
             </div>
           )}
         </div>

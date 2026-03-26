@@ -1,9 +1,9 @@
 # Crabs in a Bucket — Status
 
-Last updated: 2026-03-25
+Last updated: 2026-03-26
 
 ## Phase
-Phase 1 — The Cupcake. MVP built locally. Needs clean server verification + deploy.
+Phase 1 — The Cupcake. **LIVE at https://crabfight.ai**
 
 ## Concept Summary
 AI agents compete head-to-head on timed challenges. Both outputs embedded side-by-side on arena website. Community votes. Battles live forever as playable content.
@@ -15,8 +15,17 @@ AI agents compete head-to-head on timed challenges. Both outputs embedded side-b
 - **Scoring:** AI referee (40%) + community vote (60%)
 - **Leaderboards by stack** — filter by model + harness
 - **Timer enforced** from pull to submit
-- **Design:** vintage terminal / MS-DOS, monochrome + hot pink crab accent
-- **Name candidate:** Crab Fight
+- **Design:** vintage terminal / MS-DOS, monochrome + hot pink crab accent (not yet applied)
+- **Name:** Crab Fight — domain: crabfight.ai
+
+## Infrastructure
+- **VPS:** DigitalOcean droplet `commandcenter` (24.144.103.101)
+- **API:** Fastify + SQLite, port 5000, managed by pm2 (`crabfight-api`)
+- **Arena:** Next.js 16.2.1, port 3001, managed by pm2 (`crabfight-arena`)
+- **Nginx:** reverse proxy, SSL via self-signed cert (Cloudflare proxied handles public SSL)
+- **DNS:** Cloudflare zone `crabfight.ai` — A records for @ and api, CNAME for www
+- **GitHub:** https://github.com/anacuero-bit/crabs-in-a-bucket (public)
+- **Firewall:** ufw — ports 22, 80, 443, 5001 open
 
 ## What's Built
 - ✅ CONCEPT.md — final concept with two-layer model + folder submissions
@@ -28,19 +37,15 @@ AI agents compete head-to-head on timed challenges. Both outputs embedded side-b
 - ✅ Arena website (arena/) — Next.js, wired to API, battle viewer + voting + Under the Hood
 - ✅ Seed content (seed/) — 8 HTML apps (Breakout, JSON Formatter, Typing Game, Color Palette × 2)
 - ✅ Seed data — 4 battles, 8 submissions, 400 votes in database
-- ✅ API response normalizer — website handles both flat and nested API shapes
-- ✅ start.sh — startup script for both servers
-- ✅ HOW-TO-RUN.md — local setup instructions
+- ✅ Deployed to production — crabfight.ai live with SSL
 
 ## Known Issues
-- Zombie Node processes held ports during session — need clean restart to verify full end-to-end
-- Manuel saw homepage but iframes may not have rendered (file serving path needs verification)
-- .env.local points to localhost:5000 (API confirmed working with nested data on that port)
+- One seed game (Breakout crab-b) has a non-functional start button — seed content bug, not platform
+- Cloudflare API token doesn't have DNS write access — DNS records added manually
+- Design refresh (MS-DOS aesthetic) not yet applied
 
 ## Next Session
-1. **Clean restart** — kill all Node, start API on 5000, website on 5001, verify iframes render
-2. **Fix any file serving issues** — submission HTML must load in iframes
-3. **Apply design refresh** — MS-DOS / terminal aesthetic, hot pink crab accent
-4. **External setup** — Supabase, Vercel, GitHub org (crabs-arena), domain
-5. **Deploy live** — Phase 1 cupcake goes public
-6. **Begin Phase 2** — First 10 Users outreach (r/ClaudeAI, r/cursor, AI Discords)
+1. **Apply design refresh** — MS-DOS / terminal aesthetic, hot pink crab accent
+2. **GitHub org** — create `crabs-arena` for public submission repos
+3. **Begin Phase 2** — First 10 Users outreach (r/ClaudeAI, r/cursor, AI Discords)
+4. **CLI pointing to production** — update CLI config to use api.crabfight.ai

@@ -85,7 +85,7 @@ export async function castVote(battleId: string, vote: 'A' | 'B'): Promise<void>
   const res = await fetch(`${API_BASE}/api/battles/${battleId}/vote`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ vote }),
+    body: JSON.stringify({ voted_for: vote }),
   });
   if (!res.ok) throw new Error(`Failed to cast vote: ${res.status}`);
 }
