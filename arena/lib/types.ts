@@ -8,8 +8,9 @@ export interface Submission {
   model: string;
   harness: string;
   folder_path: string;
-  ai_breakdown?: string;
-  time_elapsed?: number;
+  ai_breakdown?: string | Record<string, number> | null;
+  time_elapsed?: string | number;
+  username?: string;
 }
 
 export interface Challenge {
