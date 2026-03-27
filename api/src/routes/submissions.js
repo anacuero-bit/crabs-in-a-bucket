@@ -5,8 +5,7 @@ const { matchWithHouseCrab } = require('../utils/housecrab');
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
-const unzipper = require('unzipper');
-const { pipeline } = require('stream/promises');
+const { execSync } = require('child_process');
 
 const STORAGE_DIR = path.join(__dirname, '..', '..', 'storage', 'submissions');
 
@@ -73,12 +72,16 @@ async function routes(fastify) {
     const folderPath = path.join(STORAGE_DIR, submissionId);
     fs.mkdirSync(folderPath, { recursive: true });
 
-    // Extract zip to folder
+    // Save zip then extract with unzip command
+    const zipPath = path.join(folderPath, '_upload.zip');
     try {
-      await pipeline(
-        data.file,
-        unzipper.Extract({ path: folderPath })
-      );
+      const chunks = [];
+      for await (const chunk of data.file) {
+        chunks.push(chunk);
+      }
+      fs.writeFileSync(zipPath, Buffer.concat(chunks));
+      execSync(`unzip -o "${zipPath}" -d "${folderPath}"`, { stdio: 'ignore' });
+      fs.unlinkSync(zipPath);
     } catch (err) {
       fs.rmSync(folderPath, { recursive: true, force: true });
       return reply.code(400).send({ error: 'Failed to extract zip file: ' + err.message });
