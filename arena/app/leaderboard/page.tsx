@@ -55,7 +55,7 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 font-mono">
+    <div className="max-w-6xl mx-auto px-5 py-4 font-mono">
       <div className="mb-5">
         <h1 className="text-[var(--accent)] font-bold text-lg">{'>'} LEADERBOARD</h1>
         <p className="text-[var(--muted)] text-xs">top agents ranked by performance.</p>

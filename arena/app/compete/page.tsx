@@ -154,7 +154,7 @@ export default function CompetePage() {
   }, [handleFileReady]);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 font-mono">
+    <div className="max-w-6xl mx-auto px-5 py-4 font-mono">
 
       {/* FIGHTING */}
       {phase === 'fighting' && (
@@ -177,23 +177,34 @@ export default function CompetePage() {
                 <p className="text-[var(--dim)] text-xs mt-1">{challenge.prompt.split('\n')[0]}</p>
               </div>
 
-              {/* Clock box — urgency */}
+              {/* Upload + clock — combined */}
               <div
-                className={`terminal-panel p-3 mb-3 flex items-center justify-between cursor-pointer hover:border-[var(--accent)] transition-colors ${remaining <= 60 ? 'border-red-400/50' : ''}`}
+                className={`terminal-panel p-6 mb-4 text-center cursor-pointer transition-colors ${
+                  dragging ? 'border-[var(--accent)] bg-[var(--accent)]/5' : remaining <= 60 ? 'border-red-400/50' : 'hover:border-[var(--accent)]'
+                }`}
+                onDragOver={e => { e.preventDefault(); setDragging(true); }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
               >
-                <span className="text-[var(--muted)] text-[10px]">
-                  clock is ticking — build it, zip it, drop it here
-                </span>
-                <div className={`font-bold text-sm tabular-nums ${remaining <= 60 ? 'text-red-400 fight-flash' : remaining <= 120 ? 'text-yellow-400' : 'text-[var(--accent)]'}`}>
+                <div className={`font-bold text-lg tabular-nums mb-2 ${remaining <= 60 ? 'text-red-400 fight-flash' : remaining <= 120 ? 'text-yellow-400' : 'text-[var(--accent)]'}`}>
                   {formatTime(remaining)}
                 </div>
+                <div className="text-[var(--accent)] text-xl mb-1">{dragging ? 'DROP IT' : '(.zip)'}</div>
+                <p className="text-[var(--muted)] text-[10px]">clock is ticking — drop your submission zip here</p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".zip"
+                  onChange={e => { const f = e.target.files?.[0]; if (f) handleFileReady(f); }}
+                  className="hidden"
+                />
               </div>
 
               {/* Challenge a friend */}
               <div className="terminal-panel p-3 mb-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-[var(--dim)] text-[10px]">challenge a friend — send them this fight</span>
+                  <span className="text-[var(--dim)] text-[10px]">challenge a friend</span>
                   <button
                     onClick={() => {
                       const url = typeof window !== 'undefined' ? window.location.href : '';
@@ -209,7 +220,7 @@ export default function CompetePage() {
               </div>
 
               {/* Challenge prompt */}
-              <div className="terminal-panel p-4 mb-4 relative">
+              <div className="terminal-panel p-4 mb-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[var(--muted)] text-xs font-bold">prompt</span>
                   <button
@@ -222,28 +233,6 @@ export default function CompetePage() {
                 <pre className="text-[var(--text)] text-xs whitespace-pre-wrap leading-relaxed">
                   {challenge.prompt}
                 </pre>
-              </div>
-
-              {/* Upload zone */}
-              <div
-                className={`terminal-panel p-8 text-center cursor-pointer transition-colors ${
-                  dragging ? 'border-[var(--accent)] bg-[var(--accent)]/5' : 'hover:border-[var(--accent)]'
-                }`}
-                onDragOver={e => { e.preventDefault(); setDragging(true); }}
-                onDragLeave={() => setDragging(false)}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <div className="text-[var(--accent)] text-2xl mb-2">{dragging ? 'DROP IT' : '(.zip)'}</div>
-                <p className="text-[var(--muted)] text-xs mb-1">drag & drop your submission zip</p>
-                <p className="text-[var(--muted)] text-xs opacity-60">must contain index.html</p>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".zip"
-                  onChange={e => { const f = e.target.files?.[0]; if (f) handleFileReady(f); }}
-                  className="hidden"
-                />
               </div>
 
               {error && <p className="text-red-400 text-xs text-center mt-3">{error}</p>}

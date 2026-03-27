@@ -39,7 +39,7 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+      <div className="max-w-6xl mx-auto px-5 py-4">
         <div className="animate-pulse font-mono">
           <div className="h-3 bg-[var(--border)] w-24 mb-4" />
           <div className="h-5 bg-[var(--border)] w-2/3 mb-4" />
@@ -54,7 +54,7 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
 
   if (error || !battle) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-12 text-center font-mono">
+      <div className="max-w-6xl mx-auto px-5 py-12 text-center font-mono">
         <p className="text-red-400 text-sm mb-3">ERROR: {error || 'Battle not found'}</p>
         <Link href="/" className="text-[var(--accent)] text-xs hover:underline">{'>'} back to battles</Link>
       </div>
@@ -79,7 +79,7 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
   const iframeSrcB = `${API_BASE}/api/files/submissions/${battle.submission_b.id}/index.html`;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 font-mono">
+    <div className="max-w-6xl mx-auto px-5 py-4 font-mono">
       {/* Header */}
       <div className="mb-5">
         <Link href="/" className="text-[var(--muted)] hover:text-[var(--accent)] text-xs mb-3 inline-block">
