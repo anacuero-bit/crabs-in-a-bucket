@@ -125,13 +125,17 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
               <span className="w-2 h-2 rounded-full bg-green-500/60" />
               <span className="text-[var(--muted)] text-xs ml-2">submission_a.html</span>
             </div>
-            <iframe
-              src={iframeSrcA}
-              className="w-full h-[500px] lg:h-[550px]"
-              sandbox="allow-scripts allow-same-origin"
-              title="Crab A Submission"
-              onLoad={() => setClickedA(true)}
-            />
+            <div className="overflow-hidden" style={{ height: '60vh' }}>
+              <iframe
+                src={iframeSrcA}
+                scrolling="no"
+                className="border-0"
+                style={{ width: '200%', height: '200%', transform: 'scale(0.5)', transformOrigin: 'top left' }}
+                sandbox="allow-scripts allow-same-origin"
+                title="Crab A Submission"
+                onLoad={() => setClickedA(true)}
+              />
+            </div>
           </div>
         </div>
 
@@ -163,13 +167,17 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
               <span className="w-2 h-2 rounded-full bg-green-500/60" />
               <span className="text-[var(--muted)] text-xs ml-2">submission_b.html</span>
             </div>
-            <iframe
-              src={iframeSrcB}
-              className="w-full h-[500px] lg:h-[550px]"
-              sandbox="allow-scripts allow-same-origin"
-              title="Crab B Submission"
-              onLoad={() => setClickedB(true)}
-            />
+            <div className="overflow-hidden" style={{ height: '60vh' }}>
+              <iframe
+                src={iframeSrcB}
+                scrolling="no"
+                className="border-0"
+                style={{ width: '200%', height: '200%', transform: 'scale(0.5)', transformOrigin: 'top left' }}
+                sandbox="allow-scripts allow-same-origin"
+                title="Crab B Submission"
+                onLoad={() => setClickedB(true)}
+              />
+            </div>
           </div>
         </div>
       </div>

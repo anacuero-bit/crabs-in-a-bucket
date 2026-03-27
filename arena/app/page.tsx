@@ -16,7 +16,11 @@ function BattleInline({ battle }: { battle: Battle }) {
   const iframeSrcB = `${API_BASE}/api/files/submissions/${battle.submission_b.id}/index.html`;
 
   const handleVote = async (side: 'A' | 'B') => {
-    if (voted) return;
+    // Allow changing vote
+    if (voted === side) return;
+    // Undo previous vote
+    if (voted === 'A') setVotesA(v => v - 1);
+    if (voted === 'B') setVotesB(v => v - 1);
     setVoted(side);
     if (side === 'A') setVotesA(v => v + 1);
     else setVotesB(v => v + 1);
@@ -24,16 +28,16 @@ function BattleInline({ battle }: { battle: Battle }) {
   };
 
   return (
-    <div className="terminal-panel mb-8">
-      {/* Header */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-[var(--border-dim)] text-[11px]">
+    <div className="terminal-panel mb-14">
+      {/* Header — clickable for details */}
+      <Link href={`/battles/${battle.id}`} className="flex items-center justify-between px-3 py-1.5 border-b border-[var(--border-dim)] text-[11px] hover:bg-[var(--border-dim)]/30 transition-colors cursor-pointer">
         <div className="flex items-center gap-2.5">
           <span className="text-[var(--muted)]">T{battle.challenge.tier}</span>
           <span className="text-[var(--muted)]">{battle.challenge.category?.toUpperCase()}</span>
           <span className="text-[var(--text)] font-bold">{battle.challenge.name}</span>
         </div>
         <span className="text-[var(--dim)]">{battle.challenge.time_minutes}min</span>
-      </div>
+      </Link>
 
       {/* Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-2">
@@ -88,34 +92,29 @@ function BattleInline({ battle }: { battle: Battle }) {
         </div>
       </div>
 
-      {/* Vote */}
-      <div className="flex items-center gap-2 px-3 py-1.5 border-t border-[var(--border)]">
+      {/* Vote — centered bar, A left, B right */}
+      <div className="flex items-center border-t border-[var(--border)]">
         <button
           onClick={() => handleVote('A')}
-          disabled={!!voted}
-          className={`px-3 py-0.5 text-[10px] font-bold border transition-colors ${
-            voted === 'A' ? 'bg-[var(--crab-a)] text-black border-[var(--crab-a)]'
-            : voted ? 'border-[var(--border-dim)] text-[var(--border-dim)] cursor-not-allowed'
-            : 'border-[var(--border)] text-[var(--muted)] hover:text-[var(--crab-a)] hover:border-[var(--crab-a)]'
+          className={`flex-none px-4 py-2 text-[10px] font-bold transition-colors border-r border-[var(--border)] ${
+            voted === 'A' ? 'bg-[var(--crab-a)] text-black'
+            : 'text-[var(--muted)] hover:text-[var(--crab-a)] hover:bg-[var(--crab-a)]/10'
           }`}
         >A</button>
-        <div className="flex-1"><VoteBar votesA={votesA} votesB={votesB} /></div>
+        <div className="flex-1 flex justify-center py-2"><VoteBar votesA={votesA} votesB={votesB} /></div>
         <button
           onClick={() => handleVote('B')}
-          disabled={!!voted}
-          className={`px-3 py-0.5 text-[10px] font-bold border transition-colors ${
-            voted === 'B' ? 'bg-[var(--crab-b)] text-black border-[var(--crab-b)]'
-            : voted ? 'border-[var(--border-dim)] text-[var(--border-dim)] cursor-not-allowed'
-            : 'border-[var(--border)] text-[var(--muted)] hover:text-[var(--crab-b)] hover:border-[var(--crab-b)]'
+          className={`flex-none px-4 py-2 text-[10px] font-bold transition-colors border-l border-[var(--border)] ${
+            voted === 'B' ? 'bg-[var(--crab-b)] text-black'
+            : 'text-[var(--muted)] hover:text-[var(--crab-b)] hover:bg-[var(--crab-b)]/10'
           }`}
         >B</button>
       </div>
 
-      <div className="text-center py-1 border-t border-[var(--border-dim)]">
-        <Link href={`/battles/${battle.id}`} className="text-[var(--dim)] text-[10px] hover:text-[var(--muted)] transition-colors">
-          details
-        </Link>
-      </div>
+      {/* Clickable details bar */}
+      <Link href={`/battles/${battle.id}`} className="block text-center py-2 border-t border-[var(--border-dim)] text-[var(--dim)] text-[10px] hover:text-[var(--muted)] hover:bg-[var(--border-dim)]/30 transition-colors cursor-pointer">
+        details
+      </Link>
     </div>
   );
 }
