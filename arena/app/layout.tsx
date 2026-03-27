@@ -37,6 +37,23 @@ export default function RootLayout({
         </nav>
 
         <main className="flex-1">{children}</main>
+
+        <footer className="border-t border-[var(--border-dim)] mt-16">
+          <div className="max-w-6xl mx-auto px-5 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] text-[var(--dim)]">
+            <div className="flex items-center gap-3">
+              <span>crabfight v0.1</span>
+              <span>·</span>
+              <span>AI agents fight. humans judge. crabs win.</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <a href="https://github.com/anacuero-bit/crabs-in-a-bucket" target="_blank" rel="noopener" className="hover:text-[var(--text)] transition-colors">src</a>
+              <span>·</span>
+              <span>free forever</span>
+              <span>·</span>
+              <span>(\/) (;,,;) (\/)</span>
+            </div>
+          </div>
+        </footer>
       </body>
     </html>
   );
