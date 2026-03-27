@@ -15,13 +15,24 @@ OUTPUT FORMAT:
 - NO external files (no style.css, no app.js, no images on disk)
 - CDN libraries are allowed (e.g., Chart.js, D3, Three.js via CDN <script> tags)
 - The file must open directly in a browser with zero setup — no server, no build step, no dependencies to install
-- Target modern browsers (Chrome, Firefox, Safari)
+- Target modern desktop browsers (Chrome, Firefox, Safari)
+
+VIEWPORT — CRITICAL:
+- Design for a fixed 1280x720 viewport (16:9 aspect ratio)
+- EVERYTHING must fit in a single screen — NO SCROLLING
+- Use width: 100vw and height: 100vh as your canvas. Do not exceed it.
+- Set body { margin: 0; padding: 0; overflow: hidden; width: 100vw; height: 100vh; }
+- Desktop only — do not add mobile/responsive layouts
+- All UI elements, controls, and content must be visible without scrolling
+- If building a game: the game canvas + score + controls must all fit in 1280x720
+- If building a tool: the input, output, and controls must all fit in 1280x720
+- If building a dashboard: all charts and data must fit in 1280x720
+- Think of it as a single-screen application, like a TV or kiosk display
 
 QUALITY BAR:
 - This is a COMPETITION. Your output will be compared side-by-side against another agent.
 - Visual polish matters — default browser styles will lose. Use a cohesive color scheme, proper spacing, typography.
 - Functionality matters — it must actually WORK, not just look good. Test edge cases.
-- Responsiveness matters — should look good on both desktop and mobile viewports.
 - Interactivity matters — hover states, transitions, feedback on user actions.
 - Completeness matters — implement ALL requirements, not just the easy ones.
 
@@ -34,7 +45,7 @@ Your submission folder should contain:
 
 UX REQUIREMENTS:
 - Must have a clear START state — the app should be immediately usable on load
-- For games: include start screen, score display, game over screen, and restart button
+- For games: include start screen, score display, game over screen, and restart button — ALL visible without scrolling
 - For tools: include sample/default data so the tool isn't empty on load
 - For dashboards: show real or realistic data immediately, not a blank canvas
 - Include clear visual feedback for every user action (hover, click, success, error)
@@ -45,7 +56,7 @@ WINNING STRATEGY:
 - First impressions count — make it look professional in the first 2 seconds
 - Make it feel like a real product, not a homework assignment
 - Add small details: loading states, error handling, sound effects, animations
-- Think about what a human voter would prefer when comparing two apps side-by-side
+- Think of this as a single-screen app on a display — everything visible at once
 - Games should be FUN and replayable. Tools should be USEFUL and polished.
 
 === CHALLENGE PROMPT BELOW ===

@@ -14,18 +14,20 @@ function ExpandedIframe({ src, label, onClose }: { src: string; label: string; o
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/95 flex flex-col" onClick={onClose}>
-      <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--border)]" onClick={e => e.stopPropagation()}>
-        <span className="text-[var(--muted)] text-[11px]">{label}</span>
-        <button onClick={onClose} className="text-[var(--muted)] text-[11px] hover:text-[var(--text)] px-2">esc / close</button>
-      </div>
-      <div className="flex-1" onClick={e => e.stopPropagation()}>
-        <iframe
-          src={src}
-          className="w-full h-full border-0"
-          sandbox="allow-scripts allow-same-origin"
-          title={label}
-        />
+    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center" onClick={onClose}>
+      <div className="flex flex-col" style={{ width: '90vw', maxWidth: '1280px', aspectRatio: '16/9' }} onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-3 py-1.5 border border-b-0 border-[var(--border)] bg-[var(--bg)]">
+          <span className="text-[var(--muted)] text-[10px]">{label}</span>
+          <button onClick={onClose} className="text-[var(--muted)] text-[10px] hover:text-[var(--text)]">[ close ] esc</button>
+        </div>
+        <div className="flex-1 border border-[var(--border)] overflow-hidden">
+          <iframe
+            src={src}
+            className="w-full h-full border-0"
+            sandbox="allow-scripts allow-same-origin"
+            title={label}
+          />
+        </div>
       </div>
     </div>
   );
