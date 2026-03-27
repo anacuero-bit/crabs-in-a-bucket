@@ -165,25 +165,56 @@ export default function CompetePage() {
             </div>
           ) : (
             <>
-              {/* Timer + meta */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-[var(--accent)] font-bold text-sm">{challenge.name}</span>
-                  <span className="text-[var(--muted)] text-xs">[{challenge.category.toUpperCase()}] T{challenge.tier}</span>
+              {/* Battle name + description */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[var(--text)] font-bold text-sm">{challenge.name}</span>
+                    <span className="text-[var(--muted)] text-xs">[{challenge.category.toUpperCase()}] T{challenge.tier}</span>
+                  </div>
                   <span className="text-[var(--muted)] text-xs opacity-60">{challenge.fight_code}</span>
                 </div>
-                <div className={`font-bold text-lg tabular-nums ${remaining <= 60 ? 'text-red-400 fight-flash' : remaining <= 120 ? 'text-yellow-400' : 'text-[var(--accent)]'}`}>
+                <p className="text-[var(--dim)] text-xs mt-1">{challenge.prompt.split('\n')[0]}</p>
+              </div>
+
+              {/* Clock box — urgency */}
+              <div
+                className={`terminal-panel p-3 mb-3 flex items-center justify-between cursor-pointer hover:border-[var(--accent)] transition-colors ${remaining <= 60 ? 'border-red-400/50' : ''}`}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <span className="text-[var(--muted)] text-[10px]">
+                  clock is ticking — build it, zip it, drop it here
+                </span>
+                <div className={`font-bold text-sm tabular-nums ${remaining <= 60 ? 'text-red-400 fight-flash' : remaining <= 120 ? 'text-yellow-400' : 'text-[var(--accent)]'}`}>
                   {formatTime(remaining)}
+                </div>
+              </div>
+
+              {/* Challenge a friend */}
+              <div className="terminal-panel p-3 mb-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[var(--dim)] text-[10px]">challenge a friend — send them this fight</span>
+                  <button
+                    onClick={() => {
+                      const url = typeof window !== 'undefined' ? window.location.href : '';
+                      navigator.clipboard.writeText(url);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    className="text-[var(--muted)] text-[10px] hover:text-[var(--text)] transition-colors"
+                  >
+                    {copied ? 'copied!' : '[ copy link ]'}
+                  </button>
                 </div>
               </div>
 
               {/* Challenge prompt */}
               <div className="terminal-panel p-4 mb-4 relative">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[var(--accent)] text-xs font-bold">{'>'} YOUR CHALLENGE</span>
+                  <span className="text-[var(--muted)] text-xs font-bold">prompt</span>
                   <button
                     onClick={copyPrompt}
-                    className="text-[var(--muted)] text-xs hover:text-[var(--accent)] transition-colors flex items-center gap-1"
+                    className="text-[var(--muted)] text-xs hover:text-[var(--text)] transition-colors"
                   >
                     {copied ? 'copied!' : '[ copy ]'}
                   </button>
@@ -216,24 +247,6 @@ export default function CompetePage() {
               </div>
 
               {error && <p className="text-red-400 text-xs text-center mt-3">{error}</p>}
-
-              {/* Challenge a friend */}
-              <div className="terminal-panel mt-4 p-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[var(--dim)] text-[10px]">challenge a friend</span>
-                  <button
-                    onClick={() => {
-                      const url = typeof window !== 'undefined' ? window.location.href : '';
-                      navigator.clipboard.writeText(url);
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 2000);
-                    }}
-                    className="text-[var(--muted)] text-[10px] hover:text-[var(--text)] transition-colors"
-                  >
-                    {copied ? 'copied!' : '[ copy link ]'}
-                  </button>
-                </div>
-              </div>
             </>
           )}
         </div>
