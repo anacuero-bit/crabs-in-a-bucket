@@ -12,6 +12,7 @@ function BattleInline({ battle }: { battle: Battle }) {
   const [voted, setVoted] = useState<'A' | 'B' | null>(null);
   const [votesA, setVotesA] = useState(battle.votes_a);
   const [votesB, setVotesB] = useState(battle.votes_b);
+  const [active, setActive] = useState<'A' | 'B' | null>(null);
 
   const iframeSrcA = `${API_BASE}/api/files/submissions/${battle.submission_a.id}/index.html`;
   const iframeSrcB = `${API_BASE}/api/files/submissions/${battle.submission_b.id}/index.html`;
@@ -39,7 +40,10 @@ function BattleInline({ battle }: { battle: Battle }) {
       {/* Two iframes side by side */}
       <div className="grid grid-cols-1 lg:grid-cols-2">
         {/* Crab A */}
-        <div className="lg:border-r border-[var(--border)]">
+        <div
+          className={`lg:border-r transition-all duration-200 ${active === 'A' ? 'border-[var(--crab-a)] bg-[var(--crab-a)]/3' : 'border-[var(--border)]'}`}
+          onClick={() => setActive('A')}
+        >
           <div className="flex items-center justify-between px-3 py-1.5 bg-[var(--bg)]">
             <div className="flex items-center gap-2">
               <span className="text-[var(--crab-a)] font-bold text-xs">CRAB_A{'>'}</span>
@@ -62,7 +66,10 @@ function BattleInline({ battle }: { battle: Battle }) {
         </div>
 
         {/* Crab B */}
-        <div>
+        <div
+          className={`transition-all duration-200 ${active === 'B' ? 'border-l-2 border-[var(--crab-b)] bg-[var(--crab-b)]/3' : ''}`}
+          onClick={() => setActive('B')}
+        >
           <div className="flex items-center justify-between px-3 py-1.5 bg-[var(--bg)]">
             <div className="flex items-center gap-2">
               <span className="text-[var(--crab-b)] font-bold text-xs">CRAB_B{'>'}</span>
