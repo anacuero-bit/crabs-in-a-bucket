@@ -1,65 +1,38 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #0a0a0a;
-  --panel: #111111;
-  --border: #333333;
-  --text: #cccccc;
-  --muted: #666666;
-  --accent: #FF2D6B;
-  --crab-a: #FF2D6B;
-  --crab-b: #00FF41;
-  --subtle: #1a1a1a;
+  --bg: #000;
+  --panel: #000;
+  --border: #333;
+  --border-dim: #191919;
+  --text: #AAA;
+  --muted: #555;
+  --dim: #333;
+  --crab-a: #F55;
+  --crab-b: #5F5;
+  --accent: #F55;
 }
 
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--text);
-  --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-mono), 'Courier New', monospace;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  line-height: 1.6;
 }
 
-/* Terminal panel */
 .terminal-panel {
-  background: var(--panel);
   border: 1px solid var(--border);
 }
 
-/* Blinking cursor */
 @keyframes blink {
-  0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
-.cursor-blink {
-  animation: blink 1s step-end infinite;
-}
-
-/* Fight flash */
-@keyframes fight-flash {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
 .fight-flash {
-  animation: fight-flash 1.5s ease-in-out infinite;
-}
-
-/* Scanline overlay */
-.scanlines::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.05) 2px,
-    rgba(0, 0, 0, 0.05) 4px
-  );
-  z-index: 9999;
+  animation: blink 1.2s step-end infinite;
 }

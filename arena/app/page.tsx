@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { fetchBattles, fetchStats, castVote, API_BASE } from '@/lib/api';
-import TierBadge from '@/components/TierBadge';
-import CategoryBadge from '@/components/CategoryBadge';
 import VoteBar from '@/components/VoteBar';
 import { Battle } from '@/lib/types';
 
@@ -26,38 +24,31 @@ function BattleInline({ battle }: { battle: Battle }) {
   };
 
   return (
-    <div className="terminal-panel mb-6">
+    <div className="terminal-panel mb-4">
       {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-[var(--border)]">
-        <div className="flex items-center gap-2">
-          <TierBadge tier={battle.challenge.tier} />
-          <CategoryBadge category={battle.challenge.category} />
-          <span className="text-[var(--text)] font-bold text-sm">{battle.challenge.name}</span>
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-[var(--border-dim)] text-[11px]">
+        <div className="flex items-center gap-2.5">
+          <span className="text-[var(--muted)]">T{battle.challenge.tier}</span>
+          <span className="text-[var(--muted)]">{battle.challenge.category?.toUpperCase()}</span>
+          <span className="text-[var(--text)] font-bold">{battle.challenge.name}</span>
         </div>
-        <span className="text-[var(--muted)] text-xs">{battle.challenge.time_minutes}min build</span>
+        <span className="text-[var(--dim)]">{battle.challenge.time_minutes}min</span>
       </div>
 
-      {/* Two iframes side by side */}
+      {/* Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-2">
-        {/* Crab A */}
-        <div className={`lg:border-r transition-all duration-300 ${active === 'A' ? 'border-[var(--crab-a)]' : 'border-[var(--border)]'}`}>
-          <div
-            className={`flex items-center justify-between px-3 py-1.5 cursor-pointer transition-colors duration-300 ${active === 'A' ? 'bg-[var(--crab-a)]/10' : 'bg-[var(--bg)]'}`}
-            onClick={() => setActive('A')}
-          >
+        {/* A */}
+        <div className={`lg:border-r border-[var(--border-dim)] transition-colors ${active === 'A' ? 'bg-[var(--crab-a)]/5' : ''}`}>
+          <div className="flex items-center justify-between px-3 py-1 border-b border-[var(--border-dim)] text-[10px]">
             <div className="flex items-center gap-2">
-              <span className="text-[var(--crab-a)] font-bold text-xs">CRAB_A{'>'}</span>
-              <span className="text-[var(--muted)] text-xs">{battle.submission_a.model}</span>
-              <span className="text-[var(--muted)] text-xs opacity-60">{battle.submission_a.harness}</span>
+              <span className="text-[var(--crab-a)] font-bold">A</span>
+              <span className="text-[var(--dim)]">{battle.submission_a.model} · {battle.submission_a.harness}</span>
             </div>
-            <span className="text-[var(--crab-a)] font-bold text-xs">{battle.submission_a.ai_score}</span>
+            <span className="text-[var(--crab-a)]">{battle.submission_a.ai_score}</span>
           </div>
-          <div className="relative border-t border-[var(--border)] overflow-hidden" style={{ height: '70vh' }}>
+          <div className="relative overflow-hidden" style={{ height: '70vh' }}>
             {active !== 'A' && (
-              <div
-                className="absolute inset-0 z-10 cursor-pointer"
-                onClick={() => setActive('A')}
-              />
+              <div className="absolute inset-0 z-10 cursor-pointer" onClick={() => setActive('A')} />
             )}
             <iframe
               src={iframeSrcA}
@@ -65,31 +56,24 @@ function BattleInline({ battle }: { battle: Battle }) {
               className="border-0"
               style={{ width: '200%', height: '200%', transform: 'scale(0.5)', transformOrigin: 'top left' }}
               sandbox="allow-scripts allow-same-origin"
-              title="Crab A"
+              title="A"
               loading="lazy"
             />
           </div>
         </div>
 
-        {/* Crab B */}
-        <div className={`transition-all duration-300 ${active === 'B' ? 'border-l-2 border-[var(--crab-b)]' : ''}`}>
-          <div
-            className={`flex items-center justify-between px-3 py-1.5 cursor-pointer transition-colors duration-300 ${active === 'B' ? 'bg-[var(--crab-b)]/10' : 'bg-[var(--bg)]'}`}
-            onClick={() => setActive('B')}
-          >
+        {/* B */}
+        <div className={`transition-colors ${active === 'B' ? 'bg-[var(--crab-b)]/5' : ''}`}>
+          <div className="flex items-center justify-between px-3 py-1 border-b border-[var(--border-dim)] text-[10px]">
             <div className="flex items-center gap-2">
-              <span className="text-[var(--crab-b)] font-bold text-xs">CRAB_B{'>'}</span>
-              <span className="text-[var(--muted)] text-xs">{battle.submission_b.model}</span>
-              <span className="text-[var(--muted)] text-xs opacity-60">{battle.submission_b.harness}</span>
+              <span className="text-[var(--crab-b)] font-bold">B</span>
+              <span className="text-[var(--dim)]">{battle.submission_b.model} · {battle.submission_b.harness}</span>
             </div>
-            <span className="text-[var(--crab-b)] font-bold text-xs">{battle.submission_b.ai_score}</span>
+            <span className="text-[var(--crab-b)]">{battle.submission_b.ai_score}</span>
           </div>
-          <div className="relative border-t border-[var(--border)] overflow-hidden" style={{ height: '70vh' }}>
+          <div className="relative overflow-hidden" style={{ height: '70vh' }}>
             {active !== 'B' && (
-              <div
-                className="absolute inset-0 z-10 cursor-pointer"
-                onClick={() => setActive('B')}
-              />
+              <div className="absolute inset-0 z-10 cursor-pointer" onClick={() => setActive('B')} />
             )}
             <iframe
               src={iframeSrcB}
@@ -97,51 +81,40 @@ function BattleInline({ battle }: { battle: Battle }) {
               className="border-0"
               style={{ width: '200%', height: '200%', transform: 'scale(0.5)', transformOrigin: 'top left' }}
               sandbox="allow-scripts allow-same-origin"
-              title="Crab B"
+              title="B"
               loading="lazy"
             />
           </div>
         </div>
       </div>
 
-      {/* Vote bar + buttons */}
-      <div className="p-3 border-t border-[var(--border)]">
-        <div className="flex items-center gap-3 mb-2">
-          <button
-            onClick={() => handleVote('A')}
-            disabled={!!voted}
-            className={`px-4 py-1 text-xs font-bold transition-all ${
-              voted === 'A'
-                ? 'bg-[var(--crab-a)] text-[var(--bg)]'
-                : voted
-                ? 'border border-[var(--border)] text-[var(--border)] cursor-not-allowed'
-                : 'border border-[var(--crab-a)] text-[var(--crab-a)] hover:bg-[var(--crab-a)] hover:text-[var(--bg)]'
-            }`}
-          >
-            {voted === 'A' ? 'VOTED A' : '> VOTE_A'}
-          </button>
-          <div className="flex-1">
-            <VoteBar votesA={votesA} votesB={votesB} />
-          </div>
-          <button
-            onClick={() => handleVote('B')}
-            disabled={!!voted}
-            className={`px-4 py-1 text-xs font-bold transition-all ${
-              voted === 'B'
-                ? 'bg-[var(--crab-b)] text-[var(--bg)]'
-                : voted
-                ? 'border border-[var(--border)] text-[var(--border)] cursor-not-allowed'
-                : 'border border-[var(--crab-b)] text-[var(--crab-b)] hover:bg-[var(--crab-b)] hover:text-[var(--bg)]'
-            }`}
-          >
-            {voted === 'B' ? 'VOTED B' : '> VOTE_B'}
-          </button>
-        </div>
-        <div className="text-center">
-          <Link href={`/battles/${battle.id}`} className="text-[var(--muted)] text-xs hover:text-[var(--accent)] transition-colors">
-            {'>'} details // under the hood
-          </Link>
-        </div>
+      {/* Vote */}
+      <div className="flex items-center gap-2 px-3 py-1.5 border-t border-[var(--border)]">
+        <button
+          onClick={() => handleVote('A')}
+          disabled={!!voted}
+          className={`px-3 py-0.5 text-[10px] font-bold border transition-colors ${
+            voted === 'A' ? 'bg-[var(--crab-a)] text-black border-[var(--crab-a)]'
+            : voted ? 'border-[var(--border-dim)] text-[var(--border-dim)] cursor-not-allowed'
+            : 'border-[var(--border)] text-[var(--muted)] hover:text-[var(--crab-a)] hover:border-[var(--crab-a)]'
+          }`}
+        >A</button>
+        <div className="flex-1"><VoteBar votesA={votesA} votesB={votesB} /></div>
+        <button
+          onClick={() => handleVote('B')}
+          disabled={!!voted}
+          className={`px-3 py-0.5 text-[10px] font-bold border transition-colors ${
+            voted === 'B' ? 'bg-[var(--crab-b)] text-black border-[var(--crab-b)]'
+            : voted ? 'border-[var(--border-dim)] text-[var(--border-dim)] cursor-not-allowed'
+            : 'border-[var(--border)] text-[var(--muted)] hover:text-[var(--crab-b)] hover:border-[var(--crab-b)]'
+          }`}
+        >B</button>
+      </div>
+
+      <div className="text-center py-1 border-t border-[var(--border-dim)]">
+        <Link href={`/battles/${battle.id}`} className="text-[var(--dim)] text-[10px] hover:text-[var(--muted)] transition-colors">
+          details
+        </Link>
       </div>
     </div>
   );
@@ -153,69 +126,38 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchStats().then(setStats);
-  }, []);
+  useEffect(() => { fetchStats().then(setStats); }, []);
 
   useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
     fetchBattles()
-      .then((data) => {
-        if (!cancelled) {
-          setBattles(data);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setError(err.message);
-          setLoading(false);
-        }
-      });
-    return () => { cancelled = true; };
+      .then(data => { setBattles(data); setLoading(false); })
+      .catch(err => { setError(err.message); setLoading(false); });
   }, []);
 
   const totalVotes = battles.reduce((sum, b) => sum + b.votes_a + b.votes_b, 0);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
-      {/* Stats counter */}
-      <div className="text-[var(--muted)] text-xs font-mono mb-4">
-        {'>'} {stats.battles} battles | {stats.players} agents | {totalVotes.toLocaleString()} votes
+    <div className="max-w-6xl mx-auto px-5 py-2">
+      <div className="text-[var(--dim)] text-[11px] py-2">
+        {stats.battles} battles · {stats.players} agents · {totalVotes.toLocaleString()} votes
       </div>
 
-      {/* Loading */}
       {loading && (
-        <div className="space-y-6">
-          {[1, 2].map((i) => (
-            <div key={i} className="terminal-panel p-4 animate-pulse">
-              <div className="h-4 bg-[var(--border)] w-1/3 mb-4" />
-              <div className="grid grid-cols-2 gap-4">
-                <div className="h-[400px] bg-[var(--border)]" />
-                <div className="h-[400px] bg-[var(--border)]" />
-              </div>
-            </div>
+        <div className="space-y-4">
+          {[1, 2].map(i => (
+            <div key={i} className="terminal-panel animate-pulse" style={{ height: '300px' }} />
           ))}
         </div>
       )}
 
-      {/* Error */}
       {error && (
-        <div className="text-center py-12 font-mono">
-          <p className="text-red-400 text-sm mb-3">ERROR: {error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-3 py-1 border border-[var(--accent)] text-[var(--accent)] text-xs"
-          >
-            {'>'} RETRY
-          </button>
+        <div className="text-center py-12 text-[11px]">
+          <p className="text-red-400 mb-2">{error}</p>
+          <button onClick={() => window.location.reload()} className="text-[var(--muted)] hover:text-white">retry</button>
         </div>
       )}
 
-      {/* Battle Feed */}
-      {!loading && !error && battles.map((battle) => (
+      {!loading && !error && battles.map(battle => (
         <BattleInline key={battle.id} battle={battle} />
       ))}
     </div>

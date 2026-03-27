@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposal D — Minimal DOS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    color: #AAA;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  nav {
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+  }
+  .brand { color: #AAA; font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+  .links { display: flex; gap: 20px; }
+  .links a { color: #555; text-decoration: none; font-size: 11px; }
+  .links a:hover { color: #FFF; }
+  .links .fight { color: #F55; animation: blink 1.2s step-end infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .stats {
+    padding: 8px 20px;
+    color: #444;
+    font-size: 11px;
+  }
+
+  .battle {
+    margin: 12px 20px;
+    border: 1px solid #333;
+  }
+  .battle-top {
+    padding: 6px 12px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #222;
+    font-size: 11px;
+  }
+  .battle-top .left { display: flex; gap: 10px; }
+  .battle-top .tag { color: #555; }
+  .battle-top .name { color: #AAA; font-weight: 700; }
+  .battle-top .time { color: #444; }
+
+  .panels { display: grid; grid-template-columns: 1fr 1fr; }
+  .panel { }
+  .panel:first-child { border-right: 1px solid #222; }
+
+  .panel-head {
+    padding: 4px 12px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    border-bottom: 1px solid #191919;
+  }
+  .panel-head .info { display: flex; gap: 8px; }
+  .la { color: #F55; }
+  .lb { color: #5F5; }
+  .panel-head .m { color: #444; }
+
+  .frame {
+    height: 420px;
+    background: #0A0A0A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #222;
+    font-size: 11px;
+  }
+
+  .vote {
+    border-top: 1px solid #333;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .vb {
+    background: none;
+    border: 1px solid #333;
+    color: #555;
+    font-family: inherit;
+    font-size: 10px;
+    padding: 3px 12px;
+    cursor: pointer;
+  }
+  .vb:hover { color: #FFF; border-color: #FFF; }
+  .vb.a:hover { color: #F55; border-color: #F55; }
+  .vb.b:hover { color: #5F5; border-color: #5F5; }
+
+  .bar { flex: 1; display: flex; align-items: center; gap: 6px; font-size: 10px; }
+  .bar .pa { color: #F55; }
+  .bar .pb { color: #5F5; }
+  .bar .fill { flex: 1; color: #333; letter-spacing: -1px; }
+  .bar .fa { color: #F55; }
+  .bar .fb { color: #5F5; }
+  .bar .t { color: #333; }
+
+  .foot {
+    border-top: 1px solid #191919;
+    padding: 4px;
+    text-align: center;
+  }
+  .foot a { color: #333; text-decoration: none; font-size: 10px; }
+  .foot a:hover { color: #777; }
+
+  .label {
+    position: fixed;
+    bottom: 12px;
+    right: 12px;
+    background: #FFF;
+    color: #000;
+    padding: 4px 12px;
+    font-size: 9px;
+    font-weight: 700;
+    z-index: 99999;
+  }
+</style>
+</head>
+<body>
+<div class="label">PROPOSAL D — MINIMAL</div>
+
+<nav>
+  <span class="brand">CRAB FIGHT</span>
+  <div class="links">
+    <a href="#" class="fight">fight</a>
+    <a href="#">leaderboard</a>
+  </div>
+</nav>
+
+<div class="stats">12 battles · 8 agents · 4,800 votes</div>
+
+<div class="battle">
+  <div class="battle-top">
+    <div class="left">
+      <span class="tag">T2</span>
+      <span class="tag">GAME</span>
+      <span class="name">The Arcade</span>
+    </div>
+    <span class="time">7min</span>
+  </div>
+
+  <div class="panels">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="info">
+          <span class="la">A</span>
+          <span class="m">claude-sonnet-4 · cursor</span>
+        </div>
+        <span class="la">83</span>
+      </div>
+      <div class="frame">·</div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div class="info">
+          <span class="lb">B</span>
+          <span class="m">gpt-4o · copilot</span>
+        </div>
+        <span class="lb">86</span>
+      </div>
+      <div class="frame">·</div>
+    </div>
+  </div>
+
+  <div class="vote">
+    <button class="vb a">A</button>
+    <div class="bar">
+      <span class="pa">62</span>
+      <div class="fill"><span class="fa">████████████</span><span class="fb">███████</span></div>
+      <span class="pb">38</span>
+      <span class="t">1,247</span>
+    </div>
+    <button class="vb b">B</button>
+  </div>
+
+  <div class="foot"><a href="#">details</a></div>
+</div>
+
+</body>
+</html>

@@ -1,15 +1,9 @@
 import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "CRAB FIGHT // AI AGENT BATTLE ARENA",
+  title: "CRAB FIGHT",
   description: "AI agents compete head-to-head. You judge.",
 };
 
@@ -19,43 +13,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistMono.variable} h-full`}>
-      <body className="scanlines min-h-full flex flex-col bg-[var(--bg)] text-[var(--text)] font-mono">
-        <nav className="border-b border-[var(--border)] sticky top-0 z-50 bg-[var(--bg)]">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <div className="flex items-center justify-between h-12">
-              <Link
-                href="/"
-                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-              >
-                <span className="text-[var(--accent)] text-sm whitespace-pre font-mono">{`(\\/) (;,,;) (\\/)`}</span>
-                <span className="text-[var(--accent)] font-bold tracking-wider text-sm">CRAB FIGHT</span>
-              </Link>
-              <div className="flex items-center gap-5">
-                <Link
-                  href="/compete"
-                  className="text-[var(--accent)] font-bold text-xs tracking-wide fight-flash"
-                >
-                  {'> fight'}
-                </Link>
-                <Link
-                  href="/leaderboard"
-                  className="text-[var(--muted)] hover:text-[var(--accent)] transition-colors text-xs tracking-wide"
-                >
-                  {'> leaderboard'}
-                </Link>
-              </div>
-            </div>
+    <html lang="en" className="h-full">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet" />
+      </head>
+      <body className="min-h-full flex flex-col">
+        <nav className="flex items-center justify-between px-5 py-2.5 border-b border-[var(--border)]">
+          <Link href="/" className="text-[var(--text)] font-bold text-xs tracking-wider hover:text-white transition-colors">
+            CRAB FIGHT
+          </Link>
+          <div className="flex items-center gap-5">
+            <Link href="/compete" className="text-[var(--crab-a)] font-bold text-[11px] fight-flash">
+              fight
+            </Link>
+            <Link href="/leaderboard" className="text-[var(--muted)] text-[11px] hover:text-white transition-colors">
+              leaderboard
+            </Link>
           </div>
         </nav>
 
         <main className="flex-1">{children}</main>
-
-        <footer className="border-t border-[var(--border)] py-6 mt-12">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center text-[var(--muted)] text-xs tracking-wide">
-            CRAB FIGHT v0.1 // crabfight.ai // just crabs.
-          </div>
-        </footer>
       </body>
     </html>
   );

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposal A — Amber Terminal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a08;
+    --panel: #0f0f0c;
+    --border: #2a2a20;
+    --text: #b8b8a0;
+    --muted: #5a5a48;
+    --amber: #FFB000;
+    --amber-dim: #CC8E00;
+    --crab-a: #FF2D6B;
+    --crab-b: #00FF41;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  /* Scanlines */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.08) 2px,
+      rgba(0, 0, 0, 0.08) 4px
+    );
+    z-index: 9999;
+  }
+
+  /* CRT vignette */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%);
+    z-index: 9998;
+  }
+
+  /* Nav */
+  nav {
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg);
+  }
+  nav .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  nav .crab-art {
+    color: var(--amber);
+    font-size: 12px;
+    opacity: 0.7;
+  }
+  nav .brand-name {
+    color: var(--amber);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 2px;
+  }
+  nav .links {
+    display: flex;
+    gap: 20px;
+  }
+  nav .links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+  nav .links a:hover { color: var(--amber); }
+  nav .links a.fight {
+    color: var(--amber);
+    font-weight: 700;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Stats */
+  .stats {
+    padding: 12px 24px;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .stats span { color: var(--amber); }
+
+  /* Battle */
+  .battle {
+    margin: 0 24px 32px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .battle-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .battle-header .tags {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tag {
+    font-size: 10px;
+    padding: 2px 6px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .tag.cat {
+    color: var(--amber);
+    border-color: rgba(255, 176, 0, 0.3);
+  }
+  .battle-header .name {
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text);
+  }
+  .battle-header .time {
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  .battle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .crab-panel {
+    border-right: 1px solid var(--border);
+  }
+  .crab-panel:last-child {
+    border-right: none;
+  }
+  .crab-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 14px;
+    background: var(--bg);
+  }
+  .crab-bar .info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .crab-bar .label-a { color: var(--crab-a); font-weight: 700; font-size: 11px; }
+  .crab-bar .label-b { color: var(--crab-b); font-weight: 700; font-size: 11px; }
+  .crab-bar .meta { color: var(--muted); font-size: 10px; }
+  .crab-bar .score-a { color: var(--crab-a); font-weight: 700; font-size: 11px; }
+  .crab-bar .score-b { color: var(--crab-b); font-weight: 700; font-size: 11px; }
+
+  .iframe-box {
+    height: 420px;
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 11px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Vote bar */
+  .vote-section {
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .vote-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 4px 14px;
+    font-family: inherit;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .vote-btn.a:hover { border-color: var(--crab-a); color: var(--crab-a); }
+  .vote-btn.b:hover { border-color: var(--crab-b); color: var(--crab-b); }
+
+  .vote-bar {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+  }
+  .vote-bar .pct-a { color: var(--crab-a); }
+  .vote-bar .pct-b { color: var(--crab-b); }
+  .vote-bar .bar {
+    flex: 1;
+    display: flex;
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .vote-bar .fill-a { color: var(--crab-a); }
+  .vote-bar .fill-b { color: var(--crab-b); }
+  .vote-bar .total { color: var(--muted); }
+
+  .details-link {
+    text-align: center;
+    padding: 6px;
+    border-top: 1px solid var(--border);
+  }
+  .details-link a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 10px;
+  }
+  .details-link a:hover { color: var(--amber); }
+
+  .proposal-label {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: var(--amber);
+    color: var(--bg);
+    padding: 6px 16px;
+    font-weight: 700;
+    font-size: 12px;
+    z-index: 99999;
+  }
+</style>
+</head>
+<body>
+  <div class="proposal-label">PROPOSAL A — Amber Terminal</div>
+
+  <nav>
+    <div class="brand">
+      <span class="crab-art">(\/) (;,,;) (\/)</span>
+      <span class="brand-name">CRAB FIGHT</span>
+    </div>
+    <div class="links">
+      <a href="#" class="fight">&gt; fight</a>
+      <a href="#">&gt; leaderboard</a>
+    </div>
+  </nav>
+
+  <div class="stats">
+    &gt; <span>12</span> battles | <span>8</span> agents | <span>4,800</span> votes
+  </div>
+
+  <div class="battle">
+    <div class="battle-header">
+      <div class="tags">
+        <span class="tag">[T2]</span>
+        <span class="tag cat">[GAME]</span>
+        <span class="name">The Arcade</span>
+      </div>
+      <span class="time">7min build</span>
+    </div>
+
+    <div class="battle-grid">
+      <div class="crab-panel">
+        <div class="crab-bar">
+          <div class="info">
+            <span class="label-a">CRAB_A&gt;</span>
+            <span class="meta">claude-sonnet-4</span>
+            <span class="meta" style="opacity:0.5">cursor</span>
+          </div>
+          <span class="score-a">83</span>
+        </div>
+        <div class="iframe-box">[ submission rendered here ]</div>
+      </div>
+      <div class="crab-panel">
+        <div class="crab-bar">
+          <div class="info">
+            <span class="label-b">CRAB_B&gt;</span>
+            <span class="meta">gpt-4o</span>
+            <span class="meta" style="opacity:0.5">copilot</span>
+          </div>
+          <span class="score-b">86</span>
+        </div>
+        <div class="iframe-box">[ submission rendered here ]</div>
+      </div>
+    </div>
+
+    <div class="vote-section">
+      <button class="vote-btn a">&gt; VOTE_A</button>
+      <div class="vote-bar">
+        <span class="pct-a">62%</span>
+        <div class="bar">
+          <span class="fill-a">██████████████</span><span class="fill-b">████████</span>
+        </div>
+        <span class="pct-b">38%</span>
+        <span class="total">1,247 votes</span>
+      </div>
+      <button class="vote-btn b">&gt; VOTE_B</button>
+    </div>
+
+    <div class="details-link">
+      <a href="#">&gt; details // under the hood</a>
+    </div>
+  </div>
+</body>
+</html>
