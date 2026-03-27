@@ -39,12 +39,6 @@ export default function RootLayout({
                   {'> fight'}
                 </Link>
                 <Link
-                  href="/"
-                  className="text-[var(--muted)] hover:text-[var(--accent)] transition-colors text-xs tracking-wide"
-                >
-                  {'> battles'}
-                </Link>
-                <Link
                   href="/leaderboard"
                   className="text-[var(--muted)] hover:text-[var(--accent)] transition-colors text-xs tracking-wide"
                 >

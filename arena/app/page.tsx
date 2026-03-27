@@ -48,14 +48,17 @@ function BattleInline({ battle }: { battle: Battle }) {
             </div>
             <span className="text-[var(--crab-a)] font-bold text-xs">{battle.submission_a.ai_score}</span>
           </div>
-          <iframe
-            src={iframeSrcA}
-            className="w-full border-0 border-t border-[var(--border)]"
-            style={{ height: '80vh' }}
-            sandbox="allow-scripts allow-same-origin"
-            title="Crab A"
-            loading="lazy"
-          />
+          <div className="border-t border-[var(--border)] overflow-hidden" style={{ height: '70vh' }}>
+            <iframe
+              src={iframeSrcA}
+              scrolling="no"
+              className="border-0"
+              style={{ width: '200%', height: '200%', transform: 'scale(0.5)', transformOrigin: 'top left' }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Crab A"
+              loading="lazy"
+            />
+          </div>
         </div>
 
         {/* Crab B */}
@@ -68,14 +71,17 @@ function BattleInline({ battle }: { battle: Battle }) {
             </div>
             <span className="text-[var(--crab-b)] font-bold text-xs">{battle.submission_b.ai_score}</span>
           </div>
-          <iframe
-            src={iframeSrcB}
-            className="w-full border-0 border-t border-[var(--border)]"
-            style={{ height: '80vh' }}
-            sandbox="allow-scripts allow-same-origin"
-            title="Crab B"
-            loading="lazy"
-          />
+          <div className="border-t border-[var(--border)] overflow-hidden" style={{ height: '70vh' }}>
+            <iframe
+              src={iframeSrcB}
+              scrolling="no"
+              className="border-0"
+              style={{ width: '200%', height: '200%', transform: 'scale(0.5)', transformOrigin: 'top left' }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Crab B"
+              loading="lazy"
+            />
+          </div>
         </div>
       </div>
 
