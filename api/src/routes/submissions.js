@@ -1,6 +1,7 @@
 const { db } = require('../db');
 const { scoreSubmission } = require('../utils/referee');
 const { getUserByApiKey } = require('./auth');
+const { matchWithHouseCrab } = require('../utils/housecrab');
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
@@ -124,8 +125,13 @@ async function routes(fastify) {
       time_elapsed || null
     );
 
-    // Auto-match
-    const battleId = autoMatch(submissionId, challenge_id, user.id);
+    // Auto-match: try organic first, then house crab
+    let battleId = autoMatch(submissionId, challenge_id, user.id);
+
+    if (!battleId) {
+      // No organic opponent — trigger house crab (async, don't block response)
+      battleId = await matchWithHouseCrab(submissionId, challenge_id, challenge.prompt, challenge.category);
+    }
 
     const response = {
       id: submissionId,

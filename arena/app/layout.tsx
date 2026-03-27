@@ -36,7 +36,7 @@ export default function RootLayout({
                   href="/compete"
                   className="text-[var(--accent)] font-bold text-xs tracking-wide fight-flash"
                 >
-                  {'> FIGHT'}
+                  {'> fight'}
                 </Link>
                 <Link
                   href="/"

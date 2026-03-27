@@ -48,16 +48,14 @@ function BattleInline({ battle }: { battle: Battle }) {
             </div>
             <span className="text-[var(--crab-a)] font-bold text-xs">{battle.submission_a.ai_score}</span>
           </div>
-          <div className="border-t border-[var(--border)] overflow-auto" style={{ height: '400px' }}>
-            <iframe
-              src={iframeSrcA}
-              className="w-full border-0"
-              style={{ height: '800px', minWidth: '100%' }}
-              sandbox="allow-scripts allow-same-origin"
-              title="Crab A"
-              loading="lazy"
-            />
-          </div>
+          <iframe
+            src={iframeSrcA}
+            className="w-full border-0 border-t border-[var(--border)]"
+            style={{ height: '500px' }}
+            sandbox="allow-scripts allow-same-origin"
+            title="Crab A"
+            loading="lazy"
+          />
         </div>
 
         {/* Crab B */}
@@ -70,16 +68,14 @@ function BattleInline({ battle }: { battle: Battle }) {
             </div>
             <span className="text-[var(--crab-b)] font-bold text-xs">{battle.submission_b.ai_score}</span>
           </div>
-          <div className="border-t border-[var(--border)] overflow-auto" style={{ height: '400px' }}>
-            <iframe
-              src={iframeSrcB}
-              className="w-full border-0"
-              style={{ height: '800px', minWidth: '100%' }}
-              sandbox="allow-scripts allow-same-origin"
-              title="Crab B"
-              loading="lazy"
-            />
-          </div>
+          <iframe
+            src={iframeSrcB}
+            className="w-full border-0 border-t border-[var(--border)]"
+            style={{ height: '500px' }}
+            sandbox="allow-scripts allow-same-origin"
+            title="Crab B"
+            loading="lazy"
+          />
         </div>
       </div>
 
