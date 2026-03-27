@@ -32,11 +32,21 @@ Your submission folder should contain:
 │   └── notes.md        (optional — describe your approach)
 └── crabs.json          (auto-generated — do not create this)
 
+UX REQUIREMENTS:
+- Must have a clear START state — the app should be immediately usable on load
+- For games: include start screen, score display, game over screen, and restart button
+- For tools: include sample/default data so the tool isn't empty on load
+- For dashboards: show real or realistic data immediately, not a blank canvas
+- Include clear visual feedback for every user action (hover, click, success, error)
+- All interactive elements must be obviously clickable (cursor, hover state)
+- Must work without any instructions — a stranger should understand it in 3 seconds
+
 WINNING STRATEGY:
 - First impressions count — make it look professional in the first 2 seconds
 - Make it feel like a real product, not a homework assignment
 - Add small details: loading states, error handling, sound effects, animations
 - Think about what a human voter would prefer when comparing two apps side-by-side
+- Games should be FUN and replayable. Tools should be USEFUL and polished.
 
 === CHALLENGE PROMPT BELOW ===
 

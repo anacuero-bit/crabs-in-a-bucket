@@ -6,11 +6,37 @@ import { fetchBattles, fetchStats, castVote, API_BASE } from '@/lib/api';
 import VoteBar from '@/components/VoteBar';
 import { Battle } from '@/lib/types';
 
+function ExpandedIframe({ src, label, onClose }: { src: string; label: string; onClose: () => void }) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/95 flex flex-col" onClick={onClose}>
+      <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--border)]" onClick={e => e.stopPropagation()}>
+        <span className="text-[var(--muted)] text-[11px]">{label}</span>
+        <button onClick={onClose} className="text-[var(--muted)] text-[11px] hover:text-[var(--text)] px-2">esc / close</button>
+      </div>
+      <div className="flex-1" onClick={e => e.stopPropagation()}>
+        <iframe
+          src={src}
+          className="w-full h-full border-0"
+          sandbox="allow-scripts allow-same-origin"
+          title={label}
+        />
+      </div>
+    </div>
+  );
+}
+
 function BattleInline({ battle }: { battle: Battle }) {
   const [voted, setVoted] = useState<'A' | 'B' | null>(null);
   const [votesA, setVotesA] = useState(battle.votes_a);
   const [votesB, setVotesB] = useState(battle.votes_b);
   const [active, setActive] = useState<'A' | 'B' | null>(null);
+  const [expanded, setExpanded] = useState<'A' | 'B' | null>(null);
 
   const iframeSrcA = `${API_BASE}/api/files/submissions/${battle.submission_a.id}/index.html`;
   const iframeSrcB = `${API_BASE}/api/files/submissions/${battle.submission_b.id}/index.html`;
@@ -28,6 +54,9 @@ function BattleInline({ battle }: { battle: Battle }) {
   };
 
   return (
+    <>
+    {expanded === 'A' && <ExpandedIframe src={iframeSrcA} label={`A — ${battle.submission_a.model} · ${battle.submission_a.harness}`} onClose={() => setExpanded(null)} />}
+    {expanded === 'B' && <ExpandedIframe src={iframeSrcB} label={`B — ${battle.submission_b.model} · ${battle.submission_b.harness}`} onClose={() => setExpanded(null)} />}
     <div className="terminal-panel mb-14">
       {/* Header — clickable for details */}
       <Link href={`/battles/${battle.id}`} className="flex items-center justify-between px-3 py-1.5 border-b border-[var(--border-dim)] text-[11px] hover:bg-[var(--border-dim)]/30 transition-colors cursor-pointer">
@@ -48,7 +77,10 @@ function BattleInline({ battle }: { battle: Battle }) {
               <span className={`font-bold ${active === 'A' ? 'text-black' : 'text-[var(--crab-a)]'}`}>A</span>
               <span className={active === 'A' ? 'text-black/60' : 'text-[var(--dim)]'}>{battle.submission_a.model} · {battle.submission_a.harness}</span>
             </div>
-            <span className={`font-bold ${active === 'A' ? 'text-black' : 'text-[var(--crab-a)]'}`}>{battle.submission_a.ai_score}</span>
+            <div className="flex items-center gap-2">
+              <span className={`font-bold ${active === 'A' ? 'text-black' : 'text-[var(--crab-a)]'}`}>{battle.submission_a.ai_score}</span>
+              <button onClick={() => setExpanded('A')} className={`${active === 'A' ? 'text-black/60 hover:text-black' : 'text-[var(--dim)] hover:text-[var(--text)]'} transition-colors`}>[ expand ]</button>
+            </div>
           </div>
           <div className="relative overflow-hidden" style={{ height: '55vh' }}>
             {active !== 'A' && (
@@ -73,7 +105,10 @@ function BattleInline({ battle }: { battle: Battle }) {
               <span className={`font-bold ${active === 'B' ? 'text-black' : 'text-[var(--crab-b)]'}`}>B</span>
               <span className={active === 'B' ? 'text-black/60' : 'text-[var(--dim)]'}>{battle.submission_b.model} · {battle.submission_b.harness}</span>
             </div>
-            <span className={`font-bold ${active === 'B' ? 'text-black' : 'text-[var(--crab-b)]'}`}>{battle.submission_b.ai_score}</span>
+            <div className="flex items-center gap-2">
+              <span className={`font-bold ${active === 'B' ? 'text-black' : 'text-[var(--crab-b)]'}`}>{battle.submission_b.ai_score}</span>
+              <button onClick={() => setExpanded('B')} className={`${active === 'B' ? 'text-black/60 hover:text-black' : 'text-[var(--dim)] hover:text-[var(--text)]'} transition-colors`}>[ expand ]</button>
+            </div>
           </div>
           <div className="relative overflow-hidden" style={{ height: '55vh' }}>
             {active !== 'B' && (
@@ -119,6 +154,7 @@ function BattleInline({ battle }: { battle: Battle }) {
         details
       </Link>
     </div>
+    </>
   );
 }
 
