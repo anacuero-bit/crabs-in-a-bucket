@@ -40,11 +40,11 @@ function BattleInline({ battle }: { battle: Battle }) {
       {/* Two iframes side by side */}
       <div className="grid grid-cols-1 lg:grid-cols-2">
         {/* Crab A */}
-        <div
-          className={`lg:border-r transition-all duration-200 ${active === 'A' ? 'border-[var(--crab-a)] bg-[var(--crab-a)]/3' : 'border-[var(--border)]'}`}
-          onClick={() => setActive('A')}
-        >
-          <div className="flex items-center justify-between px-3 py-1.5 bg-[var(--bg)]">
+        <div className={`lg:border-r transition-all duration-300 ${active === 'A' ? 'border-[var(--crab-a)]' : 'border-[var(--border)]'}`}>
+          <div
+            className={`flex items-center justify-between px-3 py-1.5 cursor-pointer transition-colors duration-300 ${active === 'A' ? 'bg-[var(--crab-a)]/10' : 'bg-[var(--bg)]'}`}
+            onClick={() => setActive('A')}
+          >
             <div className="flex items-center gap-2">
               <span className="text-[var(--crab-a)] font-bold text-xs">CRAB_A{'>'}</span>
               <span className="text-[var(--muted)] text-xs">{battle.submission_a.model}</span>
@@ -52,7 +52,13 @@ function BattleInline({ battle }: { battle: Battle }) {
             </div>
             <span className="text-[var(--crab-a)] font-bold text-xs">{battle.submission_a.ai_score}</span>
           </div>
-          <div className="border-t border-[var(--border)] overflow-hidden" style={{ height: '70vh' }}>
+          <div className="relative border-t border-[var(--border)] overflow-hidden" style={{ height: '70vh' }}>
+            {active !== 'A' && (
+              <div
+                className="absolute inset-0 z-10 cursor-pointer"
+                onClick={() => setActive('A')}
+              />
+            )}
             <iframe
               src={iframeSrcA}
               scrolling="no"
@@ -66,11 +72,11 @@ function BattleInline({ battle }: { battle: Battle }) {
         </div>
 
         {/* Crab B */}
-        <div
-          className={`transition-all duration-200 ${active === 'B' ? 'border-l-2 border-[var(--crab-b)] bg-[var(--crab-b)]/3' : ''}`}
-          onClick={() => setActive('B')}
-        >
-          <div className="flex items-center justify-between px-3 py-1.5 bg-[var(--bg)]">
+        <div className={`transition-all duration-300 ${active === 'B' ? 'border-l-2 border-[var(--crab-b)]' : ''}`}>
+          <div
+            className={`flex items-center justify-between px-3 py-1.5 cursor-pointer transition-colors duration-300 ${active === 'B' ? 'bg-[var(--crab-b)]/10' : 'bg-[var(--bg)]'}`}
+            onClick={() => setActive('B')}
+          >
             <div className="flex items-center gap-2">
               <span className="text-[var(--crab-b)] font-bold text-xs">CRAB_B{'>'}</span>
               <span className="text-[var(--muted)] text-xs">{battle.submission_b.model}</span>
@@ -78,7 +84,13 @@ function BattleInline({ battle }: { battle: Battle }) {
             </div>
             <span className="text-[var(--crab-b)] font-bold text-xs">{battle.submission_b.ai_score}</span>
           </div>
-          <div className="border-t border-[var(--border)] overflow-hidden" style={{ height: '70vh' }}>
+          <div className="relative border-t border-[var(--border)] overflow-hidden" style={{ height: '70vh' }}>
+            {active !== 'B' && (
+              <div
+                className="absolute inset-0 z-10 cursor-pointer"
+                onClick={() => setActive('B')}
+              />
+            )}
             <iframe
               src={iframeSrcB}
               scrolling="no"

@@ -78,8 +78,8 @@ async function routes(fastify) {
     const issuedAt = new Date().toISOString();
     const deadline = new Date(Date.now() + challenge.time_minutes * 60 * 1000).toISOString();
 
-    // Full prompt with generic instructions
-    const fullPrompt = `${prompt}\n\n---\n\n${GENERIC_INSTRUCTIONS}\n\nFIGHT CODE: ${fightCode}\nDEADLINE: ${challenge.time_minutes} minutes from pull\nTIME LIMIT: ${challenge.time_minutes} minutes`;
+    // System instructions first, then challenge prompt
+    const fullPrompt = `${GENERIC_INSTRUCTIONS}\n\n${prompt}\n\n---\nFIGHT CODE: ${fightCode}\nTIME LIMIT: ${challenge.time_minutes} minutes`;
 
     return {
       ...challenge,
