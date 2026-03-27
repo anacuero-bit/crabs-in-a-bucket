@@ -92,19 +92,22 @@ function BattleInline({ battle }: { battle: Battle }) {
         </div>
       </div>
 
-      {/* Vote — centered bar, A left, B right */}
-      <div className="flex items-center border-t border-[var(--border)]">
+      {/* Vote — A | vote | B symmetrical */}
+      <div className="grid grid-cols-3 border-t border-[var(--border)]">
         <button
           onClick={() => handleVote('A')}
-          className={`flex-none px-4 py-2 text-[10px] font-bold transition-colors border-r border-[var(--border)] ${
+          className={`py-2 text-[10px] font-bold transition-colors border-r border-[var(--border)] ${
             voted === 'A' ? 'bg-[var(--crab-a)] text-black'
             : 'text-[var(--muted)] hover:text-[var(--crab-a)] hover:bg-[var(--crab-a)]/10'
           }`}
         >A</button>
-        <div className="flex-1 flex justify-center py-2"><VoteBar votesA={votesA} votesB={votesB} /></div>
+        <div className="flex flex-col items-center justify-center py-2">
+          <span className="text-[var(--dim)] text-[8px] mb-0.5">{voted ? 'voted' : 'vote'}</span>
+          <VoteBar votesA={votesA} votesB={votesB} />
+        </div>
         <button
           onClick={() => handleVote('B')}
-          className={`flex-none px-4 py-2 text-[10px] font-bold transition-colors border-l border-[var(--border)] ${
+          className={`py-2 text-[10px] font-bold transition-colors border-l border-[var(--border)] ${
             voted === 'B' ? 'bg-[var(--crab-b)] text-black'
             : 'text-[var(--muted)] hover:text-[var(--crab-b)] hover:bg-[var(--crab-b)]/10'
           }`}

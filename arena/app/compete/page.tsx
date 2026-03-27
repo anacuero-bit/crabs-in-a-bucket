@@ -216,6 +216,24 @@ export default function CompetePage() {
               </div>
 
               {error && <p className="text-red-400 text-xs text-center mt-3">{error}</p>}
+
+              {/* Challenge a friend */}
+              <div className="terminal-panel mt-4 p-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[var(--dim)] text-[10px]">challenge a friend</span>
+                  <button
+                    onClick={() => {
+                      const url = typeof window !== 'undefined' ? window.location.href : '';
+                      navigator.clipboard.writeText(url);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    className="text-[var(--muted)] text-[10px] hover:text-[var(--text)] transition-colors"
+                  >
+                    {copied ? 'copied!' : '[ copy link ]'}
+                  </button>
+                </div>
+              </div>
             </>
           )}
         </div>
