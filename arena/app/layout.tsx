@@ -20,17 +20,19 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className="min-h-full flex flex-col">
-        <nav className="flex items-center justify-between px-5 py-2.5 border-b border-[var(--border)]">
-          <Link href="/" className="text-[var(--muted)] text-[11px] hover:text-[var(--text)] transition-colors">
-            crabfight.ai
-          </Link>
-          <div className="flex items-center gap-5">
-            <Link href="/compete" className="text-[var(--crab-a)] text-[11px] fight-flash">
-              /fight
+        <nav className="border-b border-[var(--border)]">
+          <div className="max-w-6xl mx-auto px-5 flex items-center justify-between py-2.5">
+            <Link href="/" className="text-[var(--muted)] text-[11px] hover:text-[var(--text)] transition-colors">
+              crabfight.ai
             </Link>
-            <Link href="/leaderboard" className="text-[var(--muted)] text-[11px] hover:text-[var(--text)] transition-colors">
-              /leaderboard
-            </Link>
+            <div className="flex items-center gap-5">
+              <Link href="/compete" className="text-[var(--crab-a)] text-[11px] fight-flash">
+                /fight
+              </Link>
+              <Link href="/leaderboard" className="text-[var(--muted)] text-[11px] hover:text-[var(--text)] transition-colors">
+                /leaderboard
+              </Link>
+            </div>
           </div>
         </nav>
 

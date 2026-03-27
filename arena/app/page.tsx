@@ -24,7 +24,7 @@ function BattleInline({ battle }: { battle: Battle }) {
   };
 
   return (
-    <div className="terminal-panel mb-4">
+    <div className="terminal-panel mb-8">
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-1.5 border-b border-[var(--border-dim)] text-[11px]">
         <div className="flex items-center gap-2.5">
@@ -38,15 +38,15 @@ function BattleInline({ battle }: { battle: Battle }) {
       {/* Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-2">
         {/* A */}
-        <div className={`lg:border-r transition-all duration-200 ${active === 'A' ? 'border-[var(--crab-a)] shadow-[inset_0_0_30px_rgba(255,85,85,0.15)]' : 'border-[var(--border-dim)]'}`}>
-          <div className="flex items-center justify-between px-3 py-1 border-b border-[var(--border-dim)] text-[10px]">
+        <div className={`lg:border-r transition-all duration-200 ${active === 'A' ? 'border-[var(--crab-a)]' : 'border-[var(--border-dim)]'}`}>
+          <div className={`flex items-center justify-between px-3 py-1.5 border-b text-[10px] transition-colors duration-200 ${active === 'A' ? 'bg-[#F55] text-black border-[#F55]' : 'border-[var(--border-dim)]'}`}>
             <div className="flex items-center gap-2">
-              <span className="text-[var(--crab-a)] font-bold">A</span>
-              <span className="text-[var(--dim)]">{battle.submission_a.model} · {battle.submission_a.harness}</span>
+              <span className={`font-bold ${active === 'A' ? 'text-black' : 'text-[var(--crab-a)]'}`}>A</span>
+              <span className={active === 'A' ? 'text-black/60' : 'text-[var(--dim)]'}>{battle.submission_a.model} · {battle.submission_a.harness}</span>
             </div>
-            <span className="text-[var(--crab-a)]">{battle.submission_a.ai_score}</span>
+            <span className={`font-bold ${active === 'A' ? 'text-black' : 'text-[var(--crab-a)]'}`}>{battle.submission_a.ai_score}</span>
           </div>
-          <div className="relative overflow-hidden" style={{ height: '70vh' }}>
+          <div className="relative overflow-hidden" style={{ height: '55vh' }}>
             {active !== 'A' && (
               <div className="absolute inset-0 z-10 cursor-pointer" onClick={() => setActive('A')} />
             )}
@@ -63,15 +63,15 @@ function BattleInline({ battle }: { battle: Battle }) {
         </div>
 
         {/* B */}
-        <div className={`transition-all duration-200 ${active === 'B' ? 'shadow-[inset_0_0_30px_rgba(85,255,85,0.15)]' : ''}`}>
-          <div className="flex items-center justify-between px-3 py-1 border-b border-[var(--border-dim)] text-[10px]">
+        <div className={`transition-all duration-200 ${active === 'B' ? 'border-l border-[var(--crab-b)]' : ''}`}>
+          <div className={`flex items-center justify-between px-3 py-1.5 border-b text-[10px] transition-colors duration-200 ${active === 'B' ? 'bg-[#5F5] text-black border-[#5F5]' : 'border-[var(--border-dim)]'}`}>
             <div className="flex items-center gap-2">
-              <span className="text-[var(--crab-b)] font-bold">B</span>
-              <span className="text-[var(--dim)]">{battle.submission_b.model} · {battle.submission_b.harness}</span>
+              <span className={`font-bold ${active === 'B' ? 'text-black' : 'text-[var(--crab-b)]'}`}>B</span>
+              <span className={active === 'B' ? 'text-black/60' : 'text-[var(--dim)]'}>{battle.submission_b.model} · {battle.submission_b.harness}</span>
             </div>
-            <span className="text-[var(--crab-b)]">{battle.submission_b.ai_score}</span>
+            <span className={`font-bold ${active === 'B' ? 'text-black' : 'text-[var(--crab-b)]'}`}>{battle.submission_b.ai_score}</span>
           </div>
-          <div className="relative overflow-hidden" style={{ height: '70vh' }}>
+          <div className="relative overflow-hidden" style={{ height: '55vh' }}>
             {active !== 'B' && (
               <div className="absolute inset-0 z-10 cursor-pointer" onClick={() => setActive('B')} />
             )}
