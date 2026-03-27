@@ -51,7 +51,7 @@ function BattleInline({ battle }: { battle: Battle }) {
           <iframe
             src={iframeSrcA}
             className="w-full border-0 border-t border-[var(--border)]"
-            style={{ height: '500px' }}
+            style={{ height: '80vh' }}
             sandbox="allow-scripts allow-same-origin"
             title="Crab A"
             loading="lazy"
@@ -71,7 +71,7 @@ function BattleInline({ battle }: { battle: Battle }) {
           <iframe
             src={iframeSrcB}
             className="w-full border-0 border-t border-[var(--border)]"
-            style={{ height: '500px' }}
+            style={{ height: '80vh' }}
             sandbox="allow-scripts allow-same-origin"
             title="Crab B"
             loading="lazy"
