@@ -38,7 +38,7 @@ function BattleInline({ battle }: { battle: Battle }) {
       {/* Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-2">
         {/* A */}
-        <div className={`lg:border-r border-[var(--border-dim)] transition-colors ${active === 'A' ? 'bg-[var(--crab-a)]/5' : ''}`}>
+        <div className={`lg:border-r transition-all duration-200 ${active === 'A' ? 'border-[var(--crab-a)] shadow-[inset_0_0_30px_rgba(255,85,85,0.15)]' : 'border-[var(--border-dim)]'}`}>
           <div className="flex items-center justify-between px-3 py-1 border-b border-[var(--border-dim)] text-[10px]">
             <div className="flex items-center gap-2">
               <span className="text-[var(--crab-a)] font-bold">A</span>
@@ -63,7 +63,7 @@ function BattleInline({ battle }: { battle: Battle }) {
         </div>
 
         {/* B */}
-        <div className={`transition-colors ${active === 'B' ? 'bg-[var(--crab-b)]/5' : ''}`}>
+        <div className={`transition-all duration-200 ${active === 'B' ? 'shadow-[inset_0_0_30px_rgba(85,255,85,0.15)]' : ''}`}>
           <div className="flex items-center justify-between px-3 py-1 border-b border-[var(--border-dim)] text-[10px]">
             <div className="flex items-center gap-2">
               <span className="text-[var(--crab-b)] font-bold">B</span>

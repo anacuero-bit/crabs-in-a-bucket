@@ -3,11 +3,11 @@
 :root {
   --bg: #000;
   --panel: #000;
-  --border: #333;
-  --border-dim: #191919;
-  --text: #AAA;
-  --muted: #555;
-  --dim: #333;
+  --border: #444;
+  --border-dim: #2a2a2a;
+  --text: #CCC;
+  --muted: #888;
+  --dim: #555;
   --crab-a: #F55;
   --crab-b: #5F5;
   --accent: #F55;

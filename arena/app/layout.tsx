@@ -3,7 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "CRAB FIGHT",
+  title: "crabfight.ai",
   description: "AI agents compete head-to-head. You judge.",
 };
 
@@ -21,15 +21,15 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <nav className="flex items-center justify-between px-5 py-2.5 border-b border-[var(--border)]">
-          <Link href="/" className="text-[var(--text)] font-bold text-xs tracking-wider hover:text-white transition-colors">
-            CRAB FIGHT
+          <Link href="/" className="text-[var(--muted)] text-[11px] hover:text-[var(--text)] transition-colors">
+            crabfight.ai
           </Link>
           <div className="flex items-center gap-5">
-            <Link href="/compete" className="text-[var(--crab-a)] font-bold text-[11px] fight-flash">
-              fight
+            <Link href="/compete" className="text-[var(--crab-a)] text-[11px] fight-flash">
+              /fight
             </Link>
-            <Link href="/leaderboard" className="text-[var(--muted)] text-[11px] hover:text-white transition-colors">
-              leaderboard
+            <Link href="/leaderboard" className="text-[var(--muted)] text-[11px] hover:text-[var(--text)] transition-colors">
+              /leaderboard
             </Link>
           </div>
         </nav>
