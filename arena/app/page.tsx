@@ -5,7 +5,7 @@ import { fetchBattles, fetchStats, castVote, API_BASE } from '@/lib/api';
 import VoteBar from '@/components/VoteBar';
 import { Battle } from '@/lib/types';
 
-function ExpandedIframe({ src, label, onClose }: { src: string; label: string; onClose: () => void }) {
+function ExpandedIframe({ src, onClose }: { src: string; onClose: () => void }) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handler);
@@ -13,27 +13,18 @@ function ExpandedIframe({ src, label, onClose }: { src: string; label: string; o
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black flex items-center justify-center" onClick={onClose}>
-      <div className="relative flex flex-col" style={{ width: '92vw', maxWidth: '1280px', aspectRatio: '16/9' }} onClick={e => e.stopPropagation()}>
-        <button
-          onClick={onClose}
-          className="absolute -top-8 right-0 text-[var(--muted)] text-[11px] hover:text-white transition-colors flex items-center gap-2"
-        >
-          <span>esc</span>
-          <span className="border border-[var(--border)] px-1.5 py-0.5 text-[10px]">X</span>
-        </button>
-        <div className="flex items-center px-3 py-1 border border-b-0 border-[var(--border)] bg-[#111]">
-          <span className="text-[var(--muted)] text-[10px]">{label}</span>
-        </div>
-        <div className="flex-1 border border-[var(--border)]">
-          <iframe
-            src={src}
-            className="w-full h-full border-0"
-            sandbox="allow-scripts allow-same-origin"
-            title={label}
-          />
-        </div>
-      </div>
+    <div className="fixed inset-0 z-50 bg-black">
+      <iframe
+        src={src}
+        className="w-full h-full border-0"
+        sandbox="allow-scripts allow-same-origin"
+      />
+      <button
+        onClick={onClose}
+        className="fixed top-3 right-4 text-white/40 text-[10px] hover:text-white/80 transition-colors z-50"
+      >
+        esc to close
+      </button>
     </div>
   );
 }
@@ -67,8 +58,8 @@ function BattleInline({ battle }: { battle: Battle }) {
 
   return (
     <>
-    {expanded === 'A' && <ExpandedIframe src={iframeSrcA} label={`A — ${battle.submission_a.model} · ${battle.submission_a.harness}`} onClose={() => setExpanded(null)} />}
-    {expanded === 'B' && <ExpandedIframe src={iframeSrcB} label={`B — ${battle.submission_b.model} · ${battle.submission_b.harness}`} onClose={() => setExpanded(null)} />}
+    {expanded === 'A' && <ExpandedIframe src={iframeSrcA} onClose={() => setExpanded(null)} />}
+    {expanded === 'B' && <ExpandedIframe src={iframeSrcB} onClose={() => setExpanded(null)} />}
     <div className="terminal-panel mb-14">
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-1.5 border-b border-[var(--border-dim)] text-[11px]">
