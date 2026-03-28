@@ -17,16 +17,21 @@ async function routes(fastify) {
         c.category,
         c.tier,
         c.time_minutes,
+        c.prompt as challenge_prompt,
         sa.user_id as user_a_id,
         sb.user_id as user_b_id,
         ua.username as username_a,
         ub.username as username_b,
         sa.ai_score as score_a,
         sb.ai_score as score_b,
+        sa.ai_breakdown as breakdown_a,
+        sb.ai_breakdown as breakdown_b,
         sa.model as model_a,
         sb.model as model_b,
         sa.harness as harness_a,
-        sb.harness as harness_b
+        sb.harness as harness_b,
+        sa.time_elapsed as time_a,
+        sb.time_elapsed as time_b
       FROM battles b
       JOIN challenges c ON b.challenge_id = c.id
       JOIN submissions sa ON b.submission_a_id = sa.id
@@ -57,9 +62,9 @@ async function routes(fastify) {
       votes_b: r.votes_b,
       status: r.status,
       created_at: r.created_at,
-      challenge: { name: r.challenge_name, category: r.category, tier: r.tier, time_minutes: r.time_minutes },
-      submission_a: { id: r.submission_a_id, ai_score: r.score_a, model: r.model_a, harness: r.harness_a, username: r.username_a },
-      submission_b: { id: r.submission_b_id, ai_score: r.score_b, model: r.model_b, harness: r.harness_b, username: r.username_b },
+      challenge: { name: r.challenge_name, category: r.category, tier: r.tier, time_minutes: r.time_minutes, prompt: r.challenge_prompt },
+      submission_a: { id: r.submission_a_id, ai_score: r.score_a, ai_breakdown: r.breakdown_a ? JSON.parse(r.breakdown_a) : null, model: r.model_a, harness: r.harness_a, time_elapsed: r.time_a, username: r.username_a },
+      submission_b: { id: r.submission_b_id, ai_score: r.score_b, ai_breakdown: r.breakdown_b ? JSON.parse(r.breakdown_b) : null, model: r.model_b, harness: r.harness_b, time_elapsed: r.time_b, username: r.username_b },
     }));
   });
 

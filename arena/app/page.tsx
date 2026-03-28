@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { fetchBattles, fetchStats, castVote, API_BASE } from '@/lib/api';
 import VoteBar from '@/components/VoteBar';
 import { Battle } from '@/lib/types';
@@ -14,13 +13,19 @@ function ExpandedIframe({ src, label, onClose }: { src: string; label: string; o
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center" onClick={onClose}>
-      <div className="flex flex-col" style={{ width: '90vw', maxWidth: '1280px', aspectRatio: '16/9' }} onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-3 py-1.5 border border-b-0 border-[var(--border)] bg-[var(--bg)]">
+    <div className="fixed inset-0 z-50 bg-black flex items-center justify-center" onClick={onClose}>
+      <div className="relative flex flex-col" style={{ width: '92vw', maxWidth: '1280px', aspectRatio: '16/9' }} onClick={e => e.stopPropagation()}>
+        <button
+          onClick={onClose}
+          className="absolute -top-8 right-0 text-[var(--muted)] text-[11px] hover:text-white transition-colors flex items-center gap-2"
+        >
+          <span>esc</span>
+          <span className="border border-[var(--border)] px-1.5 py-0.5 text-[10px]">X</span>
+        </button>
+        <div className="flex items-center px-3 py-1 border border-b-0 border-[var(--border)] bg-[#111]">
           <span className="text-[var(--muted)] text-[10px]">{label}</span>
-          <button onClick={onClose} className="text-[var(--muted)] text-[10px] hover:text-[var(--text)]">[ close ] esc</button>
         </div>
-        <div className="flex-1 border border-[var(--border)] overflow-hidden">
+        <div className="flex-1 border border-[var(--border)]">
           <iframe
             src={src}
             className="w-full h-full border-0"
@@ -39,14 +44,13 @@ function BattleInline({ battle }: { battle: Battle }) {
   const [votesB, setVotesB] = useState(battle.votes_b);
   const [active, setActive] = useState<'A' | 'B' | null>(null);
   const [expanded, setExpanded] = useState<'A' | 'B' | null>(null);
+  const [hood, setHood] = useState(false);
 
   const iframeSrcA = `${API_BASE}/api/files/submissions/${battle.submission_a.id}/index.html`;
   const iframeSrcB = `${API_BASE}/api/files/submissions/${battle.submission_b.id}/index.html`;
 
   const handleVote = async (side: 'A' | 'B') => {
-    // Allow changing vote
     if (voted === side) return;
-    // Undo previous vote
     if (voted === 'A') setVotesA(v => v - 1);
     if (voted === 'B') setVotesB(v => v - 1);
     setVoted(side);
@@ -55,20 +59,26 @@ function BattleInline({ battle }: { battle: Battle }) {
     try { await castVote(battle.id, side); } catch {}
   };
 
+  const formatBreakdown = (bd: string | Record<string, number> | null | undefined) => {
+    if (!bd) return null;
+    if (typeof bd === 'string') return bd;
+    return JSON.stringify(bd, null, 2);
+  };
+
   return (
     <>
     {expanded === 'A' && <ExpandedIframe src={iframeSrcA} label={`A — ${battle.submission_a.model} · ${battle.submission_a.harness}`} onClose={() => setExpanded(null)} />}
     {expanded === 'B' && <ExpandedIframe src={iframeSrcB} label={`B — ${battle.submission_b.model} · ${battle.submission_b.harness}`} onClose={() => setExpanded(null)} />}
     <div className="terminal-panel mb-14">
-      {/* Header — clickable for details */}
-      <Link href={`/battles/${battle.id}`} className="flex items-center justify-between px-3 py-1.5 border-b border-[var(--border-dim)] text-[11px] hover:bg-[var(--border-dim)]/30 transition-colors cursor-pointer">
+      {/* Header */}
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-[var(--border-dim)] text-[11px]">
         <div className="flex items-center gap-2.5">
           <span className="text-[var(--muted)]">T{battle.challenge.tier}</span>
           <span className="text-[var(--muted)]">{battle.challenge.category?.toUpperCase()}</span>
           <span className="text-[var(--text)] font-bold">{battle.challenge.name}</span>
         </div>
         <span className="text-[var(--dim)]">{battle.challenge.time_minutes}min</span>
-      </Link>
+      </div>
 
       {/* Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-2">
@@ -129,32 +139,80 @@ function BattleInline({ battle }: { battle: Battle }) {
         </div>
       </div>
 
-      {/* Vote — A | vote | B symmetrical */}
-      <div className="grid grid-cols-3 border-t border-[var(--border)]">
+      {/* Vote — text only, no boxes */}
+      <div className="flex items-center border-t border-[var(--border)] py-2 px-3">
         <button
           onClick={() => handleVote('A')}
-          className={`py-2 text-[10px] font-bold transition-colors border-r border-[var(--border)] ${
-            voted === 'A' ? 'bg-[var(--crab-a)] text-black'
-            : 'text-[var(--muted)] hover:text-[var(--crab-a)] hover:bg-[var(--crab-a)]/10'
+          className={`text-[10px] font-bold transition-colors ${
+            voted === 'A' ? 'text-[var(--crab-a)]' : 'text-[var(--dim)] hover:text-[var(--crab-a)]'
           }`}
-        >A</button>
-        <div className="flex flex-col items-center justify-center py-2">
-          <span className="text-[var(--dim)] text-[8px] mb-0.5">{voted ? 'voted' : 'vote'}</span>
+        >{voted === 'A' ? 'voted A' : 'vote A'}</button>
+        <div className="flex-1 flex justify-center">
           <VoteBar votesA={votesA} votesB={votesB} />
         </div>
         <button
           onClick={() => handleVote('B')}
-          className={`py-2 text-[10px] font-bold transition-colors border-l border-[var(--border)] ${
-            voted === 'B' ? 'bg-[var(--crab-b)] text-black'
-            : 'text-[var(--muted)] hover:text-[var(--crab-b)] hover:bg-[var(--crab-b)]/10'
+          className={`text-[10px] font-bold transition-colors ${
+            voted === 'B' ? 'text-[var(--crab-b)]' : 'text-[var(--dim)] hover:text-[var(--crab-b)]'
           }`}
-        >B</button>
+        >{voted === 'B' ? 'voted B' : 'vote B'}</button>
       </div>
 
-      {/* Clickable details bar */}
-      <Link href={`/battles/${battle.id}`} className="block text-center py-2 border-t border-[var(--border-dim)] text-[var(--dim)] text-[10px] hover:text-[var(--muted)] hover:bg-[var(--border-dim)]/30 transition-colors cursor-pointer">
-        details
-      </Link>
+      {/* Under the Hood — expandable inline */}
+      <button
+        onClick={() => setHood(!hood)}
+        className="w-full text-center py-1.5 border-t border-[var(--border-dim)] text-[var(--dim)] text-[10px] hover:text-[var(--muted)] hover:bg-[var(--border-dim)]/20 transition-colors"
+      >
+        under the hood {hood ? '[-]' : '[+]'}
+      </button>
+
+      {hood && (
+        <div className="border-t border-[var(--border-dim)] px-3 py-3 text-[10px] space-y-3">
+          {/* Stacks */}
+          <div>
+            <div className="text-[var(--muted)] font-bold mb-1.5">stacks</div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <div className="text-[var(--crab-a)] font-bold">A</div>
+                <div className="flex justify-between"><span className="text-[var(--dim)]">model</span><span>{battle.submission_a.model}</span></div>
+                <div className="flex justify-between"><span className="text-[var(--dim)]">harness</span><span>{battle.submission_a.harness}</span></div>
+                <div className="flex justify-between"><span className="text-[var(--dim)]">score</span><span className="text-[var(--crab-a)]">{battle.submission_a.ai_score}</span></div>
+                {battle.submission_a.time_elapsed != null && <div className="flex justify-between"><span className="text-[var(--dim)]">time</span><span>{battle.submission_a.time_elapsed}</span></div>}
+              </div>
+              <div className="space-y-1">
+                <div className="text-[var(--crab-b)] font-bold">B</div>
+                <div className="flex justify-between"><span className="text-[var(--dim)]">model</span><span>{battle.submission_b.model}</span></div>
+                <div className="flex justify-between"><span className="text-[var(--dim)]">harness</span><span>{battle.submission_b.harness}</span></div>
+                <div className="flex justify-between"><span className="text-[var(--dim)]">score</span><span className="text-[var(--crab-b)]">{battle.submission_b.ai_score}</span></div>
+                {battle.submission_b.time_elapsed != null && <div className="flex justify-between"><span className="text-[var(--dim)]">time</span><span>{battle.submission_b.time_elapsed}</span></div>}
+              </div>
+            </div>
+          </div>
+
+          {/* AI Referee Breakdown */}
+          {(battle.submission_a.ai_breakdown || battle.submission_b.ai_breakdown) && (
+            <div>
+              <div className="text-[var(--muted)] font-bold mb-1.5">AI referee breakdown</div>
+              <div className="grid grid-cols-2 gap-3">
+                {battle.submission_a.ai_breakdown && (
+                  <pre className="text-[var(--dim)] whitespace-pre-wrap">{formatBreakdown(battle.submission_a.ai_breakdown)}</pre>
+                )}
+                {battle.submission_b.ai_breakdown && (
+                  <pre className="text-[var(--dim)] whitespace-pre-wrap">{formatBreakdown(battle.submission_b.ai_breakdown)}</pre>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Challenge Prompt */}
+          {battle.challenge.prompt && (
+            <div>
+              <div className="text-[var(--muted)] font-bold mb-1.5">challenge prompt</div>
+              <pre className="text-[var(--dim)] whitespace-pre-wrap leading-relaxed">{battle.challenge.prompt}</pre>
+            </div>
+          )}
+        </div>
+      )}
     </div>
     </>
   );
