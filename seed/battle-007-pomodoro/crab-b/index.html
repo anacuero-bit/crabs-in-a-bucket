@@ -10,18 +10,19 @@
     background: linear-gradient(135deg, #0f0c29, #1a1a3e, #24243e);
     color: #e0e0e0;
     font-family: 'Segoe UI', -apple-system, sans-serif;
-    min-height: 100vh;
+    margin: 0; padding: 0; overflow: hidden; width: 100vw; height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
   }
   .app {
     display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 24px;
+    grid-template-columns: 1fr 260px;
+    gap: 20px;
     max-width: 720px;
     width: 100%;
+    padding: 0 20px;
+    max-height: 100vh;
   }
   @media (max-width: 640px) {
     .app { grid-template-columns: 1fr; }
@@ -32,18 +33,18 @@
   /* Mode selector */
   .modes {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     justify-content: center;
-    margin-bottom: 32px;
+    margin-bottom: 16px;
   }
   .mode-btn {
-    padding: 8px 18px;
+    padding: 6px 14px;
     border: 1px solid rgba(255,255,255,0.1);
     background: rgba(255,255,255,0.03);
     color: #888;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     transition: all 0.2s;
   }
   .mode-btn.active {
@@ -60,14 +61,14 @@
   /* Circular timer */
   .timer-ring-wrap {
     position: relative;
-    width: 260px;
-    height: 260px;
-    margin: 0 auto 28px;
+    width: 220px;
+    height: 220px;
+    margin: 0 auto 16px;
   }
   .timer-ring-wrap svg {
     transform: rotate(-90deg);
-    width: 260px;
-    height: 260px;
+    width: 220px;
+    height: 220px;
   }
   .ring-bg {
     fill: none;
@@ -91,32 +92,32 @@
     justify-content: center;
   }
   .timer-time {
-    font-size: 3.5rem;
+    font-size: 2.8rem;
     font-weight: 300;
     letter-spacing: 3px;
     font-variant-numeric: tabular-nums;
     color: #fff;
   }
   .timer-label {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: #666;
     text-transform: uppercase;
     letter-spacing: 2px;
-    margin-top: 4px;
+    margin-top: 2px;
   }
 
   /* Controls */
   .controls {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
   }
   .btn {
-    padding: 12px 32px;
+    padding: 10px 28px;
     border: none;
     border-radius: 12px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.15s;
@@ -124,7 +125,7 @@
   .btn-primary {
     background: #ff6b6b;
     color: #fff;
-    min-width: 130px;
+    min-width: 120px;
   }
   .btn-primary:hover { background: #ee5a5a; transform: translateY(-1px); }
   .btn-primary.is-break { background: #51cf66; }
@@ -137,23 +138,23 @@
   }
   .btn-secondary:hover { background: rgba(255,255,255,0.1); color: #ccc; }
   .btn-icon {
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     padding: 0;
     border-radius: 10px;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 
   /* Session counter */
   .sessions {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     justify-content: center;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
   }
   .session-dot {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.1);
@@ -165,7 +166,7 @@
     box-shadow: 0 0 8px rgba(255,107,107,0.4);
   }
   .session-info {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #555;
     margin-bottom: 0;
   }
@@ -174,44 +175,45 @@
   .side-panel {
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 16px;
-    padding: 20px;
+    border-radius: 14px;
+    padding: 14px;
     display: flex;
     flex-direction: column;
+    max-height: 520px;
   }
   .side-title {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 2px;
     color: #555;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
   .task-input-row {
     display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
+    gap: 6px;
+    margin-bottom: 10px;
   }
   .task-input {
     flex: 1;
-    padding: 10px 14px;
+    padding: 8px 10px;
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px;
+    border-radius: 8px;
     color: #ccc;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     outline: none;
     transition: border-color 0.2s;
   }
   .task-input:focus { border-color: rgba(255,107,107,0.4); }
   .task-input::placeholder { color: #444; }
   .add-btn {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border: 1px solid rgba(255,255,255,0.08);
     background: rgba(255,107,107,0.15);
     color: #ff6b6b;
-    border-radius: 10px;
-    font-size: 1.3rem;
+    border-radius: 8px;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.15s;
     flex-shrink: 0;
@@ -221,23 +223,23 @@
     list-style: none;
     flex: 1;
     overflow-y: auto;
-    max-height: 300px;
+    max-height: 200px;
   }
   .task-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
+    gap: 8px;
+    padding: 7px 10px;
     background: rgba(255,255,255,0.02);
-    border-radius: 8px;
-    margin-bottom: 6px;
+    border-radius: 6px;
+    margin-bottom: 4px;
     transition: opacity 0.2s;
   }
   .task-item.done { opacity: 0.4; }
   .task-item.done .task-text { text-decoration: line-through; }
   .task-check {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border: 2px solid #444;
     border-radius: 50%;
     cursor: pointer;
@@ -246,7 +248,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
+    font-size: 9px;
     color: transparent;
   }
   .task-item.done .task-check {
@@ -256,7 +258,7 @@
   }
   .task-text {
     flex: 1;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #bbb;
   }
   .task-del {
@@ -264,7 +266,7 @@
     border: none;
     color: #444;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.9rem;
     padding: 2px;
     transition: color 0.15s;
   }
@@ -272,40 +274,40 @@
 
   /* Duration settings */
   .duration-settings {
-    margin-top: 16px;
-    padding-top: 16px;
+    margin-top: 10px;
+    padding-top: 10px;
     border-top: 1px solid rgba(255,255,255,0.06);
   }
   .dur-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
-    font-size: 0.8rem;
+    margin-bottom: 5px;
+    font-size: 0.75rem;
     color: #777;
   }
   .dur-row:last-child { margin-bottom: 0; }
   .dur-adj {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
   }
   .dur-btn {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border: 1px solid rgba(255,255,255,0.08);
     background: rgba(255,255,255,0.04);
     color: #888;
-    border-radius: 6px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     display: flex;
     align-items: center;
     justify-content: center;
   }
   .dur-btn:hover { background: rgba(255,255,255,0.1); color: #ccc; }
   .dur-val {
-    min-width: 28px;
+    min-width: 24px;
     text-align: center;
     font-weight: 600;
     color: #ccc;
@@ -322,10 +324,10 @@
     </div>
 
     <div class="timer-ring-wrap">
-      <svg viewBox="0 0 260 260">
-        <circle class="ring-bg" cx="130" cy="130" r="115"/>
-        <circle class="ring-progress" id="ringProgress" cx="130" cy="130" r="115"
-          stroke-dasharray="722.57" stroke-dashoffset="0"/>
+      <svg viewBox="0 0 220 220">
+        <circle class="ring-bg" cx="110" cy="110" r="97"/>
+        <circle class="ring-progress" id="ringProgress" cx="110" cy="110" r="97"
+          stroke-dasharray="609.47" stroke-dashoffset="0"/>
       </svg>
       <div class="timer-center">
         <div class="timer-time" id="timerTime">25:00</div>
@@ -351,7 +353,7 @@
     <ul class="task-list" id="taskList"></ul>
 
     <div class="duration-settings">
-      <div class="side-title" style="margin-bottom:10px">Durations</div>
+      <div class="side-title" style="margin-bottom:6px">Durations</div>
       <div class="dur-row">
         <span>Focus</span>
         <div class="dur-adj">
@@ -381,7 +383,7 @@
 </div>
 
 <script>
-const CIRCUMFERENCE = 2 * Math.PI * 115; // ~722.57
+const CIRCUMFERENCE = 2 * Math.PI * 97; // ~609.47
 const ring = document.getElementById('ringProgress');
 
 let durations = { work: 25, short: 5, long: 15 };

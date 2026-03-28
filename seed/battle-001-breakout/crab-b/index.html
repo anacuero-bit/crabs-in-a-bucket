@@ -6,15 +6,15 @@
 <title>Neon Breakout</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Segoe UI',Arial,sans-serif;color:#e0e0ff;overflow:hidden}
-#hud{display:flex;gap:30px;margin-bottom:8px;font-size:15px;width:480px;justify-content:space-between}
-.hud-item{text-transform:uppercase;letter-spacing:1px;font-size:13px;color:#88a}
-.hud-val{font-size:20px;font-weight:bold;color:#0ff}
+body{background:#0a0a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0;padding:0;overflow:hidden;width:100vw;height:100vh;font-family:'Segoe UI',Arial,sans-serif;color:#e0e0ff}
+#hud{display:flex;gap:30px;margin-bottom:6px;font-size:14px;width:480px;justify-content:space-between}
+.hud-item{text-transform:uppercase;letter-spacing:1px;font-size:12px;color:#88a}
+.hud-val{font-size:18px;font-weight:bold;color:#0ff}
 canvas{display:block;border:1px solid #224;border-radius:4px}
 #msg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;display:none;z-index:10}
-#msg h2{font-size:32px;color:#0ff;text-shadow:0 0 20px #0ff;margin-bottom:10px}
-#msg p{color:#aac;margin-bottom:16px;font-size:15px}
-#msg button{padding:10px 32px;font-size:16px;background:transparent;color:#0ff;border:2px solid #0ff;border-radius:6px;cursor:pointer;text-transform:uppercase;letter-spacing:2px;transition:all .2s}
+#msg h2{font-size:28px;color:#0ff;text-shadow:0 0 20px #0ff;margin-bottom:8px}
+#msg p{color:#aac;margin-bottom:12px;font-size:14px}
+#msg button{padding:8px 28px;font-size:14px;background:transparent;color:#0ff;border:2px solid #0ff;border-radius:6px;cursor:pointer;text-transform:uppercase;letter-spacing:2px;transition:all .2s}
 #msg button:hover{background:#0ff;color:#0a0a1a}
 #touch-left,#touch-right{display:none;position:fixed;bottom:10px;width:45%;height:80px;border:1px solid #335;border-radius:10px;background:rgba(0,255,255,0.05);z-index:20;font-size:28px;color:#0ff;line-height:80px;text-align:center;user-select:none;-webkit-user-select:none}
 #touch-left{left:2.5%}
@@ -27,12 +27,12 @@ canvas{display:block;border:1px solid #224;border-radius:4px}
   <div><div class="hud-item">Score</div><div class="hud-val" id="hScore">0</div></div>
   <div><div class="hud-item">High</div><div class="hud-val" id="hHigh">0</div></div>
   <div><div class="hud-item">Level</div><div class="hud-val" id="hLevel">1</div></div>
-  <div><div class="hud-item">Lives</div><div class="hud-val" id="hLives">♥♥♥</div></div>
+  <div><div class="hud-item">Lives</div><div class="hud-val" id="hLives">&#9829;&#9829;&#9829;</div></div>
 </div>
 <canvas id="c" width="480" height="440"></canvas>
 <div id="msg"><h2 id="msgTitle"></h2><p id="msgSub"></p><button id="msgBtn">Play</button></div>
-<div id="touch-left">◀</div>
-<div id="touch-right">▶</div>
+<div id="touch-left">&#9664;</div>
+<div id="touch-right">&#9654;</div>
 <script>
 const C=document.getElementById('c'),X=C.getContext('2d');
 const hScore=document.getElementById('hScore'),hHigh=document.getElementById('hHigh'),hLevel=document.getElementById('hLevel'),hLives=document.getElementById('hLives');
@@ -106,7 +106,7 @@ function nextLevel(){
 
 function updateHUD(){
   hScore.textContent=score;hLevel.textContent=level;
-  hLives.textContent='♥'.repeat(Math.max(0,lives));
+  hLives.textContent='\u2665'.repeat(Math.max(0,lives));
   if(score>highScore){highScore=score;localStorage.setItem('neonBreakoutHi',highScore);hHigh.textContent=highScore}
 }
 

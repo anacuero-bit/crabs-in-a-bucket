@@ -6,20 +6,20 @@
 <title>Typing Speed Test</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#ddd;font-family:Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-h1{font-size:22px;margin-bottom:20px;color:#aab}
-#word-display{font-size:36px;margin:20px 0;letter-spacing:2px;min-height:50px;color:#fff}
-#input{width:300px;padding:12px;font-size:20px;text-align:center;background:#12122a;color:#eee;border:2px solid #444;border-radius:6px;outline:none;font-family:monospace}
+body{background:#1a1a2e;color:#ddd;font-family:Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0;padding:0;overflow:hidden;width:100vw;height:100vh}
+h1{font-size:20px;margin-bottom:12px;color:#aab}
+#word-display{font-size:32px;margin:14px 0;letter-spacing:2px;min-height:44px;color:#fff}
+#input{width:300px;padding:10px;font-size:18px;text-align:center;background:#12122a;color:#eee;border:2px solid #444;border-radius:6px;outline:none;font-family:monospace}
 #input:focus{border-color:#58a6ff}
-#timer{font-size:18px;margin:16px 0;color:#888}
-#stats{display:flex;gap:30px;margin:16px 0}
+#timer{font-size:16px;margin:10px 0;color:#888}
+#stats{display:flex;gap:30px;margin:10px 0}
 .stat{text-align:center}
-.stat-val{font-size:28px;font-weight:bold;color:#58a6ff}
-.stat-label{font-size:12px;color:#888;text-transform:uppercase}
+.stat-val{font-size:24px;font-weight:bold;color:#58a6ff}
+.stat-label{font-size:11px;color:#888;text-transform:uppercase}
 #results{display:none;text-align:center}
-#results h2{margin-bottom:12px;color:#fff}
-#startBtn{padding:10px 30px;font-size:16px;background:#334;color:#eee;border:1px solid #556;border-radius:4px;cursor:pointer;margin-top:12px}
-#startBtn:hover{background:#445}
+#results h2{margin-bottom:10px;color:#fff;font-size:20px}
+#startBtn,#restartBtn{padding:8px 24px;font-size:14px;background:#334;color:#eee;border:1px solid #556;border-radius:4px;cursor:pointer;margin-top:8px}
+#startBtn:hover,#restartBtn:hover{background:#445}
 </style>
 </head>
 <body>
@@ -36,7 +36,7 @@ h1{font-size:22px;margin-bottom:20px;color:#aab}
 </div>
 <div id="results">
   <h2>Results</h2>
-  <div id="stats2" style="display:flex;gap:30px;justify-content:center;margin:16px 0">
+  <div id="stats2" style="display:flex;gap:30px;justify-content:center;margin:10px 0">
     <div class="stat"><div class="stat-val" id="fwpm">0</div><div class="stat-label">WPM</div></div>
     <div class="stat"><div class="stat-val" id="facc">0%</div><div class="stat-label">Accuracy</div></div>
     <div class="stat"><div class="stat-val" id="fwords">0</div><div class="stat-label">Words</div></div>

@@ -10,23 +10,25 @@
     font-family: 'Consolas', 'Monaco', monospace;
     background: #1a1a1a;
     color: #e0e0e0;
-    min-height: 100vh;
+    margin: 0; padding: 0; overflow: hidden; width: 100vw; height: 100vh;
     display: flex;
     justify-content: center;
-    padding: 20px;
+    align-items: center;
   }
   .app {
     width: 820px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 10px;
+    max-height: 100vh;
+    padding: 10px 0;
   }
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
-  h1 { font-size: 1.3rem; color: #00bcd4; font-weight: 400; }
+  h1 { font-size: 1.1rem; color: #00bcd4; font-weight: 400; }
   .mode-toggle {
     display: flex;
     background: #2a2a2a;
@@ -34,12 +36,12 @@
     overflow: hidden;
   }
   .mode-btn {
-    padding: 8px 16px;
+    padding: 6px 14px;
     background: transparent;
     border: none;
     color: #888;
     font-family: inherit;
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     cursor: pointer;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -47,54 +49,59 @@
   .mode-btn.active { background: #00bcd4; color: #000; }
   .main-area {
     display: flex;
-    gap: 16px;
+    gap: 12px;
+    flex: 1;
+    min-height: 0;
   }
   .calc-panel {
     flex: 1;
     background: #222;
     border: 1px solid #333;
     border-radius: 10px;
-    padding: 16px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
   }
   .display-box {
     background: #111;
     border: 1px solid #333;
     border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 12px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
     text-align: right;
-    min-height: 80px;
+    min-height: 64px;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
   }
   .stack-display {
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     color: #666;
-    max-height: 60px;
+    max-height: 40px;
     overflow-y: auto;
   }
   .stack-display div { padding: 1px 0; }
-  .stack-display .lbl { color: #00bcd4; display: inline-block; width: 24px; }
+  .stack-display .lbl { color: #00bcd4; display: inline-block; width: 20px; }
   .main-val {
-    font-size: 2rem;
+    font-size: 1.6rem;
     color: #fff;
     word-break: break-all;
   }
-  .sub-val { font-size: 0.8rem; color: #555; }
+  .sub-val { font-size: 0.7rem; color: #555; }
   .keys {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 6px;
+    gap: 4px;
+    flex: 1;
   }
   .k {
-    padding: 12px 4px;
+    padding: 9px 3px;
     border: 1px solid #333;
-    border-radius: 6px;
+    border-radius: 5px;
     background: #2a2a2a;
     color: #ccc;
     font-family: inherit;
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     cursor: pointer;
     text-align: center;
     transition: background 0.1s;
@@ -103,29 +110,30 @@
   .k:active { background: #444; }
   .k.num { background: #333; color: #fff; }
   .k.op { background: #004d5a; color: #00bcd4; }
-  .k.fn { background: #2a2a2a; color: #aaa; font-size: 0.75rem; }
+  .k.fn { background: #2a2a2a; color: #aaa; font-size: 0.68rem; }
   .k.act { background: #00bcd4; color: #000; font-weight: bold; }
   .k.wide { grid-column: span 2; }
   .graph-panel {
-    width: 340px;
+    width: 310px;
     background: #222;
     border: 1px solid #333;
     border-radius: 10px;
-    padding: 16px;
+    padding: 12px;
     display: none;
+    flex-direction: column;
   }
-  .graph-panel.show { display: block; }
+  .graph-panel.show { display: flex; }
   .graph-panel h3 {
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     color: #666;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   .graph-input {
     display: flex;
-    gap: 6px;
-    margin-bottom: 10px;
+    gap: 5px;
+    margin-bottom: 6px;
   }
   .graph-input input {
     flex: 1;
@@ -133,46 +141,46 @@
     border: 1px solid #333;
     color: #00bcd4;
     font-family: inherit;
-    padding: 8px;
-    border-radius: 6px;
+    padding: 6px;
+    border-radius: 5px;
     outline: none;
-    font-size: 0.85rem;
+    font-size: 0.78rem;
   }
   .graph-input button {
     background: #00bcd4;
     color: #000;
     border: none;
-    padding: 8px 14px;
-    border-radius: 6px;
+    padding: 6px 10px;
+    border-radius: 5px;
     cursor: pointer;
     font-family: inherit;
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     font-weight: bold;
   }
   canvas {
     width: 100%;
     border: 1px solid #333;
-    border-radius: 6px;
+    border-radius: 5px;
     background: #111;
   }
   .range-row {
     display: flex;
-    gap: 8px;
-    margin-top: 8px;
+    gap: 6px;
+    margin-top: 6px;
     align-items: center;
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     color: #666;
   }
   .range-row input {
-    width: 60px;
+    width: 50px;
     background: #111;
     border: 1px solid #333;
     color: #aaa;
     font-family: inherit;
-    padding: 4px 6px;
-    border-radius: 4px;
+    padding: 3px 4px;
+    border-radius: 3px;
     text-align: center;
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     outline: none;
   }
 </style>

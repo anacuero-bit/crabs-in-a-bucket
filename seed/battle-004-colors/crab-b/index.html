@@ -7,46 +7,47 @@
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--border:#30363d;--text:#c9d1d9;--accent:#58a6ff;--dim:#484f58}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
-#top{padding:12px 16px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--border);flex-wrap:wrap}
-#top h1{font-size:16px;color:var(--accent);margin-right:8px}
-#top input[type=text]{padding:8px 14px;font-size:14px;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;width:180px;outline:none}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;margin:0;padding:0;overflow:hidden;width:100vw;height:100vh;display:flex;flex-direction:column}
+#top{padding:8px 16px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap}
+#top h1{font-size:14px;color:var(--accent);margin-right:6px}
+#top input[type=text]{padding:6px 12px;font-size:13px;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;width:160px;outline:none}
 #top input:focus{border-color:var(--accent)}
-#top select,#top button{padding:6px 14px;font-size:12px;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:4px;cursor:pointer}
+#top select,#top button{padding:5px 12px;font-size:11px;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:4px;cursor:pointer}
 #top button:hover{border-color:var(--accent)}
-.sep{width:1px;height:22px;background:var(--border)}
-#palette{display:flex;min-height:180px;width:100%;user-select:none}
+.sep{width:1px;height:20px;background:var(--border)}
+#palette{display:flex;height:140px;width:100%;user-select:none;flex-shrink:0}
 .swatch-col{flex:1;display:flex;flex-direction:column;position:relative;transition:flex 0.3s;min-width:0;cursor:grab}
 .swatch-col:active{cursor:grabbing}
 .swatch-top{flex:1;display:flex;align-items:center;justify-content:center;position:relative;transition:background 0.4s}
-.swatch-info{padding:12px;background:var(--panel);border-top:1px solid var(--border);font-size:11px;font-family:monospace;line-height:1.8}
-.swatch-info .hex{font-size:15px;font-weight:bold;cursor:pointer}
+.swatch-info{padding:6px 10px;background:var(--panel);border-top:1px solid var(--border);font-size:10px;font-family:monospace;line-height:1.6}
+.swatch-info .hex{font-size:13px;font-weight:bold;cursor:pointer}
 .swatch-info .hex:hover{color:var(--accent)}
-.lock-btn{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.4);border:none;color:#fff;font-size:16px;cursor:pointer;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.lock-btn{position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.4);border:none;color:#fff;font-size:14px;cursor:pointer;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 .lock-btn:hover{background:rgba(0,0,0,0.7)}
 .lock-btn.locked{color:#f0c040}
-.copy-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:8px 20px;border-radius:6px;font-size:13px;font-weight:bold;z-index:100;opacity:0;transition:opacity 0.3s;pointer-events:none}
+.copy-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:6px 16px;border-radius:6px;font-size:12px;font-weight:bold;z-index:100;opacity:0;transition:opacity 0.3s;pointer-events:none}
 .copy-toast.show{opacity:1}
-#export-bar{padding:10px 16px;display:flex;gap:8px;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center}
-#export-bar button{padding:6px 14px;font-size:12px;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:4px;cursor:pointer}
+#export-bar{padding:6px 16px;display:flex;gap:6px;border-top:1px solid var(--border);flex-shrink:0;align-items:center}
+#export-bar button{padding:4px 12px;font-size:11px;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:4px;cursor:pointer}
 #export-bar button:hover{border-color:var(--accent)}
-#contrast-section{padding:16px;border-top:1px solid var(--border)}
-#contrast-section h3{font-size:13px;color:var(--dim);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
-#contrast-grid{display:flex;gap:6px;flex-wrap:wrap}
-.contrast-pair{background:var(--panel);border-radius:6px;padding:10px;font-size:11px;width:130px;border:1px solid var(--border)}
-.contrast-pair .ratio{font-size:16px;font-weight:bold;margin:4px 0}
+#lower{display:flex;flex:1;min-height:0;overflow:hidden}
+#contrast-section{flex:1;padding:8px 12px;border-right:1px solid var(--border);overflow:auto}
+#contrast-section h3{font-size:11px;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+#contrast-grid{display:flex;gap:4px;flex-wrap:wrap}
+.contrast-pair{background:var(--panel);border-radius:4px;padding:6px;font-size:10px;width:115px;border:1px solid var(--border)}
+.contrast-pair .ratio{font-size:13px;font-weight:bold;margin:2px 0}
 .contrast-pair .pass{color:#3fb950}.contrast-pair .fail{color:#f85149}
-.contrast-sample{display:flex;gap:4px;margin-top:6px;height:20px;border-radius:3px;overflow:hidden}
+.contrast-sample{display:flex;gap:3px;margin-top:4px;height:14px;border-radius:2px;overflow:hidden}
 .contrast-sample div{flex:1}
-#preview-section{padding:16px;border-top:1px solid var(--border)}
-#preview-section h3{font-size:13px;color:var(--dim);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px}
-#preview-mock{display:flex;gap:16px;flex-wrap:wrap}
-.mock-card{border-radius:8px;padding:16px;width:220px;min-height:140px}
-.mock-card h4{margin-bottom:8px;font-size:14px}
-.mock-card p{font-size:12px;opacity:0.8;margin-bottom:12px;line-height:1.4}
-.mock-btn{padding:6px 16px;border:none;border-radius:4px;font-size:12px;cursor:pointer;font-weight:bold}
-.mock-header{padding:12px 16px;border-radius:8px;font-size:14px;font-weight:bold;min-width:220px;display:flex;align-items:center;gap:10px}
-.mock-badge{padding:3px 10px;border-radius:10px;font-size:11px}
+#preview-section{flex:1;padding:8px 12px;overflow:auto}
+#preview-section h3{font-size:11px;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+#preview-mock{display:flex;gap:8px;flex-wrap:wrap}
+.mock-card{border-radius:6px;padding:10px;width:180px;min-height:90px}
+.mock-card h4{margin-bottom:4px;font-size:12px}
+.mock-card p{font-size:10px;opacity:0.8;margin-bottom:8px;line-height:1.3}
+.mock-btn{padding:4px 12px;border:none;border-radius:3px;font-size:10px;cursor:pointer;font-weight:bold}
+.mock-header{padding:8px 12px;border-radius:6px;font-size:12px;font-weight:bold;min-width:180px;display:flex;align-items:center;gap:8px}
+.mock-badge{padding:2px 8px;border-radius:8px;font-size:9px}
 </style>
 </head>
 <body>
@@ -64,13 +65,15 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-se
 </div>
 <div id="palette"></div>
 <div id="export-bar">
-  <span style="font-size:12px;color:var(--dim)">Export:</span>
+  <span style="font-size:11px;color:var(--dim)">Export:</span>
   <button id="expCSS">CSS Variables</button>
   <button id="expTW">Tailwind Config</button>
   <button id="expPNG">PNG Image</button>
 </div>
-<div id="contrast-section"><h3>Contrast Checker</h3><div id="contrast-grid"></div></div>
-<div id="preview-section"><h3>Preview</h3><div id="preview-mock"></div></div>
+<div id="lower">
+  <div id="contrast-section"><h3>Contrast Checker</h3><div id="contrast-grid"></div></div>
+  <div id="preview-section"><h3>Preview</h3><div id="preview-mock"></div></div>
+</div>
 <div class="copy-toast" id="toast">Copied!</div>
 
 <script>
@@ -120,7 +123,7 @@ function render(){
     const textCol=l>55?'#000':'#fff';
     col.innerHTML=`
       <div class="swatch-top" style="background:${c}">
-        <button class="lock-btn ${locked[i]?'locked':''}" data-i="${i}">${locked[i]?'🔒':'🔓'}</button>
+        <button class="lock-btn ${locked[i]?'locked':''}" data-i="${i}">${locked[i]?'\uD83D\uDD12':'\uD83D\uDD13'}</button>
       </div>
       <div class="swatch-info">
         <div class="hex" data-c="${c}" title="Click to copy">${c.toUpperCase()}</div>
@@ -156,7 +159,7 @@ function renderContrast(){
     const ratio=contrastRatio(colors[i],colors[j]);
     const pass=ratio>=4.5;
     const pair=document.createElement('div');pair.className='contrast-pair';
-    pair.innerHTML=`<div style="display:flex;gap:4px;font-size:10px">${colors[i].toUpperCase()} / ${colors[j].toUpperCase()}</div>
+    pair.innerHTML=`<div style="display:flex;gap:3px;font-size:9px">${colors[i].toUpperCase()} / ${colors[j].toUpperCase()}</div>
       <div class="ratio">${ratio.toFixed(2)}:1</div>
       <div class="${pass?'pass':'fail'}">${pass?'AA Pass':'AA Fail'}</div>
       <div class="contrast-sample"><div style="background:${colors[i]}"></div><div style="background:${colors[j]}"></div></div>`;

@@ -11,7 +11,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #eee;
   }
@@ -19,8 +23,8 @@
     text-align: center;
   }
   h1 {
-    font-size: 2rem;
-    margin-bottom: 8px;
+    font-size: 1.4rem;
+    margin-bottom: 6px;
     color: #4ecca3;
   }
   .score-bar {
@@ -28,18 +32,18 @@
     justify-content: space-between;
     align-items: center;
     max-width: 400px;
-    margin: 0 auto 12px;
-    padding: 8px 16px;
+    margin: 0 auto 8px;
+    padding: 6px 16px;
     background: #16213e;
     border-radius: 8px;
   }
   .score-bar span {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
   }
   .score-bar .score-val {
     color: #4ecca3;
     font-weight: bold;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
   }
   canvas {
     border: 2px solid #4ecca3;
@@ -49,14 +53,14 @@
     background: #0f3460;
   }
   .controls {
-    margin-top: 16px;
+    margin-top: 8px;
     display: flex;
     gap: 12px;
     justify-content: center;
   }
   button {
-    padding: 10px 28px;
-    font-size: 1rem;
+    padding: 8px 22px;
+    font-size: 0.9rem;
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -72,19 +76,19 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(15, 52, 96, 0.95);
-    padding: 40px 50px;
+    padding: 30px 40px;
     border-radius: 12px;
     border: 2px solid #4ecca3;
     text-align: center;
     display: none;
   }
-  .overlay h2 { color: #e94560; margin-bottom: 8px; font-size: 1.8rem; }
-  .overlay p { margin-bottom: 16px; font-size: 1.1rem; }
+  .overlay h2 { color: #e94560; margin-bottom: 6px; font-size: 1.5rem; }
+  .overlay p { margin-bottom: 12px; font-size: 1rem; }
   .game-wrap { position: relative; display: inline-block; }
   .instructions {
-    margin-top: 12px;
+    margin-top: 6px;
     color: #888;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
   }
 </style>
 </head>
@@ -198,7 +202,6 @@ function draw() {
   // Eyes on head
   const head = snake[0];
   ctx.fillStyle = '#1a1a2e';
-  const eyeOffset = 5;
   if (direction.x === 1) {
     ctx.fillRect(head.x * TILE + 13, head.y * TILE + 5, 3, 3);
     ctx.fillRect(head.x * TILE + 13, head.y * TILE + 12, 3, 3);

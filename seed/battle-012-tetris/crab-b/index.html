@@ -13,72 +13,72 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    margin: 0; padding: 0; overflow: hidden; width: 100vw; height: 100vh;
   }
   .game {
     display: flex;
-    gap: 20px;
+    gap: 14px;
     align-items: flex-start;
   }
   .left-panel, .right-panel {
-    width: 130px;
+    width: 110px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
   }
   .info-box {
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 12px;
-    padding: 14px;
+    border-radius: 10px;
+    padding: 10px;
     text-align: center;
   }
   .info-box .label {
-    font-size: 0.6rem;
+    font-size: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 2px;
     color: #555;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
   .info-box .value {
-    font-size: 1.6rem;
+    font-size: 1.3rem;
     font-weight: 300;
     color: #7c4dff;
   }
   .preview-box {
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 12px;
-    padding: 14px;
+    border-radius: 10px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
   .preview-box .label {
-    font-size: 0.6rem;
+    font-size: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 2px;
     color: #555;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
   }
   .board-frame {
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 0 40px rgba(124, 77, 255, 0.1);
+    box-shadow: 0 0 30px rgba(124, 77, 255, 0.1);
     border: 1px solid rgba(255,255,255,0.06);
   }
   canvas { display: block; }
   .small-canvas {
-    border-radius: 6px;
+    border-radius: 5px;
     background: rgba(0,0,0,0.3);
   }
   button {
     background: #7c4dff;
     color: white;
     border: none;
-    padding: 12px;
-    border-radius: 10px;
-    font-size: 0.8rem;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 0.7rem;
     cursor: pointer;
     width: 100%;
     font-family: inherit;
@@ -87,14 +87,14 @@
   }
   button:hover { background: #651fff; transform: translateY(-1px); }
   .controls-info {
-    font-size: 0.55rem;
+    font-size: 0.48rem;
     color: #333;
-    line-height: 2;
+    line-height: 1.8;
   }
   .controls-info kbd {
     background: rgba(255,255,255,0.06);
-    padding: 2px 6px;
-    border-radius: 4px;
+    padding: 1px 4px;
+    border-radius: 3px;
     color: #666;
   }
   .overlay {
@@ -110,14 +110,14 @@
   }
   .overlay.show { display: flex; }
   .overlay h2 {
-    font-size: 2rem;
+    font-size: 1.6rem;
     font-weight: 200;
     color: #7c4dff;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     letter-spacing: 4px;
   }
-  .overlay p { color: #555; margin-bottom: 20px; font-size: 0.9rem; }
-  .overlay button { width: auto; padding: 12px 40px; }
+  .overlay p { color: #555; margin-bottom: 16px; font-size: 0.8rem; }
+  .overlay button { width: auto; padding: 10px 32px; }
 </style>
 </head>
 <body>
@@ -125,7 +125,7 @@
   <div class="left-panel">
     <div class="preview-box">
       <div class="label">Hold</div>
-      <canvas id="holdCanvas" class="small-canvas" width="80" height="80"></canvas>
+      <canvas id="holdCanvas" class="small-canvas" width="70" height="70"></canvas>
     </div>
     <div class="info-box">
       <div class="label">Score</div>
@@ -142,13 +142,13 @@
   </div>
 
   <div class="board-frame">
-    <canvas id="board" width="300" height="600"></canvas>
+    <canvas id="board" width="280" height="560"></canvas>
   </div>
 
   <div class="right-panel">
     <div class="preview-box">
       <div class="label">Next</div>
-      <canvas id="nextCanvas" class="small-canvas" width="80" height="80"></canvas>
+      <canvas id="nextCanvas" class="small-canvas" width="70" height="70"></canvas>
     </div>
     <button onclick="startGame()">New Game</button>
     <div class="controls-info">
@@ -169,7 +169,7 @@
 </div>
 
 <script>
-const COLS = 10, ROWS = 20, BS = 30;
+const COLS = 10, ROWS = 20, BS = 28;
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
 const nextCvs = document.getElementById('nextCanvas');
@@ -319,7 +319,7 @@ function drawPreview(c, cvs, type) {
   c.fillRect(0, 0, cvs.width, cvs.height);
   if (!type) return;
   const s = SHAPES[type];
-  const bs = 16;
+  const bs = 14;
   const ox = Math.floor((cvs.width - s[0].length * bs) / 2);
   const oy = Math.floor((cvs.height - s.length * bs) / 2);
   for (let y = 0; y < s.length; y++)

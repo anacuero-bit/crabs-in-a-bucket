@@ -10,43 +10,43 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: #0f0f1a;
     color: #e0e0e0;
-    min-height: 100vh;
+    margin: 0; padding: 0; overflow: hidden; width: 100vw; height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    justify-content: center;
   }
   h1 {
-    font-size: 2rem;
-    margin-bottom: 8px;
+    font-size: 1.5rem;
+    margin-bottom: 6px;
     background: linear-gradient(135deg, #667eea, #764ba2);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   .stats {
     display: flex;
-    gap: 30px;
-    margin-bottom: 20px;
-    font-size: 1.1rem;
+    gap: 24px;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
   }
   .stats span { color: #888; }
   .stats strong { color: #667eea; }
   .grid {
     display: grid;
-    grid-template-columns: repeat(4, 100px);
-    gap: 12px;
-    margin-bottom: 24px;
+    grid-template-columns: repeat(4, 90px);
+    gap: 10px;
+    margin-bottom: 14px;
   }
   .card {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
     background: #1a1a2e;
     border: 2px solid #2a2a4a;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     cursor: pointer;
     transition: all 0.3s ease;
     user-select: none;
@@ -64,24 +64,24 @@
     cursor: default;
   }
   .card .front { display: none; }
-  .card .back { display: block; color: #333; font-size: 1.5rem; }
+  .card .back { display: block; color: #333; font-size: 1.3rem; }
   .card.flipped .front, .card.matched .front { display: block; }
   .card.flipped .back, .card.matched .back { display: none; }
   button {
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
     border: none;
-    padding: 12px 32px;
+    padding: 10px 28px;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
   }
   button:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
   .win-msg {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     color: #4caf50;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
     display: none;
   }
   .win-msg.show { display: block; }

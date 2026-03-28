@@ -13,42 +13,42 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    margin: 0; padding: 0; overflow: hidden; width: 100vw; height: 100vh;
     image-rendering: pixelated;
   }
   .game-container {
     display: flex;
-    gap: 20px;
+    gap: 16px;
     align-items: flex-start;
   }
   .board-wrap {
     border: 3px solid #333;
     box-shadow: 0 0 30px rgba(0,255,0,0.1), inset 0 0 20px rgba(0,0,0,0.5);
     background: #111;
-    padding: 4px;
+    padding: 3px;
   }
   canvas { display: block; }
   .side-panel {
-    width: 160px;
+    width: 140px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 10px;
   }
   .panel-box {
     background: #111;
     border: 2px solid #333;
-    padding: 12px;
+    padding: 8px;
     text-align: center;
   }
   .panel-box h3 {
-    font-size: 0.5rem;
+    font-size: 0.45rem;
     color: #555;
     letter-spacing: 2px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     text-transform: uppercase;
   }
   .panel-box .val {
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: #0f0;
     text-shadow: 0 0 10px rgba(0,255,0,0.5);
   }
@@ -57,9 +57,9 @@
     border: 1px solid #333;
   }
   .controls {
-    font-size: 0.45rem;
+    font-size: 0.4rem;
     color: #444;
-    line-height: 2;
+    line-height: 1.8;
     text-align: left;
   }
   .controls span { color: #0f0; }
@@ -67,9 +67,9 @@
     background: #0f0;
     color: #000;
     border: none;
-    padding: 10px 20px;
+    padding: 8px 14px;
     font-family: inherit;
-    font-size: 0.6rem;
+    font-size: 0.5rem;
     cursor: pointer;
     letter-spacing: 1px;
     width: 100%;
@@ -87,12 +87,12 @@
     z-index: 10;
   }
   .overlay h2 {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: #f00;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     text-shadow: 0 0 10px rgba(255,0,0,0.5);
   }
-  .overlay p { font-size: 0.5rem; color: #888; margin-bottom: 16px; }
+  .overlay p { font-size: 0.45rem; color: #888; margin-bottom: 12px; }
   .board-container { position: relative; }
 </style>
 </head>
@@ -100,7 +100,7 @@
 <div class="game-container">
   <div class="board-container">
     <div class="board-wrap">
-      <canvas id="board" width="250" height="500"></canvas>
+      <canvas id="board" width="240" height="480"></canvas>
     </div>
     <div class="overlay" id="overlay" style="display:none;">
       <h2 id="overlayTitle">GAME OVER</h2>
@@ -123,7 +123,7 @@
     </div>
     <div class="panel-box">
       <h3>Next</h3>
-      <canvas id="nextCanvas" class="next-canvas" width="100" height="100"></canvas>
+      <canvas id="nextCanvas" class="next-canvas" width="80" height="80"></canvas>
     </div>
     <button onclick="startGame()">NEW GAME</button>
     <div class="controls">
@@ -137,7 +137,7 @@
 </div>
 
 <script>
-const COLS = 10, ROWS = 20, BLOCK = 25;
+const COLS = 10, ROWS = 20, BLOCK = 24;
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
 const nextCanvas = document.getElementById('nextCanvas');
@@ -282,11 +282,11 @@ function drawBlock(c, x, y, color) {
 
 function drawNext() {
   nextCtx.fillStyle = '#111';
-  nextCtx.fillRect(0, 0, 100, 100);
+  nextCtx.fillRect(0, 0, 80, 80);
   const s = getShape(nextPiece);
-  const bs = 20;
-  const ox = Math.floor((100 - s[0].length * bs) / 2);
-  const oy = Math.floor((100 - s.length * bs) / 2);
+  const bs = 16;
+  const ox = Math.floor((80 - s[0].length * bs) / 2);
+  const oy = Math.floor((80 - s.length * bs) / 2);
   for (let y = 0; y < s.length; y++)
     for (let x = 0; x < s[y].length; x++)
       if (s[y][x]) {

@@ -10,10 +10,9 @@
     background: #f8f9fa;
     color: #1a1a1a;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    height: 100vh;
+    margin: 0; padding: 0; overflow: hidden; width: 100vw; height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
   }
 
   /* Top bar */
@@ -21,13 +20,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
+    padding: 6px 20px;
     background: #fff;
     border-bottom: 1px solid #e5e7eb;
     flex-shrink: 0;
   }
   .logo {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 700;
     color: #1a1a1a;
   }
@@ -38,12 +37,12 @@
     align-items: center;
   }
   .top-btn {
-    padding: 7px 14px;
+    padding: 5px 12px;
     border: 1px solid #e5e7eb;
     background: #fff;
     color: #6b7280;
     border-radius: 8px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     cursor: pointer;
     transition: all 0.15s;
     font-weight: 500;
@@ -62,8 +61,8 @@
     flex-shrink: 0;
   }
   .tab {
-    padding: 10px 24px;
-    font-size: 0.85rem;
+    padding: 7px 20px;
+    font-size: 0.8rem;
     font-weight: 500;
     color: #9ca3af;
     cursor: pointer;
@@ -83,24 +82,24 @@
   .format-bar {
     display: flex;
     gap: 2px;
-    padding: 8px 20px;
+    padding: 5px 20px;
     background: #fff;
     border-bottom: 1px solid #e5e7eb;
     flex-shrink: 0;
   }
   .format-bar.hidden { display: none; }
   .fmt-btn {
-    padding: 6px 10px;
+    padding: 4px 8px;
     border: none;
     background: transparent;
     color: #6b7280;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     transition: all 0.15s;
   }
   .fmt-btn:hover { background: #f3f4f6; color: #111; }
-  .fmt-sep { width: 1px; background: #e5e7eb; margin: 4px 6px; }
+  .fmt-sep { width: 1px; background: #e5e7eb; margin: 2px 4px; }
 
   /* Content area */
   .content {
@@ -121,10 +120,10 @@
     width: 100%;
     height: 100%;
     border: none;
-    padding: 24px 20px;
+    padding: 16px 20px;
     font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
-    font-size: 0.9rem;
-    line-height: 1.8;
+    font-size: 0.85rem;
+    line-height: 1.7;
     resize: none;
     outline: none;
     background: #fefefe;
@@ -134,32 +133,32 @@
   #editor::placeholder { color: #d1d5db; }
   .preview-pane {
     overflow-y: auto;
-    padding: 24px 20px;
+    padding: 16px 20px;
     background: #fff;
   }
 
   /* Preview rendered markdown */
-  .preview-pane h1 { font-size: 2rem; font-weight: 700; margin: 0 0 16px; color: #111; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
-  .preview-pane h2 { font-size: 1.5rem; font-weight: 700; margin: 28px 0 12px; color: #111; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
-  .preview-pane h3 { font-size: 1.2rem; font-weight: 600; margin: 20px 0 8px; color: #222; }
-  .preview-pane h4 { font-size: 1rem; font-weight: 600; margin: 16px 0 6px; color: #333; }
-  .preview-pane p { margin: 0 0 14px; line-height: 1.75; color: #374151; }
+  .preview-pane h1 { font-size: 1.6rem; font-weight: 700; margin: 0 0 12px; color: #111; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; }
+  .preview-pane h2 { font-size: 1.3rem; font-weight: 700; margin: 18px 0 8px; color: #111; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; }
+  .preview-pane h3 { font-size: 1.1rem; font-weight: 600; margin: 14px 0 6px; color: #222; }
+  .preview-pane h4 { font-size: 0.95rem; font-weight: 600; margin: 12px 0 4px; color: #333; }
+  .preview-pane p { margin: 0 0 10px; line-height: 1.6; color: #374151; }
   .preview-pane strong { font-weight: 600; color: #111; }
   .preview-pane em { font-style: italic; color: #6b21a8; }
   .preview-pane code {
     background: #f3f4f6;
-    padding: 2px 6px;
+    padding: 2px 5px;
     border-radius: 4px;
     font-family: 'SF Mono', monospace;
-    font-size: 0.85em;
+    font-size: 0.82em;
     color: #e11d48;
     border: 1px solid #e5e7eb;
   }
   .preview-pane pre {
     background: #1e1e2e;
-    border-radius: 10px;
-    padding: 18px;
-    margin: 0 0 16px;
+    border-radius: 8px;
+    padding: 14px;
+    margin: 0 0 12px;
     overflow-x: auto;
   }
   .preview-pane pre code {
@@ -167,24 +166,24 @@
     padding: 0;
     border: none;
     color: #cdd6f4;
-    font-size: 0.85rem;
-    line-height: 1.65;
+    font-size: 0.82rem;
+    line-height: 1.5;
   }
   .preview-pane a { color: #6366f1; text-decoration: none; font-weight: 500; }
   .preview-pane a:hover { text-decoration: underline; }
   .preview-pane blockquote {
     border-left: 4px solid #6366f1;
-    padding: 8px 16px;
-    margin: 0 0 16px;
+    padding: 6px 14px;
+    margin: 0 0 12px;
     background: #f5f3ff;
     color: #6b7280;
-    border-radius: 0 8px 8px 0;
+    border-radius: 0 6px 6px 0;
   }
-  .preview-pane ul, .preview-pane ol { margin: 0 0 16px; padding-left: 28px; }
-  .preview-pane li { margin-bottom: 6px; line-height: 1.7; color: #374151; }
-  .preview-pane hr { border: none; border-top: 2px solid #e5e7eb; margin: 28px 0; }
-  .preview-pane table { border-collapse: collapse; margin: 0 0 16px; width: 100%; border-radius: 8px; overflow: hidden; }
-  .preview-pane th, .preview-pane td { border: 1px solid #e5e7eb; padding: 10px 14px; text-align: left; }
+  .preview-pane ul, .preview-pane ol { margin: 0 0 12px; padding-left: 24px; }
+  .preview-pane li { margin-bottom: 4px; line-height: 1.6; color: #374151; }
+  .preview-pane hr { border: none; border-top: 2px solid #e5e7eb; margin: 18px 0; }
+  .preview-pane table { border-collapse: collapse; margin: 0 0 12px; width: 100%; border-radius: 8px; overflow: hidden; }
+  .preview-pane th, .preview-pane td { border: 1px solid #e5e7eb; padding: 8px 12px; text-align: left; }
   .preview-pane th { background: #f9fafb; font-weight: 600; color: #111; }
   .preview-pane tr:nth-child(even) { background: #fafafa; }
   .preview-pane .task-list { list-style: none; padding-left: 4px; }
@@ -193,10 +192,10 @@
 
   /* Status bar */
   .status-bar {
-    padding: 6px 20px;
+    padding: 4px 20px;
     background: #fff;
     border-top: 1px solid #e5e7eb;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     color: #9ca3af;
     display: flex;
     justify-content: space-between;

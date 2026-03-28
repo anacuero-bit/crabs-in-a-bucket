@@ -6,21 +6,35 @@
 <title>JSON Formatter</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#ddd;font-family:Arial,sans-serif;display:flex;flex-direction:column;align-items:center;padding:30px 20px;min-height:100vh}
-h1{font-size:22px;margin-bottom:16px;color:#ccc}
-textarea{width:100%;max-width:600px;height:200px;background:#12122a;color:#eee;border:1px solid #444;border-radius:6px;padding:12px;font-family:'Courier New',monospace;font-size:14px;resize:vertical}
-button{margin:12px 0;padding:10px 32px;font-size:15px;background:#334;color:#eee;border:1px solid #556;border-radius:4px;cursor:pointer}
+body{background:#1a1a2e;color:#ddd;font-family:Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0;padding:0;overflow:hidden;width:100vw;height:100vh}
+h1{font-size:20px;margin-bottom:8px;color:#ccc}
+.main-row{display:flex;gap:12px;width:90%;max-width:1200px;height:calc(100vh - 90px);min-height:0}
+.col{flex:1;display:flex;flex-direction:column;min-width:0}
+.col-label{font-size:12px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+textarea{flex:1;width:100%;background:#12122a;color:#eee;border:1px solid #444;border-radius:6px;padding:10px;font-family:'Courier New',monospace;font-size:13px;resize:none}
+#output{flex:1;width:100%;background:#12122a;border:1px solid #444;border-radius:6px;padding:10px;font-family:'Courier New',monospace;font-size:13px;white-space:pre-wrap;word-wrap:break-word;overflow:auto}
+.controls{display:flex;gap:8px;align-items:center;margin:8px 0}
+button{padding:8px 24px;font-size:14px;background:#334;color:#eee;border:1px solid #556;border-radius:4px;cursor:pointer}
 button:hover{background:#445}
-#output{width:100%;max-width:600px;min-height:200px;background:#12122a;border:1px solid #444;border-radius:6px;padding:12px;font-family:'Courier New',monospace;font-size:14px;white-space:pre-wrap;word-wrap:break-word;overflow:auto}
-#error{color:#f55;margin-top:8px;font-size:14px;max-width:600px}
+#error{color:#f55;font-size:13px;min-height:18px}
 </style>
 </head>
 <body>
 <h1>JSON Formatter</h1>
-<textarea id="input" placeholder="Paste your JSON here..."></textarea>
-<button id="formatBtn">Format</button>
-<div id="error"></div>
-<div id="output"></div>
+<div class="controls">
+  <button id="formatBtn">Format</button>
+  <span id="error"></span>
+</div>
+<div class="main-row">
+  <div class="col">
+    <div class="col-label">Input</div>
+    <textarea id="input" placeholder="Paste your JSON here..."></textarea>
+  </div>
+  <div class="col">
+    <div class="col-label">Output</div>
+    <div id="output"></div>
+  </div>
+</div>
 <script>
 const input=document.getElementById('input');
 const output=document.getElementById('output');

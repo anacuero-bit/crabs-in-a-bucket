@@ -10,7 +10,11 @@
     background: #0d1117;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: #c9d1d9;
-    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,58 +22,58 @@
   .app {
     width: 100%;
     max-width: 480px;
-    padding: 20px;
+    padding: 16px 20px;
   }
   h1 {
     text-align: center;
-    font-size: 1.5rem;
-    margin-bottom: 6px;
+    font-size: 1.3rem;
+    margin-bottom: 4px;
     color: #58a6ff;
   }
   .subtitle {
     text-align: center;
     color: #484f58;
-    font-size: 0.85rem;
-    margin-bottom: 28px;
+    font-size: 0.8rem;
+    margin-bottom: 16px;
   }
   .password-display {
     background: #161b22;
     border: 1px solid #30363d;
     border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
     position: relative;
   }
   .password-text {
     font-family: 'Courier New', monospace;
-    font-size: 1.35rem;
+    font-size: 1.15rem;
     word-break: break-all;
-    line-height: 1.6;
-    min-height: 2.5em;
+    line-height: 1.5;
+    min-height: 2em;
     color: #e6edf3;
     padding-right: 50px;
     letter-spacing: 1px;
   }
   .copy-btn {
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: 12px;
+    right: 12px;
     background: #21262d;
     border: 1px solid #30363d;
     color: #8b949e;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     transition: all 0.2s;
   }
   .copy-btn:hover { background: #30363d; color: #c9d1d9; }
   .copy-btn.copied { background: #238636; color: #fff; border-color: #238636; }
   .strength-bar {
-    height: 6px;
+    height: 5px;
     background: #21262d;
     border-radius: 3px;
-    margin-top: 12px;
+    margin-top: 8px;
     overflow: hidden;
   }
   .strength-fill {
@@ -79,8 +83,8 @@
     width: 0%;
   }
   .strength-label {
-    margin-top: 6px;
-    font-size: 0.78rem;
+    margin-top: 4px;
+    font-size: 0.72rem;
     text-align: right;
     font-weight: 600;
     transition: color 0.3s;
@@ -89,56 +93,56 @@
     background: #161b22;
     border: 1px solid #30363d;
     border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 16px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
   }
   .section-title {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 1.5px;
     color: #484f58;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
   }
   .slider-row {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
   }
   .slider-row input[type="range"] {
     flex: 1;
     -webkit-appearance: none;
     appearance: none;
-    height: 6px;
+    height: 5px;
     background: #21262d;
     border-radius: 3px;
     outline: none;
   }
   .slider-row input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     background: #58a6ff;
     border-radius: 50%;
     cursor: pointer;
     box-shadow: 0 0 6px rgba(88,166,255,0.4);
   }
   .slider-val {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: bold;
     color: #58a6ff;
-    min-width: 32px;
+    min-width: 28px;
     text-align: center;
   }
   .options {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 8px;
   }
   .option {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
+    gap: 8px;
+    padding: 8px 12px;
     background: #0d1117;
     border: 1px solid #21262d;
     border-radius: 8px;
@@ -149,8 +153,8 @@
   .option:hover { border-color: #30363d; }
   .option input[type="checkbox"] { display: none; }
   .option .check {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border: 2px solid #30363d;
     border-radius: 4px;
     display: flex;
@@ -166,25 +170,25 @@
   .option input:checked + .check::after {
     content: '\2713';
     color: #fff;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
   }
   .option .label {
-    font-size: 0.9rem;
+    font-size: 0.82rem;
   }
   .option .example {
     color: #484f58;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-family: monospace;
   }
   .generate-btn {
     width: 100%;
-    padding: 14px;
+    padding: 12px;
     background: #238636;
     border: none;
     border-radius: 10px;
     color: #fff;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s;
