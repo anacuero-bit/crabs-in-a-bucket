@@ -43,11 +43,25 @@ export default function CompetePage() {
     }
   }, []);
 
-  // Fetch challenge immediately
+  // Fetch challenge — use specific ID from URL if present, otherwise random
   useEffect(() => {
-    fetch(`${API_BASE}/api/challenges/random`, { cache: 'no-store' })
+    const params = new URLSearchParams(window.location.search);
+    const challengeId = params.get('challenge');
+    const url = challengeId
+      ? `${API_BASE}/api/challenges/${challengeId}`
+      : `${API_BASE}/api/challenges/random`;
+    fetch(url, { cache: 'no-store' })
       .then(r => r.json())
       .then(data => {
+        // For specific challenge lookups, generate fight code + deadline client-side
+        if (challengeId && !data.fight_code) {
+          data.fight_code = 'CF-' + Math.random().toString(16).slice(2, 10).toUpperCase();
+          data.deadline = new Date(Date.now() + data.time_minutes * 60 * 1000).toISOString();
+          // Prepend generic instructions if not already present
+          if (!data.prompt.includes('SYSTEM INSTRUCTIONS')) {
+            data.prompt = data.prompt; // challenge prompt as-is for shared fights
+          }
+        }
         setChallenge(data);
         const deadlineMs = new Date(data.deadline).getTime();
         deadlineRef.current = deadlineMs;
@@ -207,7 +221,8 @@ export default function CompetePage() {
                   <span className="text-[var(--dim)] text-[10px]">challenge a friend</span>
                   <button
                     onClick={() => {
-                      const url = typeof window !== 'undefined' ? window.location.href : '';
+                      const base = typeof window !== 'undefined' ? window.location.origin : '';
+                      const url = challenge ? `${base}/compete?challenge=${challenge.id}` : base;
                       navigator.clipboard.writeText(url);
                       setCopied(true);
                       setTimeout(() => setCopied(false), 2000);

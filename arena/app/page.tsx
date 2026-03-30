@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { fetchBattles, fetchStats, castVote, API_BASE } from '@/lib/api';
 import VoteBar from '@/components/VoteBar';
 import { Battle } from '@/lib/types';
@@ -36,6 +36,25 @@ function BattleInline({ battle }: { battle: Battle }) {
   const [active, setActive] = useState<'A' | 'B' | null>(null);
   const [expanded, setExpanded] = useState<'A' | 'B' | null>(null);
   const [hood, setHood] = useState(false);
+  const [iframeScale, setIframeScale] = useState(0.5);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Dynamically scale iframes based on container width
+  useEffect(() => {
+    const el = panelRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        // Each iframe panel is half the grid width (or full on mobile)
+        const panelWidth = entry.contentRect.width;
+        const cols = window.innerWidth >= 1024 ? 2 : 1; // lg breakpoint
+        const iframeContainerWidth = panelWidth / cols;
+        setIframeScale(iframeContainerWidth / 1280);
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const iframeSrcA = `${API_BASE}/api/files/submissions/${battle.submission_a.id}/index.html`;
   const iframeSrcB = `${API_BASE}/api/files/submissions/${battle.submission_b.id}/index.html`;
@@ -72,7 +91,7 @@ function BattleInline({ battle }: { battle: Battle }) {
       </div>
 
       {/* Panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-2">
+      <div ref={panelRef} className="grid grid-cols-1 lg:grid-cols-2">
         {/* A */}
         <div className={`lg:border-r transition-all duration-200 ${active === 'A' ? 'border-[var(--crab-a)]' : 'border-[var(--border-dim)]'}`}>
           <div className={`flex items-center justify-between px-3 py-1.5 border-b text-[10px] transition-colors duration-200 ${active === 'A' ? 'bg-[#F55] text-black border-[#F55]' : 'border-[var(--border-dim)]'}`}>
@@ -85,15 +104,15 @@ function BattleInline({ battle }: { battle: Battle }) {
               <button onClick={() => setExpanded('A')} className={`${active === 'A' ? 'text-black/60 hover:text-black' : 'text-[var(--dim)] hover:text-[var(--text)]'} transition-colors`}>[ expand ]</button>
             </div>
           </div>
-          <div className="relative overflow-hidden" style={{ height: '55vh' }}>
+          <div className="relative overflow-hidden" style={{ aspectRatio: '16/9' }}>
             {active !== 'A' && (
               <div className="absolute inset-0 z-10 cursor-pointer" onClick={() => setActive('A')} />
             )}
             <iframe
               src={iframeSrcA}
               scrolling="no"
-              className="border-0"
-              style={{ width: '200%', height: '200%', transform: 'scale(0.5)', transformOrigin: 'top left' }}
+              className="border-0 absolute top-0 left-0"
+              style={{ width: '1280px', height: '720px', transform: `scale(${iframeScale})`, transformOrigin: 'top left' }}
               sandbox="allow-scripts allow-same-origin"
               title="A"
               loading="lazy"
@@ -113,15 +132,15 @@ function BattleInline({ battle }: { battle: Battle }) {
               <button onClick={() => setExpanded('B')} className={`${active === 'B' ? 'text-black/60 hover:text-black' : 'text-[var(--dim)] hover:text-[var(--text)]'} transition-colors`}>[ expand ]</button>
             </div>
           </div>
-          <div className="relative overflow-hidden" style={{ height: '55vh' }}>
+          <div className="relative overflow-hidden" style={{ aspectRatio: '16/9' }}>
             {active !== 'B' && (
               <div className="absolute inset-0 z-10 cursor-pointer" onClick={() => setActive('B')} />
             )}
             <iframe
               src={iframeSrcB}
               scrolling="no"
-              className="border-0"
-              style={{ width: '200%', height: '200%', transform: 'scale(0.5)', transformOrigin: 'top left' }}
+              className="border-0 absolute top-0 left-0"
+              style={{ width: '1280px', height: '720px', transform: `scale(${iframeScale})`, transformOrigin: 'top left' }}
               sandbox="allow-scripts allow-same-origin"
               title="B"
               loading="lazy"

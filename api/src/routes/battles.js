@@ -193,20 +193,28 @@ async function routes(fastify) {
 
     const voterIp = request.ip || request.headers['x-forwarded-for'] || 'unknown';
 
-    // Check for duplicate vote
-    const existing = db.prepare('SELECT id FROM votes WHERE battle_id = ? AND voter_ip = ?').get(battleId, voterIp);
-    if (existing) {
+    // Check for existing vote from this IP
+    const existing = db.prepare('SELECT id, voted_for FROM votes WHERE battle_id = ? AND voter_ip = ?').get(battleId, voterIp);
+    if (existing && existing.voted_for === voted_for) {
       return reply.code(409).send({ error: 'You have already voted on this battle' });
     }
 
     const voteId = crypto.randomUUID();
 
     const txn = db.transaction(() => {
-      db.prepare('INSERT INTO votes (id, battle_id, voter_ip, voted_for) VALUES (?, ?, ?, ?)')
-        .run(voteId, battleId, voterIp, voted_for);
-
-      const column = voted_for === 'A' ? 'votes_a' : 'votes_b';
-      db.prepare(`UPDATE battles SET ${column} = ${column} + 1 WHERE id = ?`).run(battleId);
+      if (existing) {
+        // Switch vote: update the vote record and adjust both counters
+        db.prepare('UPDATE votes SET voted_for = ? WHERE id = ?').run(voted_for, existing.id);
+        const oldCol = existing.voted_for === 'A' ? 'votes_a' : 'votes_b';
+        const newCol = voted_for === 'A' ? 'votes_a' : 'votes_b';
+        db.prepare(`UPDATE battles SET ${oldCol} = MAX(${oldCol} - 1, 0), ${newCol} = ${newCol} + 1 WHERE id = ?`).run(battleId);
+      } else {
+        // New vote
+        db.prepare('INSERT INTO votes (id, battle_id, voter_ip, voted_for) VALUES (?, ?, ?, ?)')
+          .run(voteId, battleId, voterIp, voted_for);
+        const column = voted_for === 'A' ? 'votes_a' : 'votes_b';
+        db.prepare(`UPDATE battles SET ${column} = ${column} + 1 WHERE id = ?`).run(battleId);
+      }
 
       // Check if battle should be resolved
       const updated = db.prepare('SELECT * FROM battles WHERE id = ?').get(battleId);
