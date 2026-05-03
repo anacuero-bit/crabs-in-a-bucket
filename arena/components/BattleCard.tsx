@@ -36,14 +36,14 @@ export default function BattleCard({ battle }: { battle: Battle }) {
           <div className="bg-[var(--bg)] border border-[var(--border)] p-2">
             <div className="text-xs text-[var(--muted)] mb-1 font-mono">CRAB_A{'>'}</div>
             <div className="flex items-center justify-between">
-              <span className="text-[var(--crab-a)] font-mono font-bold text-sm">{battle.submission_a.ai_score}</span>
+              <span className="text-[var(--crab-a)] font-mono font-bold text-sm">{battle.submission_a.ai_score ?? '—'}</span>
               <span className="text-[var(--muted)] text-xs font-mono">score</span>
             </div>
           </div>
           <div className="bg-[var(--bg)] border border-[var(--border)] p-2">
             <div className="text-xs text-[var(--muted)] mb-1 font-mono">CRAB_B{'>'}</div>
             <div className="flex items-center justify-between">
-              <span className="text-[var(--crab-b)] font-mono font-bold text-sm">{battle.submission_b.ai_score}</span>
+              <span className="text-[var(--crab-b)] font-mono font-bold text-sm">{battle.submission_b.ai_score ?? '—'}</span>
               <span className="text-[var(--muted)] text-xs font-mono">score</span>
             </div>
           </div>

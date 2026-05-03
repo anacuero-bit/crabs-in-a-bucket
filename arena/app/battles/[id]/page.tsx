@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { fetchBattle, castVote, API_BASE } from '@/lib/api';
+import { fetchBattle, castVote, API_BASE, isRealBreakdown, hasRealBreakdown } from '@/lib/api';
 import TierBadge from '@/components/TierBadge';
 import CategoryBadge from '@/components/CategoryBadge';
 import VoteBar from '@/components/VoteBar';
@@ -112,7 +112,7 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
             </div>
             <div className="flex items-center gap-1">
               <span className="text-[var(--muted)] text-xs">score:</span>
-              <span className="text-[var(--crab-a)] font-bold">{battle.submission_a.ai_score}</span>
+              <span className="text-[var(--crab-a)] font-bold">{battle.submission_a.ai_score ?? '—'}</span>
             </div>
           </div>
           <div
@@ -154,7 +154,7 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
             </div>
             <div className="flex items-center gap-1">
               <span className="text-[var(--muted)] text-xs">score:</span>
-              <span className="text-[var(--crab-b)] font-bold">{battle.submission_b.ai_score}</span>
+              <span className="text-[var(--crab-b)] font-bold">{battle.submission_b.ai_score ?? '—'}</span>
             </div>
           </div>
           <div
@@ -236,13 +236,18 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
         </button>
         {hoodExpanded && (
           <div className="px-3 pb-3 border-t border-[var(--border)]">
+            {(battle.submission_a.ai_score == null || battle.submission_b.ai_score == null) && (
+              <p className="text-[var(--muted)] text-xs pt-3">
+                {'>'} ai referee in development — community vote is the live signal
+              </p>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3">
               <div className="bg-[var(--bg)] border border-[var(--border)] p-3">
                 <h3 className="text-[var(--crab-a)] font-bold text-xs mb-2">CRAB_A STACK</h3>
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between"><span className="text-[var(--muted)]">model</span><span>{battle.submission_a.model}</span></div>
                   <div className="flex justify-between"><span className="text-[var(--muted)]">harness</span><span>{battle.submission_a.harness}</span></div>
-                  <div className="flex justify-between"><span className="text-[var(--muted)]">score</span><span className="text-[var(--crab-a)]">{battle.submission_a.ai_score}</span></div>
+                  <div className="flex justify-between"><span className="text-[var(--muted)]">score</span><span className="text-[var(--crab-a)]">{battle.submission_a.ai_score ?? 'pending'}</span></div>
                   {battle.submission_a.time_elapsed != null && (
                     <div className="flex justify-between"><span className="text-[var(--muted)]">time</span><span>{battle.submission_a.time_elapsed}</span></div>
                   )}
@@ -253,7 +258,7 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between"><span className="text-[var(--muted)]">model</span><span>{battle.submission_b.model}</span></div>
                   <div className="flex justify-between"><span className="text-[var(--muted)]">harness</span><span>{battle.submission_b.harness}</span></div>
-                  <div className="flex justify-between"><span className="text-[var(--muted)]">score</span><span className="text-[var(--crab-b)]">{battle.submission_b.ai_score}</span></div>
+                  <div className="flex justify-between"><span className="text-[var(--muted)]">score</span><span className="text-[var(--crab-b)]">{battle.submission_b.ai_score ?? 'pending'}</span></div>
                   {battle.submission_b.time_elapsed != null && (
                     <div className="flex justify-between"><span className="text-[var(--muted)]">time</span><span>{battle.submission_b.time_elapsed}</span></div>
                   )}
@@ -261,11 +266,11 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
               </div>
             </div>
 
-            {(battle.submission_a.ai_breakdown || battle.submission_b.ai_breakdown) && (
+            {hasRealBreakdown(battle.submission_a.ai_breakdown, battle.submission_b.ai_breakdown) && (
               <div className="mt-3 bg-[var(--bg)] border border-[var(--border)] p-3">
                 <h3 className="font-bold text-xs mb-2">AI REFEREE BREAKDOWN</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {battle.submission_a.ai_breakdown && (
+                  {isRealBreakdown(battle.submission_a.ai_breakdown) && (
                     <div>
                       <h4 className="text-[var(--crab-a)] text-xs mb-1">CRAB_A</h4>
                       <pre className="text-[var(--muted)] text-xs whitespace-pre-wrap">
@@ -273,7 +278,7 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
                       </pre>
                     </div>
                   )}
-                  {battle.submission_b.ai_breakdown && (
+                  {isRealBreakdown(battle.submission_b.ai_breakdown) && (
                     <div>
                       <h4 className="text-[var(--crab-b)] text-xs mb-1">CRAB_B</h4>
                       <pre className="text-[var(--muted)] text-xs whitespace-pre-wrap">

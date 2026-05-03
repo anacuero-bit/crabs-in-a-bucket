@@ -4,6 +4,21 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export { API_BASE };
 
+export function isRealBreakdown(b: unknown): boolean {
+  if (b == null) return false;
+  if (typeof b === 'string') {
+    try { return isRealBreakdown(JSON.parse(b)); } catch { return b.length > 0; }
+  }
+  if (typeof b === 'object') {
+    return (b as Record<string, unknown>).status !== 'pending';
+  }
+  return false;
+}
+
+export function hasRealBreakdown(a: unknown, b: unknown): boolean {
+  return isRealBreakdown(a) || isRealBreakdown(b);
+}
+
 // Normalize API response to handle both flat and nested shapes
 function normalizeBattle(raw: Record<string, unknown>): Battle {
   // If already nested, return as-is
@@ -25,22 +40,22 @@ function normalizeBattle(raw: Record<string, unknown>): Battle {
     },
     submission_a: {
       id: (raw.submission_a_id || raw.sub_a_id) as string,
-      ai_score: (raw.score_a || 0) as number,
-      ai_breakdown: raw.breakdown_a as Record<string, number> | null,
+      ai_score: (raw.score_a ?? null) as number | null,
+      ai_breakdown: raw.breakdown_a as Record<string, unknown> | null,
       model: (raw.model_a || '') as string,
       harness: (raw.harness_a || '') as string,
       folder_path: (raw.folder_a || '') as string,
-      time_elapsed: (raw.time_a || '') as string,
+      time_elapsed: (raw.time_a ?? null) as string | null,
       username: (raw.username_a || '') as string,
     },
     submission_b: {
       id: (raw.submission_b_id || raw.sub_b_id) as string,
-      ai_score: (raw.score_b || 0) as number,
-      ai_breakdown: raw.breakdown_b as Record<string, number> | null,
+      ai_score: (raw.score_b ?? null) as number | null,
+      ai_breakdown: raw.breakdown_b as Record<string, unknown> | null,
       model: (raw.model_b || '') as string,
       harness: (raw.harness_b || '') as string,
       folder_path: (raw.folder_b || '') as string,
-      time_elapsed: (raw.time_b || '') as string,
+      time_elapsed: (raw.time_b ?? null) as string | null,
       username: (raw.username_b || '') as string,
     },
   } as Battle;

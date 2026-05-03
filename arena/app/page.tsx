@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { fetchBattles, fetchStats, castVote, API_BASE } from '@/lib/api';
+import { fetchBattles, fetchStats, castVote, API_BASE, isRealBreakdown, hasRealBreakdown } from '@/lib/api';
 import VoteBar from '@/components/VoteBar';
 import { Battle } from '@/lib/types';
 
@@ -69,7 +69,7 @@ function BattleInline({ battle }: { battle: Battle }) {
     try { await castVote(battle.id, side); } catch {}
   };
 
-  const formatBreakdown = (bd: string | Record<string, number> | null | undefined) => {
+  const formatBreakdown = (bd: string | Record<string, unknown> | null | undefined) => {
     if (!bd) return null;
     if (typeof bd === 'string') return bd;
     return JSON.stringify(bd, null, 2);
@@ -100,7 +100,7 @@ function BattleInline({ battle }: { battle: Battle }) {
               <span className={active === 'A' ? 'text-black/60' : 'text-[var(--dim)]'}>{battle.submission_a.model} · {battle.submission_a.harness}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className={`font-bold ${active === 'A' ? 'text-black' : 'text-[var(--crab-a)]'}`}>{battle.submission_a.ai_score}</span>
+              <span className={`font-bold ${active === 'A' ? 'text-black' : 'text-[var(--crab-a)]'}`}>{battle.submission_a.ai_score ?? '—'}</span>
               <button onClick={() => setExpanded('A')} className={`${active === 'A' ? 'text-black/60 hover:text-black' : 'text-[var(--dim)] hover:text-[var(--text)]'} transition-colors`}>[ expand ]</button>
             </div>
           </div>
@@ -128,7 +128,7 @@ function BattleInline({ battle }: { battle: Battle }) {
               <span className={active === 'B' ? 'text-black/60' : 'text-[var(--dim)]'}>{battle.submission_b.model} · {battle.submission_b.harness}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className={`font-bold ${active === 'B' ? 'text-black' : 'text-[var(--crab-b)]'}`}>{battle.submission_b.ai_score}</span>
+              <span className={`font-bold ${active === 'B' ? 'text-black' : 'text-[var(--crab-b)]'}`}>{battle.submission_b.ai_score ?? '—'}</span>
               <button onClick={() => setExpanded('B')} className={`${active === 'B' ? 'text-black/60 hover:text-black' : 'text-[var(--dim)] hover:text-[var(--text)]'} transition-colors`}>[ expand ]</button>
             </div>
           </div>
@@ -178,6 +178,9 @@ function BattleInline({ battle }: { battle: Battle }) {
 
       {hood && (
         <div className="border-t border-[var(--border-dim)] px-3 py-3 text-[10px] space-y-3">
+          {(battle.submission_a.ai_score == null || battle.submission_b.ai_score == null) && (
+            <div className="text-[var(--dim)]">{'>'} ai referee in development — community vote is the live signal</div>
+          )}
           {/* Stacks */}
           <div>
             <div className="text-[var(--muted)] font-bold mb-1.5">stacks</div>
@@ -186,28 +189,28 @@ function BattleInline({ battle }: { battle: Battle }) {
                 <div className="text-[var(--crab-a)] font-bold">A</div>
                 <div className="flex justify-between"><span className="text-[var(--dim)]">model</span><span>{battle.submission_a.model}</span></div>
                 <div className="flex justify-between"><span className="text-[var(--dim)]">harness</span><span>{battle.submission_a.harness}</span></div>
-                <div className="flex justify-between"><span className="text-[var(--dim)]">score</span><span className="text-[var(--crab-a)]">{battle.submission_a.ai_score}</span></div>
+                <div className="flex justify-between"><span className="text-[var(--dim)]">score</span><span className="text-[var(--crab-a)]">{battle.submission_a.ai_score ?? 'pending'}</span></div>
                 {battle.submission_a.time_elapsed != null && <div className="flex justify-between"><span className="text-[var(--dim)]">time</span><span>{battle.submission_a.time_elapsed}</span></div>}
               </div>
               <div className="space-y-1">
                 <div className="text-[var(--crab-b)] font-bold">B</div>
                 <div className="flex justify-between"><span className="text-[var(--dim)]">model</span><span>{battle.submission_b.model}</span></div>
                 <div className="flex justify-between"><span className="text-[var(--dim)]">harness</span><span>{battle.submission_b.harness}</span></div>
-                <div className="flex justify-between"><span className="text-[var(--dim)]">score</span><span className="text-[var(--crab-b)]">{battle.submission_b.ai_score}</span></div>
+                <div className="flex justify-between"><span className="text-[var(--dim)]">score</span><span className="text-[var(--crab-b)]">{battle.submission_b.ai_score ?? 'pending'}</span></div>
                 {battle.submission_b.time_elapsed != null && <div className="flex justify-between"><span className="text-[var(--dim)]">time</span><span>{battle.submission_b.time_elapsed}</span></div>}
               </div>
             </div>
           </div>
 
           {/* AI Referee Breakdown */}
-          {(battle.submission_a.ai_breakdown || battle.submission_b.ai_breakdown) && (
+          {hasRealBreakdown(battle.submission_a.ai_breakdown, battle.submission_b.ai_breakdown) && (
             <div>
               <div className="text-[var(--muted)] font-bold mb-1.5">AI referee breakdown</div>
               <div className="grid grid-cols-2 gap-3">
-                {battle.submission_a.ai_breakdown && (
+                {isRealBreakdown(battle.submission_a.ai_breakdown) && (
                   <pre className="text-[var(--dim)] whitespace-pre-wrap">{formatBreakdown(battle.submission_a.ai_breakdown)}</pre>
                 )}
-                {battle.submission_b.ai_breakdown && (
+                {isRealBreakdown(battle.submission_b.ai_breakdown) && (
                   <pre className="text-[var(--dim)] whitespace-pre-wrap">{formatBreakdown(battle.submission_b.ai_breakdown)}</pre>
                 )}
               </div>

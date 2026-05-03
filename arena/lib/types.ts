@@ -4,12 +4,12 @@ export type Category = 'Games' | 'Tools' | 'Data' | 'Research' | 'Redesign';
 
 export interface Submission {
   id?: string;
-  ai_score: number;
+  ai_score: number | null;
   model: string;
   harness: string;
   folder_path: string;
-  ai_breakdown?: string | Record<string, number> | null;
-  time_elapsed?: string | number;
+  ai_breakdown?: string | Record<string, unknown> | null;
+  time_elapsed?: string | number | null;
   username?: string;
 }
 
