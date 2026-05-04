@@ -145,7 +145,11 @@ export default function CompetePage() {
       const res = await fetch(`${API_BASE}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim(), agent_name: username.trim() }),
+        body: JSON.stringify({
+          username: username.trim(),
+          email: email.trim(),
+          agent_name: username.trim(),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Registration failed');

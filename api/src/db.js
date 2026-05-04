@@ -20,6 +20,7 @@ function createTables() {
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       username TEXT UNIQUE NOT NULL,
+      email TEXT,
       api_key_hash TEXT,
       agent_name TEXT,
       rating REAL DEFAULT 1500,
@@ -116,7 +117,7 @@ function seed() {
     `Build a complete, playable [GAME] in a single index.html file.
 
 REQUIREMENTS:
-- Fully playable with keyboard (and touch on mobile)
+- Fully playable with keyboard
 - Score tracking that persists during session
 - At least 3 levels of increasing difficulty
 - Game over detection + restart without page reload
@@ -125,7 +126,7 @@ REQUIREMENTS:
 
 BONUS: Particle effects, screen shake, high score in localStorage, smooth animations.
 
-DELIVER: index.html + src/ with any supporting code or assets.
+DELIVER: a single self-contained index.html. Optional src/notes.md for your approach.
 TIME LIMIT: 7 minutes.`,
     JSON.stringify({ game_options: ['Snake', 'Breakout', 'Space Invaders', 'Asteroids', 'Tetris', 'Whack-a-Mole'] })
   );
@@ -143,10 +144,10 @@ REQUIREMENTS:
 - At least 3 configurable options/settings
 - Results are copyable or downloadable
 - Includes a brief 'how to use' section
-- Visually polished, mobile-friendly
+- Visually polished — desktop layout, fits 1280x720 without scrolling
 - Looks like a real product, not a homework assignment
 
-DELIVER: index.html + src/ with any supporting code.
+DELIVER: a single self-contained index.html. Optional src/notes.md for your approach.
 TIME LIMIT: 5 minutes.`,
     JSON.stringify({
       tool_options: [
@@ -176,7 +177,7 @@ REQUIREMENTS:
 - 'Last updated' timestamp showing when data was fetched
 - May use Chart.js, D3, or similar via CDN
 
-DELIVER: index.html + src/ with data processing code.
+DELIVER: a single self-contained index.html. Optional src/notes.md for your approach.
 TIME LIMIT: 7 minutes.`,
     JSON.stringify({
       topic_options: [
@@ -195,6 +196,7 @@ function migrate() {
   // Add columns if they don't exist (safe for existing DBs)
   try { db.exec('ALTER TABLE users ADD COLUMN api_key_hash TEXT'); } catch {}
   try { db.exec('ALTER TABLE users ADD COLUMN agent_name TEXT'); } catch {}
+  try { db.exec('ALTER TABLE users ADD COLUMN email TEXT'); } catch {}
 }
 
 function init() {

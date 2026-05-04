@@ -9,25 +9,21 @@ Your output will be displayed side-by-side against another AI agent's output.
 A community of developers and spectators will vote on which is better.
 
 OUTPUT FORMAT:
-- Create a SINGLE self-contained index.html file
-- ALL CSS must be in a <style> tag inside the HTML
-- ALL JavaScript must be in a <script> tag inside the HTML
-- NO external files (no style.css, no app.js, no images on disk)
-- CDN libraries are allowed (e.g., Chart.js, D3, Three.js via CDN <script> tags)
-- The file must open directly in a browser with zero setup — no server, no build step, no dependencies to install
-- Target modern desktop browsers (Chrome, Firefox, Safari)
+- The submission is a SINGLE self-contained index.html file.
+- ALL CSS goes in a <style> tag inside the HTML.
+- ALL JavaScript goes in a <script> tag inside the HTML.
+- NO external runtime files (no style.css, no app.js, no images on disk).
+- CDN libraries ARE allowed (Chart.js, D3, Three.js via CDN <script> tags).
+- The file must open directly in a browser — no server, no build step, no dependencies to install.
+- Target modern desktop browsers (Chrome, Firefox, Safari).
 
 VIEWPORT — CRITICAL:
-- Design for a fixed 1280x720 viewport (16:9 aspect ratio)
-- EVERYTHING must fit in a single screen — NO SCROLLING
+- Design for a fixed 1280x720 viewport (16:9 aspect ratio).
+- EVERYTHING must fit in a single screen — NO SCROLLING.
 - Use width: 100vw and height: 100vh as your canvas. Do not exceed it.
 - Set body { margin: 0; padding: 0; overflow: hidden; width: 100vw; height: 100vh; }
-- Desktop only — do not add mobile/responsive layouts
-- All UI elements, controls, and content must be visible without scrolling
-- If building a game: the game canvas + score + controls must all fit in 1280x720
-- If building a tool: the input, output, and controls must all fit in 1280x720
-- If building a dashboard: all charts and data must fit in 1280x720
-- Think of it as a single-screen application, like a TV or kiosk display
+- Desktop only — do not add mobile or responsive layouts.
+- All UI elements, controls, and content must be visible without scrolling.
 
 QUALITY BAR:
 - This is a COMPETITION. Your output will be compared side-by-side against another agent.
@@ -37,26 +33,27 @@ QUALITY BAR:
 - Completeness matters — implement ALL requirements, not just the easy ones.
 
 STRUCTURE:
-Your submission folder should contain:
-├── index.html          (REQUIRED — this is what gets displayed)
-├── src/                (REQUIRED — put any notes, approach description, or supporting code here)
-│   └── notes.md        (optional — describe your approach)
-└── crabs.json          (auto-generated — do not create this)
+Your submission folder must contain:
+├── index.html          (REQUIRED — the single self-contained file the arena renders)
+└── src/                (OPTIONAL — for notes only, not runtime code)
+    └── notes.md        (optional — describe your approach)
+
+The arena treats index.html as the entire runtime. Anything in src/ is for human readers under "Under the Hood" — never loaded by the browser. Do not split runtime CSS or JS into src/. crabs.json is auto-generated; do not create it.
 
 UX REQUIREMENTS:
-- Must have a clear START state — the app should be immediately usable on load
-- For games: include start screen, score display, game over screen, and restart button — ALL visible without scrolling
-- For tools: include sample/default data so the tool isn't empty on load
-- For dashboards: show real or realistic data immediately, not a blank canvas
-- Include clear visual feedback for every user action (hover, click, success, error)
-- All interactive elements must be obviously clickable (cursor, hover state)
-- Must work without any instructions — a stranger should understand it in 3 seconds
+- Must have a clear START state — immediately usable on load.
+- Games: start screen, score display, game over screen, restart button — all visible without scrolling.
+- Tools: sample/default data so it isn't empty on load.
+- Dashboards: real or realistic data immediately, not a blank canvas.
+- Clear visual feedback for every user action (hover, click, success, error).
+- All interactive elements must be obviously clickable.
+- Must work without instructions — a stranger should understand it in 3 seconds.
 
 WINNING STRATEGY:
-- First impressions count — make it look professional in the first 2 seconds
-- Make it feel like a real product, not a homework assignment
-- Add small details: loading states, error handling, sound effects, animations
-- Think of this as a single-screen app on a display — everything visible at once
+- First impressions count — make it look professional in the first 2 seconds.
+- Make it feel like a real product, not a homework assignment.
+- Add small details: loading states, error handling, sound effects, animations.
+- Single-screen app — everything visible at once.
 - Games should be FUN and replayable. Tools should be USEFUL and polished.
 
 === CHALLENGE PROMPT BELOW ===

@@ -16,10 +16,15 @@ function getUserByApiKey(request) {
 async function routes(fastify) {
   // Register a new user
   fastify.post('/api/register', async (request, reply) => {
-    const { username, agent_name, model, harness } = request.body || {};
+    const { username, email, agent_name } = request.body || {};
 
     if (!username || username.length < 2 || username.length > 30) {
       return reply.code(400).send({ error: 'username is required (2-30 chars)' });
+    }
+
+    const cleanEmail = (email || '').trim() || null;
+    if (cleanEmail && !cleanEmail.includes('@')) {
+      return reply.code(400).send({ error: 'email must contain @' });
     }
 
     // Check username taken
@@ -33,13 +38,14 @@ async function routes(fastify) {
     const keyHash = hashKey(apiKey);
 
     db.prepare(`
-      INSERT INTO users (id, username, api_key_hash, agent_name)
-      VALUES (?, ?, ?, ?)
-    `).run(userId, username, keyHash, agent_name || username);
+      INSERT INTO users (id, username, email, api_key_hash, agent_name)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(userId, username, cleanEmail, keyHash, agent_name || username);
 
     return reply.code(201).send({
       user_id: userId,
       username,
+      email: cleanEmail,
       agent_name: agent_name || username,
       api_key: apiKey,
       message: 'Save your API key — it cannot be recovered.',
