@@ -23,7 +23,8 @@ export default function CompetePage() {
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
-  const [result, setResult] = useState<{ battle_id?: string; message?: string } | null>(null);
+  const [result, setResult] = useState<{ id?: string; battle_id?: string; message?: string; match_status?: string; match_error?: string } | null>(null);
+  const [retrying, setRetrying] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -292,15 +293,48 @@ export default function CompetePage() {
       {/* DONE */}
       {phase === 'done' && result && (
         <div className="text-center py-12">
-          <div className="text-[var(--crab-b)] text-2xl font-bold mb-2">FIGHT ON</div>
-          <p className="text-[var(--text)] text-sm mb-4">{result.message}</p>
+          <div className={`text-2xl font-bold mb-2 ${result.battle_id ? 'text-[var(--crab-b)]' : 'text-yellow-400'}`}>
+            {result.battle_id ? 'FIGHT ON' : 'MATCH PENDING'}
+          </div>
+          <p className="text-[var(--text)] text-sm mb-4 max-w-md mx-auto">{result.message}</p>
           {result.battle_id ? (
             <a href={`/battles/${result.battle_id}`}
               className="inline-block px-6 py-2 bg-[var(--accent)] text-[var(--bg)] font-bold text-sm hover:opacity-90">
               {'>'} VIEW YOUR BATTLE
             </a>
           ) : (
-            <p className="text-[var(--muted)] text-xs">your fight will appear once matched.</p>
+            <div className="space-y-3">
+              {result.match_error && (
+                <p className="text-[var(--muted)] text-[10px] max-w-md mx-auto">backend reported: {result.match_error}</p>
+              )}
+              <button
+                disabled={retrying}
+                onClick={async () => {
+                  if (!result.id) return;
+                  setRetrying(true);
+                  try {
+                    const res = await fetch(`${API_BASE}/api/submissions/${result.id}/retry-match`, {
+                      method: 'POST',
+                      headers: { 'Authorization': `Bearer ${apiKey}` },
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.battle_id) {
+                      setResult({ ...result, battle_id: data.battle_id, message: data.message, match_status: 'matched', match_error: undefined });
+                    } else {
+                      setResult({ ...result, match_error: data.match_error || data.error || 'still no match' });
+                    }
+                  } catch (err) {
+                    setResult({ ...result, match_error: (err as Error).message });
+                  } finally {
+                    setRetrying(false);
+                  }
+                }}
+                className="px-6 py-2 border border-[var(--accent)] text-[var(--accent)] text-sm font-bold hover:bg-[var(--accent)] hover:text-[var(--bg)] transition-colors disabled:opacity-50"
+              >
+                {retrying ? '> retrying...' : '> RETRY MATCHMAKING'}
+              </button>
+              <p className="text-[var(--muted)] text-[10px]">your submission is saved — retry won't re-upload.</p>
+            </div>
           )}
           <div className="mt-6">
             <button onClick={() => window.location.reload()} className="text-[var(--accent)] text-xs hover:underline">

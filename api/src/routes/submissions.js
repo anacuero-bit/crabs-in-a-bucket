@@ -130,10 +130,18 @@ async function routes(fastify) {
 
     // Auto-match: try organic first, then house crab
     let battleId = autoMatch(submissionId, challenge_id, user.id);
+    let matchError = null;
 
     if (!battleId) {
-      // No organic opponent — trigger house crab (async, don't block response)
-      battleId = await matchWithHouseCrab(submissionId, challenge_id, challenge.prompt, challenge.category);
+      // No organic opponent — trigger house crab
+      try {
+        battleId = await matchWithHouseCrab(submissionId, challenge_id, challenge.prompt, challenge.category);
+      } catch (err) {
+        matchError = err.message;
+      }
+      if (!battleId && !matchError) {
+        matchError = 'house crab generation returned null (likely Anthropic outage, missing API key, or invalid generated HTML)';
+      }
     }
 
     const response = {
@@ -146,10 +154,67 @@ async function routes(fastify) {
       response.battle_id = battleId;
       response.message = 'Matched! Battle created.';
     } else {
-      response.message = 'Submitted. Waiting for an opponent...';
+      // Logged with submission id so operators can correlate against /api/submissions/:id/retry-match
+      fastify.log.error({ submission_id: submissionId, matchError }, 'submission unmatched');
+      response.match_status = 'pending';
+      response.match_error = matchError;
+      response.message = 'Submitted but no opponent matched. The submission is saved — you can retry matchmaking from the result screen, or it will be picked up by the next pending-match sweep.';
+      response.retry_url = `/api/submissions/${submissionId}/retry-match`;
     }
 
     return reply.code(201).send(response);
+  });
+
+  // Retry matchmaking for an unmatched submission (auth: must own the submission).
+  fastify.post('/api/submissions/:id/retry-match', async (request, reply) => {
+    const user = getUserByApiKey(request);
+    if (!user) {
+      return reply.code(401).send({ error: 'Authentication required.' });
+    }
+
+    const submission = db.prepare('SELECT * FROM submissions WHERE id = ?').get(request.params.id);
+    if (!submission) {
+      return reply.code(404).send({ error: 'Submission not found' });
+    }
+    if (submission.user_id !== user.id) {
+      return reply.code(403).send({ error: 'Not your submission' });
+    }
+
+    // Already in a battle?
+    const existing = db.prepare(`
+      SELECT id FROM battles
+      WHERE submission_a_id = ? OR submission_b_id = ?
+    `).get(submission.id, submission.id);
+    if (existing) {
+      return { battle_id: existing.id, message: 'Already matched.' };
+    }
+
+    const challenge = db.prepare('SELECT * FROM challenges WHERE id = ?').get(submission.challenge_id);
+    if (!challenge) {
+      return reply.code(500).send({ error: 'Challenge missing for submission' });
+    }
+
+    let battleId = autoMatch(submission.id, submission.challenge_id, submission.user_id);
+    let matchError = null;
+    if (!battleId) {
+      try {
+        battleId = await matchWithHouseCrab(submission.id, submission.challenge_id, challenge.prompt, challenge.category);
+      } catch (err) {
+        matchError = err.message;
+      }
+      if (!battleId && !matchError) {
+        matchError = 'house crab generation returned null (likely Anthropic outage, missing API key, or invalid generated HTML)';
+      }
+    }
+
+    if (battleId) {
+      return { battle_id: battleId, message: 'Matched.' };
+    }
+    return reply.code(503).send({
+      error: 'still no match',
+      match_error: matchError,
+      message: 'Matchmaking failed again. The backend is likely degraded — try again in a few minutes or contact the operator.',
+    });
   });
 
   // Get submission details
