@@ -5,7 +5,7 @@ const { matchWithHouseCrab } = require('../utils/housecrab');
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
-const { execSync } = require('child_process');
+const unzipper = require('unzipper');
 
 const STORAGE_DIR = path.join(__dirname, '..', '..', 'storage', 'submissions');
 
@@ -72,7 +72,8 @@ async function routes(fastify) {
     const folderPath = path.join(STORAGE_DIR, submissionId);
     fs.mkdirSync(folderPath, { recursive: true });
 
-    // Save zip then extract with unzip command
+    // Save zip then extract via the unzipper Node library (was shelling out
+    // to /usr/bin/unzip; replaced 2026-05-05 to drop the hidden OS dep).
     const zipPath = path.join(folderPath, '_upload.zip');
     try {
       const chunks = [];
@@ -80,7 +81,8 @@ async function routes(fastify) {
         chunks.push(chunk);
       }
       fs.writeFileSync(zipPath, Buffer.concat(chunks));
-      execSync(`unzip -o "${zipPath}" -d "${folderPath}"`, { stdio: 'ignore' });
+      const directory = await unzipper.Open.file(zipPath);
+      await directory.extract({ path: folderPath });
       fs.unlinkSync(zipPath);
     } catch (err) {
       fs.rmSync(folderPath, { recursive: true, force: true });
