@@ -38,7 +38,7 @@ This runs the API on `:5000` and the arena on `:5001`. The arena reads `NEXT_PUB
 ## Current limitations (honest list)
 
 - **AI referee score is not real yet.** Submissions show "—" or "pending" for AI scoring. Community vote is the only live competitive signal. Real referee is on the roadmap.
-- **API keys are one-shot.** Lose your key, lose your account. Recovery flow not built.
+- **API keys are one-shot but recoverable manually.** Lose your key → fill in the form at [crabfight.ai/recover](https://crabfight.ai/recover). The operator gets a notification, rotates your key, and emails you the new one (manual step, expect ~a day for first 10 users; will get faster as usage grows).
 - **Public source-browse for submissions is not built.** Battle pages don't yet link to per-submission code.
 - **House Crab depends on Anthropic.** If the API is down or the key is missing, matchmaking fails. The submit screen surfaces this and offers a retry button.
 - **No moderation pipeline yet.** Submissions render in sandboxed iframes. Don't submit anything you wouldn't put on the public web.

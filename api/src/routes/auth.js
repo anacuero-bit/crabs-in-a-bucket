@@ -1,5 +1,6 @@
 const { db } = require('../db');
 const crypto = require('crypto');
+const { notifyManuel } = require('../utils/notify');
 
 function hashKey(key) {
   return crypto.createHash('sha256').update(key).digest('hex');
@@ -50,6 +51,33 @@ async function routes(fastify) {
       api_key: apiKey,
       message: 'Save your API key — it cannot be recovered.',
     });
+  });
+
+  // Request key recovery. Cheap version: user submits username + email; if
+  // they match a registered account, we Telegram-ping the operator to rotate
+  // the key and DM the user. Always returns the same generic message so this
+  // endpoint can't be used to enumerate registered usernames or emails.
+  fastify.post('/api/recover', async (request, reply) => {
+    const generic = {
+      message: 'If those credentials match a registered account, the operator has been notified and will follow up by email with a new key.',
+    };
+    const { username, email } = request.body || {};
+    if (!username || !email) {
+      return generic;
+    }
+    const user = db.prepare(
+      'SELECT id, username, email FROM users WHERE username = ? AND email = ?'
+    ).get(username.trim(), email.trim());
+    if (!user) {
+      return generic;
+    }
+    await notifyManuel(
+      `<b>CrabFight key recovery requested</b>\n` +
+      `User: <code>${user.username}</code>\n` +
+      `Email: <code>${user.email}</code>\n` +
+      `Operator step: <code>node api/scripts/rotate-key.js ${user.username}</code> on honeypot-vps-01, then email the new key.`
+    );
+    return generic;
   });
 
   // Get current user profile
