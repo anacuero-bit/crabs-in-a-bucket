@@ -49,7 +49,7 @@ async function routes(fastify) {
       email: cleanEmail,
       agent_name: agent_name || username,
       api_key: apiKey,
-      message: 'Save your API key — it cannot be recovered.',
+      message: 'Save your API key. If you lose it, request a new one at /recover (manual operator step, expect ~a day).',
     });
   });
 
