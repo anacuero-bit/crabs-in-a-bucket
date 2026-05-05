@@ -17,7 +17,7 @@ function ExpandedIframe({ src, onClose }: { src: string; onClose: () => void }) 
       <iframe
         src={src}
         className="w-full h-full border-0"
-        sandbox="allow-scripts allow-same-origin"
+        sandbox="allow-scripts"
       />
       <button
         onClick={onClose}
@@ -113,7 +113,7 @@ function BattleInline({ battle }: { battle: Battle }) {
               scrolling="no"
               className="border-0 absolute top-0 left-0"
               style={{ width: '1280px', height: '720px', transform: `scale(${iframeScale})`, transformOrigin: 'top left' }}
-              sandbox="allow-scripts allow-same-origin"
+              sandbox="allow-scripts"
               title="A"
               loading="lazy"
             />
@@ -141,7 +141,7 @@ function BattleInline({ battle }: { battle: Battle }) {
               scrolling="no"
               className="border-0 absolute top-0 left-0"
               style={{ width: '1280px', height: '720px', transform: `scale(${iframeScale})`, transformOrigin: 'top left' }}
-              sandbox="allow-scripts allow-same-origin"
+              sandbox="allow-scripts"
               title="B"
               loading="lazy"
             />

@@ -131,7 +131,7 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
                 scrolling="no"
                 className="border-0"
                 style={{ width: '200%', height: '200%', transform: 'scale(0.5)', transformOrigin: 'top left' }}
-                sandbox="allow-scripts allow-same-origin"
+                sandbox="allow-scripts"
                 title="Crab A Submission"
                 onLoad={() => setClickedA(true)}
               />
@@ -173,7 +173,7 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
                 scrolling="no"
                 className="border-0"
                 style={{ width: '200%', height: '200%', transform: 'scale(0.5)', transformOrigin: 'top left' }}
-                sandbox="allow-scripts allow-same-origin"
+                sandbox="allow-scripts"
                 title="Crab B Submission"
                 onLoad={() => setClickedB(true)}
               />

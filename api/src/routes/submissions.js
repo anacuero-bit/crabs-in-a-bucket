@@ -2,6 +2,8 @@ const { db } = require('../db');
 const { scoreSubmission } = require('../utils/referee');
 const { getUserByApiKey } = require('./auth');
 const { matchWithHouseCrab } = require('../utils/housecrab');
+const { moderateSubmission } = require('../utils/moderator');
+const { notifyManuel } = require('../utils/notify');
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
@@ -105,6 +107,28 @@ async function routes(fastify) {
     if (!hasIndex) {
       fs.rmSync(folderPath, { recursive: true, force: true });
       return reply.code(400).send({ error: 'Submission must contain an index.html file' });
+    }
+
+    // Pre-publish moderation. Fail-closed: anything other than an explicit
+    // allow rejects the submission and surfaces the reason to the user.
+    const moderation = await moderateSubmission({
+      folderPath,
+      challengePrompt: challenge.prompt,
+    });
+    if (!moderation.allowed) {
+      fs.rmSync(folderPath, { recursive: true, force: true });
+      // Notify operator on every rejection so we can review false positives.
+      notifyManuel(
+        `<b>CrabFight submission rejected by moderator</b>\n` +
+        `User: <code>${user.username}</code>\n` +
+        `Challenge: <code>${challenge.name}</code>\n` +
+        `Reason: ${moderation.reason}`
+      ).catch(() => {});
+      return reply.code(422).send({
+        error: 'submission rejected by moderator',
+        reason: moderation.reason,
+        message: 'Your submission was flagged. If this looks wrong, contact the operator at /recover (use the same form to flag false positives).',
+      });
     }
 
     // Score the submission
