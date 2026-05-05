@@ -73,13 +73,11 @@ async function moderateSubmission({ folderPath, challengePrompt }) {
       return { allowed: false, reason: 'Moderator API error; fail-closed.' };
     }
     const data = await res.json();
-    let text = data.content?.[0]?.text || '';
-    text = text.replace(/^```json?\n?/, '').replace(/\n?```$/, '').trim();
-    let parsed;
-    try {
-      parsed = JSON.parse(text);
-    } catch {
-      console.error('[moderator] non-JSON response:', text.slice(0, 200));
+    const raw = data.content?.[0]?.text || '';
+    const parsed = extractJson(raw);
+    if (!parsed) {
+      console.error('[moderator] could not parse response. raw bytes:', Buffer.from(raw).toString('hex').slice(0, 400));
+      console.error('[moderator] raw text:', JSON.stringify(raw).slice(0, 400));
       return { allowed: false, reason: 'Moderator returned malformed response; fail-closed.' };
     }
     if (typeof parsed.allowed !== 'boolean') {
@@ -93,6 +91,23 @@ async function moderateSubmission({ folderPath, challengePrompt }) {
     console.error('[moderator] fetch error:', err.message);
     return { allowed: false, reason: 'Moderator fetch failed; fail-closed.' };
   }
+}
+
+// Pull a JSON object out of model output. Tries: raw, fenced markdown,
+// and a fall-through regex that grabs the first {...} block. Returns the
+// parsed object or null.
+function extractJson(text) {
+  if (!text) return null;
+  const candidates = [
+    text,
+    text.replace(/^[\s\S]*?```(?:json)?\s*/i, '').replace(/```[\s\S]*$/, ''),
+    (text.match(/\{[\s\S]*\}/) || [])[0],
+  ];
+  for (const c of candidates) {
+    if (!c) continue;
+    try { return JSON.parse(c.trim()); } catch {}
+  }
+  return null;
 }
 
 function findIndexHtml(folderPath) {
