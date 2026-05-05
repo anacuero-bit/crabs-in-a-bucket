@@ -44,31 +44,28 @@ export default function CompetePage() {
     }
   }, []);
 
-  // Fetch challenge — use specific ID from URL if present, otherwise random
+  // Start a fight — server issues a fight_code + deadline + rendered prompt.
+  // ?challenge=<id> targets a specific challenge (challenge-a-friend); empty URL = random.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const challengeId = params.get('challenge');
-    const url = challengeId
-      ? `${API_BASE}/api/challenges/${challengeId}`
-      : `${API_BASE}/api/challenges/random`;
-    fetch(url, { cache: 'no-store' })
-      .then(r => r.json())
+    fetch(`${API_BASE}/api/fight/start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(challengeId ? { challenge_id: challengeId } : {}),
+    })
+      .then(async r => {
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || 'failed to start fight');
+        return data;
+      })
       .then(data => {
-        // For specific challenge lookups, generate fight code + deadline client-side
-        if (challengeId && !data.fight_code) {
-          data.fight_code = 'CF-' + Math.random().toString(16).slice(2, 10).toUpperCase();
-          data.deadline = new Date(Date.now() + data.time_minutes * 60 * 1000).toISOString();
-          // Prepend generic instructions if not already present
-          if (!data.prompt.includes('SYSTEM INSTRUCTIONS')) {
-            data.prompt = data.prompt; // challenge prompt as-is for shared fights
-          }
-        }
         setChallenge(data);
         const deadlineMs = new Date(data.deadline).getTime();
         deadlineRef.current = deadlineMs;
         setRemaining(Math.max(0, Math.floor((deadlineMs - Date.now()) / 1000)));
       })
-      .catch(() => setError('Failed to fetch challenge.'));
+      .catch(err => setError('Failed to start fight: ' + err.message));
   }, []);
 
   // Countdown timer
@@ -95,9 +92,7 @@ export default function CompetePage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const elapsed = challenge ? (challenge.time_minutes * 60) - remaining : 0;
-
-  // Upload
+  // Upload — uses fight_code (server-issued); time_elapsed is server-computed.
   const doUpload = useCallback(async (file: File, key: string) => {
     if (!challenge) return;
     setPhase('uploading');
@@ -105,10 +100,9 @@ export default function CompetePage() {
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('challenge_id', challenge.id);
+    formData.append('fight_code', challenge.fight_code);
     formData.append('model', 'unknown');
     formData.append('harness', 'web-upload');
-    formData.append('time_elapsed', elapsed.toString());
 
     try {
       const res = await fetch(`${API_BASE}/api/submissions`, {
@@ -117,7 +111,13 @@ export default function CompetePage() {
         body: formData,
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      if (res.status === 410) {
+        // Time expired — explicit, recoverable, friendly message.
+        setError("time's up — your fight code expired. reload to start a fresh fight.");
+        setPhase('fighting');
+        return;
+      }
+      if (!res.ok) throw new Error(data.error || data.message || 'Upload failed');
 
       setResult(data);
       setPhase('done');
@@ -126,7 +126,7 @@ export default function CompetePage() {
       setError((err as Error).message);
       setPhase('fighting');
     }
-  }, [challenge, elapsed]);
+  }, [challenge]);
 
   const handleFileReady = useCallback((file: File) => {
     if (apiKey) {

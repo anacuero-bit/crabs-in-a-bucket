@@ -48,27 +48,52 @@ async function routes(fastify) {
       fields[key] = fieldObj.value;
     }
 
-    const { challenge_id, model, harness, time_elapsed } = fields;
+    const { fight_code, model, harness } = fields;
 
     // Auth: try API key first, fall back to user_id field (backward compat)
     let user = getUserByApiKey(request);
     if (!user && fields.user_id) {
       user = db.prepare('SELECT * FROM users WHERE id = ?').get(fields.user_id);
     }
-
-    if (!challenge_id) {
-      return reply.code(400).send({ error: 'challenge_id is required' });
-    }
-
     if (!user) {
       return reply.code(401).send({ error: 'Authentication required. Register with POST /api/register first.' });
     }
 
-    // Verify challenge exists
-    const challenge = db.prepare('SELECT * FROM challenges WHERE id = ?').get(challenge_id);
-    if (!challenge) {
-      return reply.code(404).send({ error: 'Challenge not found' });
+    if (!fight_code) {
+      return reply.code(400).send({ error: 'fight_code is required — call POST /api/fight/start to issue one' });
     }
+
+    // Validate fight code: exists, not used, deadline not past, user binding consistent.
+    const fightRow = db.prepare('SELECT * FROM fight_codes WHERE code = ?').get(fight_code);
+    if (!fightRow) {
+      return reply.code(404).send({ error: 'fight_code not recognized — start a new fight' });
+    }
+    if (fightRow.used_at) {
+      return reply.code(409).send({ error: 'fight_code already used — start a new fight' });
+    }
+    if (fightRow.user_id && fightRow.user_id !== user.id) {
+      return reply.code(403).send({ error: 'fight_code belongs to a different account' });
+    }
+
+    // 30-second grace covers upload latency + minor clock skew.
+    const nowMs = Date.now();
+    const deadlineMs = new Date(fightRow.deadline).getTime();
+    if (nowMs > deadlineMs + 30 * 1000) {
+      return reply.code(410).send({
+        error: 'time expired',
+        message: 'Your fight code expired before this submission landed. Start a new fight.',
+      });
+    }
+
+    const challenge = db.prepare('SELECT * FROM challenges WHERE id = ?').get(fightRow.challenge_id);
+    if (!challenge) {
+      return reply.code(500).send({ error: 'Challenge missing for this fight code' });
+    }
+
+    // Server-observed time_elapsed (seconds). Source of truth.
+    const issuedMs = new Date(fightRow.issued_at).getTime();
+    const timeElapsedSeconds = Math.max(0, Math.round((nowMs - issuedMs) / 1000));
+    const time_elapsed = `${timeElapsedSeconds}s`;
 
     const submissionId = crypto.randomUUID();
     const folderPath = path.join(STORAGE_DIR, submissionId);
@@ -111,9 +136,10 @@ async function routes(fastify) {
 
     // Pre-publish moderation. Fail-closed: anything other than an explicit
     // allow rejects the submission and surfaces the reason to the user.
+    // Use the rendered prompt — that's what the user actually saw.
     const moderation = await moderateSubmission({
       folderPath,
-      challengePrompt: challenge.prompt,
+      challengePrompt: fightRow.rendered_prompt,
     });
     if (!moderation.allowed) {
       fs.rmSync(folderPath, { recursive: true, force: true });
@@ -138,30 +164,48 @@ async function routes(fastify) {
       challengeCategory: challenge.category,
     });
 
-    // Insert into database
-    db.prepare(`
+    // Insert into database + consume the fight code (atomic).
+    const insertSubmission = db.prepare(`
       INSERT INTO submissions (id, challenge_id, user_id, folder_path, ai_score, ai_breakdown, model, harness, time_elapsed)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      submissionId,
-      challenge_id,
-      user.id,
-      submissionId,
-      score,
-      JSON.stringify(breakdown),
-      model || null,
-      harness || null,
-      time_elapsed || null
-    );
+    `);
+    const consumeFightCode = db.prepare(`
+      UPDATE fight_codes
+      SET used_at = datetime('now'), submission_id = ?, user_id = COALESCE(user_id, ?)
+      WHERE code = ? AND used_at IS NULL
+    `);
+    const txn = db.transaction(() => {
+      insertSubmission.run(
+        submissionId,
+        challenge.id,
+        user.id,
+        submissionId,
+        score,
+        JSON.stringify(breakdown),
+        model || null,
+        harness || null,
+        time_elapsed
+      );
+      const consume = consumeFightCode.run(submissionId, user.id, fight_code);
+      if (consume.changes === 0) {
+        throw new Error('fight_code race: already consumed by a concurrent submission');
+      }
+    });
+    try {
+      txn();
+    } catch (err) {
+      fs.rmSync(folderPath, { recursive: true, force: true });
+      return reply.code(409).send({ error: 'fight_code conflict', message: err.message });
+    }
 
     // Auto-match: try organic first, then house crab
-    let battleId = autoMatch(submissionId, challenge_id, user.id);
+    let battleId = autoMatch(submissionId, challenge.id, user.id);
     let matchError = null;
 
     if (!battleId) {
-      // No organic opponent — trigger house crab
+      // No organic opponent — trigger house crab using the rendered prompt
       try {
-        battleId = await matchWithHouseCrab(submissionId, challenge_id, challenge.prompt, challenge.category);
+        battleId = await matchWithHouseCrab(submissionId, challenge.id, fightRow.rendered_prompt, challenge.category);
       } catch (err) {
         matchError = err.message;
       }
@@ -220,11 +264,17 @@ async function routes(fastify) {
       return reply.code(500).send({ error: 'Challenge missing for submission' });
     }
 
+    // Use the rendered prompt from the original fight_code so retry matches
+    // what the user actually saw. Fall back to the raw template if no fight_code
+    // row (legacy submissions from before timer enforcement).
+    const fightRow = db.prepare('SELECT rendered_prompt FROM fight_codes WHERE submission_id = ?').get(submission.id);
+    const promptForMatch = fightRow ? fightRow.rendered_prompt : challenge.prompt;
+
     let battleId = autoMatch(submission.id, submission.challenge_id, submission.user_id);
     let matchError = null;
     if (!battleId) {
       try {
-        battleId = await matchWithHouseCrab(submission.id, submission.challenge_id, challenge.prompt, challenge.category);
+        battleId = await matchWithHouseCrab(submission.id, submission.challenge_id, promptForMatch, challenge.category);
       } catch (err) {
         matchError = err.message;
       }

@@ -80,6 +80,20 @@ function createTables() {
       FOREIGN KEY (battle_id) REFERENCES battles(id),
       UNIQUE(battle_id, voter_ip)
     );
+
+    CREATE TABLE IF NOT EXISTS fight_codes (
+      code TEXT PRIMARY KEY,
+      challenge_id TEXT NOT NULL,
+      user_id TEXT,
+      issued_at TEXT NOT NULL DEFAULT (datetime('now')),
+      deadline TEXT NOT NULL,
+      rendered_prompt TEXT NOT NULL,
+      used_at TEXT,
+      submission_id TEXT,
+      FOREIGN KEY (challenge_id) REFERENCES challenges(id),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_fight_codes_used ON fight_codes(used_at);
   `);
 }
 

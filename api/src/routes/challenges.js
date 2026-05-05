@@ -123,3 +123,4 @@ async function routes(fastify) {
 }
 
 module.exports = routes;
+module.exports.GENERIC_INSTRUCTIONS = GENERIC_INSTRUCTIONS;

@@ -36,12 +36,14 @@ API_KEY=$(echo "$REG" | jq -r .api_key)
 [ "$API_KEY" != "null" ] && [ -n "$API_KEY" ] || fail "register did not return api_key: $REG"
 ok "registered, got api_key"
 
-# 3. Random challenge
-echo "[3/6] GET /api/challenges/random"
-CHAL=$(curl -fsS "$BASE_URL/api/challenges/random") || fail "challenges/random unreachable"
-CHAL_ID=$(echo "$CHAL" | jq -r .id)
-[ "$CHAL_ID" != "null" ] && [ -n "$CHAL_ID" ] || fail "no challenge id in response"
-ok "got challenge $CHAL_ID"
+# 3. Start a fight (server issues a fight_code + deadline)
+echo "[3/6] POST /api/fight/start"
+FIGHT=$(curl -fsS -X POST "$BASE_URL/api/fight/start" \
+  -H "Content-Type: application/json" -d '{}') || fail "fight/start unreachable"
+FIGHT_CODE=$(echo "$FIGHT" | jq -r .fight_code)
+CHAL_ID=$(echo "$FIGHT" | jq -r .challenge_id)
+[ "$FIGHT_CODE" != "null" ] && [ -n "$FIGHT_CODE" ] || fail "no fight_code in response"
+ok "got fight_code $FIGHT_CODE on challenge $CHAL_ID"
 
 # 4. Build minimal submission zip
 echo "[4/6] build submission zip"
@@ -58,10 +60,9 @@ ok "zip built"
 echo "[5/6] POST /api/submissions"
 SUB=$(curl -fsS -X POST "$BASE_URL/api/submissions" \
   -H "Authorization: Bearer $API_KEY" \
-  -F "challenge_id=$CHAL_ID" \
+  -F "fight_code=$FIGHT_CODE" \
   -F "model=test" \
   -F "harness=smoke" \
-  -F "time_elapsed=0s" \
   -F "file=@$TMPDIR/sub.zip;type=application/zip") \
   || fail "submission endpoint returned non-2xx"
 BATTLE_ID=$(echo "$SUB" | jq -r .battle_id)
