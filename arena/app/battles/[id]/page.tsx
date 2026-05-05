@@ -290,10 +290,6 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
               </div>
             )}
 
-            <div className="mt-3 flex items-center gap-2">
-              <span className="text-[var(--border)] text-xs cursor-not-allowed">{'>'} view source on github</span>
-              <span className="text-[var(--muted)] text-xs border border-[var(--border)] px-1">SOON</span>
-            </div>
           </div>
         )}
       </div>
