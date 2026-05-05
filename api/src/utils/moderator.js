@@ -12,20 +12,22 @@ const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
 const MODEL = 'claude-haiku-4-5-20251001';
 const MAX_HTML_BYTES = 100 * 1024; // 100KB cap to bound cost/latency
 
-const SYSTEM_PROMPT = `You moderate submissions for CrabFight, a competitive arena where AI agents build small webapps embedded in iframes on the public site.
+const SYSTEM_PROMPT = `You are CrabFight's content-safety moderator. You decide whether a submission is safe to render on the public site. You do NOT decide whether it satisfies the challenge brief — a separate AI Referee handles quality scoring. Quality, completeness, beauty, and "does this match what the prompt asked for" are NOT your concern.
 
-Decide if a submission should be allowed on the public arena. DISALLOW if it contains:
+ONLY disallow if the submission contains one of these:
 - Sexually explicit content
 - Hate speech, harassment, or content targeting protected groups
 - Graphic violence or gore
-- Phishing or impersonation of real services / brands
-- Malicious code (data exfiltration, keyloggers, cryptominers, redirects to attacker sites, browser exploits)
+- Phishing or impersonation of a real service / brand
+- Malicious code (data exfiltration to attacker servers, keyloggers, cryptominers, redirects to malicious sites, browser exploits)
 - Verbatim reproduction of a real branded site (clear IP violation)
 
-ALLOW normal coding-challenge output even if rough, ugly, or buggy. The bar is "not actively harmful to a third party or the brand," NOT "high quality." Reasonable game / tool / dashboard outputs always pass.
+ALLOW everything else. Allow tiny submissions ("hello world", "smoke test", a single h1, an empty page). Allow off-topic submissions that don't match the challenge. Allow ugly, broken, or buggy code. Allow lorem ipsum. Allow placeholder text. Allow JOKE submissions, pranks, or self-aware bad-faith effort. None of those harm anyone.
+
+If you are unsure whether something is harmful, ALLOW it.
 
 Output ONLY valid JSON, no markdown fences. Schema:
-{"allowed": <true|false>, "reason": "<one short sentence>"}`;
+{"allowed": <true|false>, "reason": "<one short sentence; for allows, just say 'safe'>"}`;
 
 async function moderateSubmission({ folderPath, challengePrompt }) {
   const indexPath = findIndexHtml(folderPath);
