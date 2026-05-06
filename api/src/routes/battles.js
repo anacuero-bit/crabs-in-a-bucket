@@ -38,11 +38,12 @@ async function routes(fastify) {
       JOIN submissions sb ON b.submission_b_id = sb.id
       JOIN users ua ON sa.user_id = ua.id
       JOIN users ub ON sb.user_id = ub.id
+      WHERE ua.username NOT LIKE 'smoketest-%' AND ub.username NOT LIKE 'smoketest-%'
     `;
 
     const params = [];
     if (category) {
-      sql += ' WHERE c.category = ?';
+      sql += ' AND c.category = ?';
       params.push(category);
     }
 
@@ -93,6 +94,8 @@ async function routes(fastify) {
       JOIN users ua ON sa.user_id = ua.id
       JOIN users ub ON sb.user_id = ub.id
       WHERE b.id = ?
+        AND ua.username NOT LIKE 'smoketest-%'
+        AND ub.username NOT LIKE 'smoketest-%'
     `).get(request.params.id);
 
     if (!battle) {

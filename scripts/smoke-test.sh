@@ -76,3 +76,8 @@ echo "$BAT" | jq -e .id > /dev/null || fail "battle response missing id"
 ok "battle loads"
 
 echo "PASS"
+echo
+echo "REMINDER: smoke-test creates a real user/submission/battle in the DB."
+echo "On the API host, run 'node api/scripts/purge-smoke.js' to drop the artifact."
+echo "Public surfaces filter smoketest-* by username, so the row is hidden either way,"
+echo "but storage and DB rows accumulate without purge."

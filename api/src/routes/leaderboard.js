@@ -11,7 +11,7 @@ async function routes(fastify) {
         SELECT DISTINCT u.*
         FROM users u
         JOIN submissions s ON s.user_id = u.id
-        WHERE 1=1
+        WHERE u.username NOT LIKE 'smoketest-%'
       `;
       const params = [];
 
@@ -31,7 +31,7 @@ async function routes(fastify) {
     }
 
     // Default: all users sorted by rating
-    const users = db.prepare('SELECT * FROM users ORDER BY rating DESC').all();
+    const users = db.prepare(`SELECT * FROM users WHERE username NOT LIKE 'smoketest-%' ORDER BY rating DESC`).all();
     return users;
   });
 }
