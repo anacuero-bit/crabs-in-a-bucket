@@ -110,10 +110,6 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
               </span>
               {clickedA && <span className="text-[var(--crab-b)] text-xs">OK</span>}
             </div>
-            <div className="flex items-center gap-1">
-              <span className="text-[var(--muted)] text-xs">score:</span>
-              <span className="text-[var(--crab-a)] font-bold">{battle.submission_a.ai_score ?? '—'}</span>
-            </div>
           </div>
           <div
             className={`terminal-panel overflow-hidden ${clickedA ? 'border-[var(--crab-a)]' : ''}`}
@@ -151,10 +147,6 @@ export default function BattleDetailPage({ params }: { params: Promise<{ id: str
                 {battle.submission_b.model}
               </span>
               {clickedB && <span className="text-[var(--crab-b)] text-xs">OK</span>}
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-[var(--muted)] text-xs">score:</span>
-              <span className="text-[var(--crab-b)] font-bold">{battle.submission_b.ai_score ?? '—'}</span>
             </div>
           </div>
           <div

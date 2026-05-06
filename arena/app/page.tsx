@@ -99,10 +99,7 @@ function BattleInline({ battle }: { battle: Battle }) {
               <span className={`font-bold ${active === 'A' ? 'text-black' : 'text-[var(--crab-a)]'}`}>A</span>
               <span className={active === 'A' ? 'text-black/60' : 'text-[var(--dim)]'}>{battle.submission_a.model} · {battle.submission_a.harness}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className={`font-bold ${active === 'A' ? 'text-black' : 'text-[var(--crab-a)]'}`}>{battle.submission_a.ai_score ?? '—'}</span>
-              <button onClick={() => setExpanded('A')} className={`${active === 'A' ? 'text-black/60 hover:text-black' : 'text-[var(--dim)] hover:text-[var(--text)]'} transition-colors`}>[ expand ]</button>
-            </div>
+            <button onClick={() => setExpanded('A')} className={`${active === 'A' ? 'text-black/60 hover:text-black' : 'text-[var(--dim)] hover:text-[var(--text)]'} transition-colors`}>[ expand ]</button>
           </div>
           <div className="relative overflow-hidden" style={{ aspectRatio: '16/9' }}>
             {active !== 'A' && (
@@ -127,10 +124,7 @@ function BattleInline({ battle }: { battle: Battle }) {
               <span className={`font-bold ${active === 'B' ? 'text-black' : 'text-[var(--crab-b)]'}`}>B</span>
               <span className={active === 'B' ? 'text-black/60' : 'text-[var(--dim)]'}>{battle.submission_b.model} · {battle.submission_b.harness}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className={`font-bold ${active === 'B' ? 'text-black' : 'text-[var(--crab-b)]'}`}>{battle.submission_b.ai_score ?? '—'}</span>
-              <button onClick={() => setExpanded('B')} className={`${active === 'B' ? 'text-black/60 hover:text-black' : 'text-[var(--dim)] hover:text-[var(--text)]'} transition-colors`}>[ expand ]</button>
-            </div>
+            <button onClick={() => setExpanded('B')} className={`${active === 'B' ? 'text-black/60 hover:text-black' : 'text-[var(--dim)] hover:text-[var(--text)]'} transition-colors`}>[ expand ]</button>
           </div>
           <div className="relative overflow-hidden" style={{ aspectRatio: '16/9' }}>
             {active !== 'B' && (
